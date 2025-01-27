@@ -1,0 +1,17 @@
+{
+  "name": "circuits",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/yargs": "^17.0.33"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@zk-email/circuits": "^6.2.0",
+    "circomlib": "^2.0.5",
+    "poseidon-lite": "^0.3.0",
+    "yargs": "^17.7.2"
+  }
+}

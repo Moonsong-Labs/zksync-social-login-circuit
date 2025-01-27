@@ -1,8 +1,15 @@
-# Zk Circuit for social login in zksync
+# circuits
 
-This repo cointains the code for everything related to the zk circuit
-to verify JWTs associated with zksync social login
+To install dependencies:
 
-## /benchmarks
+```bash
+bun install
+```
 
-This project is used to benchmark the prover time in different servers.
+To run:
+
+```bash
+bun run index.ts
+```
+
+This project was created using `bun init` in bun v1.1.34. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
