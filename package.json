@@ -1,9 +1,14 @@
 {
   "name": "circuits",
   "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "tool": "tsx tooling/main.ts"
+  },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/yargs": "^17.0.33"
+    "@types/node": "^22.13.1",
+    "@types/yargs": "^17.0.33",
+    "tsx": "^4.19.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

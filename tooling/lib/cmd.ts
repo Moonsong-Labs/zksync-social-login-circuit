@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process"
 import { join } from "node:path"
 
-const thisDir = import.meta.dir
+const thisDir = import.meta.dirname
 
 export async function cmd(strCmd: string): Promise<void> {
   const [first, ...rest] = strCmd.split(/\s+/)

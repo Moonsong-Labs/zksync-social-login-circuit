@@ -6,7 +6,7 @@ import { witnessCommand } from './witness.ts';
 import { zkeyCommand } from './zkey.ts';
 import { downloadPtau } from './download-ptau.ts';
 
-const thisDir = import.meta.dir
+const thisDir = import.meta.dirname
 
 const baseDir = path.join(thisDir, '..')
 
@@ -17,7 +17,7 @@ let FILE_ARG_DEF = {
   }
 } as const;
 
-await yargs(process.argv.slice(2))
+const args = yargs(process.argv.slice(2))
     .scriptName('tooling')
     .command('compile <file>', 'compiles circuit to wasm, sym and r1cs', FILE_ARG_DEF, async (argv) => {
       await compileCmd(argv.file)
@@ -56,4 +56,10 @@ await yargs(process.argv.slice(2))
 
     .strictCommands()
     .demandCommand(1)
-    .parseAsync()
+    // .parseAsync()
+
+async function main() {
+  await args.parseAsync()
+}
+
+main().catch(console.error)
