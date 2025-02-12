@@ -89,3 +89,32 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
     signal audStartIndex <== audKeyStartIndex + audKeyLength + 1;
     aud <== RevealSubstring(maxPayloadLength, maxAudLength, 0)(payload, audStartIndex, audLength);
 }
+
+
+/// @title ExtractSub
+/// @notice Extracts and validates the 'sub' (Subject) from JWT payload
+/// @param maxPayloadLength Maximum length of JWT payload
+/// @param maxSubLength Maximum length of sub value in bytes
+/// @input payload[maxPayloadLength] JWT payload bytes
+/// @input subKeyStartIndex Starting index of 'sub' field
+/// @input subLength Length of sub value
+/// @output sub[maxSubLength] sub as array of bytes
+template ExtractSub(maxPayloadLength, maxSubLength) {
+    signal input payload[maxPayloadLength];
+    signal input subKeyStartIndex;
+    signal input subLength;
+
+    signal output sub[maxSubLength];
+
+    // Verify if the key `sub` in the payload is unique
+    var subKeyLength = SUB_KEY_LENGTH();
+    var subKey[subKeyLength] = SUB_KEY();
+    signal subKeyMatch[subKeyLength] <== RevealSubstring(maxPayloadLength, subKeyLength, 1)(payload, subKeyStartIndex, subKeyLength);
+    for (var i = 0; i < subKeyLength; i++) {
+        subKeyMatch[i] === subKey[i];
+    }
+
+    // Reveal the sub in the payload
+    signal subStartIndex <== subKeyStartIndex + subKeyLength + 1;
+    sub <== RevealSubstring(maxPayloadLength, maxSubLength, 0)(payload, subStartIndex, subLength);
+}
