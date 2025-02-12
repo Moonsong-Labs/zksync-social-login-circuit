@@ -41,7 +41,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 /// @input payload[maxPayloadLength] JWT payload bytes
 /// @input issKeyStartIndex Starting index of 'iss' field
 /// @input issLength Length of issuer value
-/// @output iss[compute_ints_size(maxIssLength)] Issuer as array of field elements
+/// @output iss[maxIssLength] iss as array of bytes
 template ExtractIssuer(maxPayloadLength, maxIssLength) {
     signal input payload[maxPayloadLength];
     signal input issKeyStartIndex;
@@ -60,4 +60,32 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
     // Reveal the iss in the payload
     signal issStartIndex <== issKeyStartIndex + issKeyLength + 1;
     iss <== RevealSubstring(maxPayloadLength, maxIssLength, 0)(payload, issStartIndex, issLength);
+}
+
+/// @title ExtractAud
+/// @notice Extracts and validates the 'aud' (Audience) from JWT payload
+/// @param maxPayloadLength Maximum length of JWT payload
+/// @param maxAudLength Maximum length of aud value in bytes
+/// @input payload[maxPayloadLength] JWT payload bytes
+/// @input audKeyStartIndex Starting index of 'aud' field
+/// @input audLength Length of aud value
+/// @output aud[maxAudLength] aud as array of bytes
+template ExtractAud(maxPayloadLength, maxAudLength) {
+    signal input payload[maxPayloadLength];
+    signal input audKeyStartIndex;
+    signal input audLength;
+
+    signal output aud[maxAudLength];
+
+    // Verify if the key `aud` in the payload is unique
+    var audKeyLength = AUD_KEY_LENGTH();
+    var audKey[audKeyLength] = AUD_KEY();
+    signal audKeyMatch[audKeyLength] <== RevealSubstring(maxPayloadLength, audKeyLength, 1)(payload, audKeyStartIndex, audKeyLength);
+    for (var i = 0; i < audKeyLength; i++) {
+        audKeyMatch[i] === audKey[i];
+    }
+
+    // Reveal the aud in the payload
+    signal audStartIndex <== audKeyStartIndex + audKeyLength + 1;
+    aud <== RevealSubstring(maxPayloadLength, maxAudLength, 0)(payload, audStartIndex, audLength);
 }

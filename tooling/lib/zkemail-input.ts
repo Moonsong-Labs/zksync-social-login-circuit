@@ -1,7 +1,7 @@
 import { ok } from "node:assert";
 
 import { CircomBigInt } from "./circom-big-int.ts";
-import { MAX_ISS_LENGTH, MAX_NONCE_LENGTH } from "./constants.ts";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_NONCE_LENGTH } from "./constants.ts";
 import type { CircuitInput } from "./types.ts";
 
 type Payload = {
@@ -23,6 +23,9 @@ type ZkEmailInputData = {
   issKeyStartIndex: string;
   issLength: string;
   expectedIss: string[];
+  audKeyStartIndex: string;
+  audLength: string;
+  expectedAud: string[];
 };
 
 function prepareMessage(
@@ -94,6 +97,9 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       issKeyStartIndex: this.issKeyStartIndex(),
       issLength: this.issLength(),
       expectedIss: this.expectedIss(),
+      audKeyStartIndex: this.audKeyStartIndex(),
+      audLength: this.audLength(),
+      expectedAud: this.expectedAud(),
     };
   }
 
@@ -123,6 +129,20 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
 
   private expectedIss(): string[] {
     return this.buildCircomExpectedValue(this.payload().iss, MAX_ISS_LENGTH);
+  }
+
+  // aud
+
+  private audKeyStartIndex(): string {
+    return this.findSubstringIndexForPayload("\"aud\":");
+  }
+
+  private audLength(): string {
+    return this.buildCircomStringLength(this.payload().aud);
+  }
+
+  private expectedAud(): string[] {
+    return this.buildCircomExpectedValue(this.payload().aud, AUD_MAX_LENGTH);
   }
 
   // Helpers

@@ -31,7 +31,8 @@ template JWTVerifier(
     maxMessageLength,
     maxB64PayloadLength,
     maxNonceLength,
-    maxIssLength
+    maxIssLength,
+    maxAudLength
 ) {
     signal input message[maxMessageLength]; // JWT message (header + payload)
     signal input messageLength; // Length of the message signed in the JWT
@@ -47,11 +48,16 @@ template JWTVerifier(
     signal input issLength; // Real length for iss value.
     signal input expectedIss[maxIssLength]; // Expected value for iss.
 
+    signal input audKeyStartIndex; // Index for '"aud":' substring in payload
+    signal input audLength; // Real length for aud value.
+    signal input expectedAud[maxAudLength]; // Expected value for aud.
+
     var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
     signal payload[maxPayloadLength];
     signal nonce[maxNonceLength];
     signal iss[maxIssLength];
+    signal aud[maxAudLength];
 
 
     // Check signature over JWT and extract payload
@@ -70,8 +76,10 @@ template JWTVerifier(
 
     nonce <== ExtractNonce(maxPayloadLength, maxNonceLength)(payload, nonceKeyStartIndex, nonceLength);
     iss <== ExtractIssuer(maxPayloadLength, maxIssLength)(payload, issKeyStartIndex, issLength);
+    aud <== ExtractAud(maxPayloadLength, maxAudLength)(payload, audKeyStartIndex, audLength);
     nonce === expectedNonce;
     iss === expectedIss;
+    aud === expectedAud;
 }
 
 component main = JWTVerifier(
@@ -80,5 +88,6 @@ component main = JWTVerifier(
     1024,
     1024,
     64,
-    32
+    32,
+    100
 );
