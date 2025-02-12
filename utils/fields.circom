@@ -31,3 +31,33 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
     signal nonceStartIndex <== nonceKeyStartIndex + nonceKeyLength + 1;
     nonce <== RevealSubstring(maxPayloadLength, maxNonceLength, 0)(payload, nonceStartIndex, nonceLength);
 }
+
+
+
+/// @title ExtractIssuer
+/// @notice Extracts and validates the 'iss' (Issuer) from JWT payload
+/// @param maxPayloadLength Maximum length of JWT payload
+/// @param maxIssLength Maximum length of issuer value in bytes
+/// @input payload[maxPayloadLength] JWT payload bytes
+/// @input issKeyStartIndex Starting index of 'iss' field
+/// @input issLength Length of issuer value
+/// @output iss[compute_ints_size(maxIssLength)] Issuer as array of field elements
+template ExtractIssuer(maxPayloadLength, maxIssLength) {
+    signal input payload[maxPayloadLength];
+    signal input issKeyStartIndex;
+    signal input issLength;
+
+    signal output iss[maxIssLength];
+
+    // Verify if the key `iss` in the payload is unique
+    var issKeyLength = ISS_KEY_LENGTH();
+    var issKey[issKeyLength] = ISS_KEY();
+    signal issKeyMatch[issKeyLength] <== RevealSubstring(maxPayloadLength, issKeyLength, 1)(payload, issKeyStartIndex, issKeyLength);
+    for (var i = 0; i < issKeyLength; i++) {
+        issKeyMatch[i] === issKey[i];
+    }
+
+    // Reveal the iss in the payload
+    signal issStartIndex <== issKeyStartIndex + issKeyLength + 1;
+    iss <== RevealSubstring(maxPayloadLength, maxIssLength, 0)(payload, issStartIndex, issLength);
+}
