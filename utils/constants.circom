@@ -63,11 +63,6 @@ function INVITATION_CODE_LENGTH() {
     return 64;
 }
 
-function SUB_VALUE_LENGTH() {
-    // length of the "sub" field in JWT which identifies an unique user
-    return 21;
-}
-
 function JWT_TYP() {
     // "typ":"JWT"
     return [34, 116, 121, 112, 34, 58, 34, 74, 87, 84, 34];
