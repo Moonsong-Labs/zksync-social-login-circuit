@@ -9,6 +9,7 @@ include "@zk-email/circuits/lib/rsa.circom";
 include "@zk-email/circuits/lib/base64.circom";
 include "./utils/bytes.circom";
 include "./utils/array.circom";
+include "./utils/fields.circom";
 
 /// @title JWTVerifier
 /// @notice Verifies JWT signatures and extracts header/payload components
@@ -37,13 +38,17 @@ template JWTVerifier(
     k,
     maxMessageLength,
     maxB64HeaderLength,
-    maxB64PayloadLength
+    maxB64PayloadLength,
+    maxNonceLength
 ) {
     signal input message[maxMessageLength]; // JWT message (header + payload)
     signal input messageLength; // Length of the message signed in the JWT
     signal input pubkey[k]; // RSA public key split into k chunks
     signal input signature[k]; // RSA signature split into k chunks
     signal input periodIndex; // Index of the period in the JWT message
+    signal input nonceKeyStartIndex; // Index for '"nonce":' substring in paylaoad
+    signal input nonceLength; // Length for nonce.
+    signal input expectedNonce[maxNonceLength];
 
     var maxHeaderLength = (maxB64HeaderLength * 3) \ 4;
     var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
@@ -99,7 +104,13 @@ template JWTVerifier(
     signal b64Payload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageLength, maxB64PayloadLength)(message, b64HeaderLength + 1, b64PayloadLength);
 
     payload <== Base64Decode(maxPayloadLength)(b64Payload);
-    payload[0] === 123;
+
+    component extractNonce = ExtractNonce(maxPayloadLength, maxNonceLength);
+    extractNonce.payload <== payload;
+    extractNonce.nonceKeyStartIndex <== nonceKeyStartIndex;
+    extractNonce.nonceLength <== nonceLength;
+
+    extractNonce.nonce === expectedNonce;
 }
 
 component main = JWTVerifier(
@@ -107,5 +118,6 @@ component main = JWTVerifier(
     17,
     1024,
     512,
-    1024
+    1024,
+    64
 );
