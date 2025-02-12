@@ -97,16 +97,35 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
     };
   }
 
-  private nonceKeyStartIndex(): string {
-    const payload = this.rawJWT.split(".")[1];
-    const rawJson = Buffer.from(payload, "base64url").toString("utf8");
-    const nonceIndex = rawJson.indexOf("\"nonce\":");
-    if (nonceIndex === -1) {
-      throw new Error("Missing nonce key inside JWT payload");
-    }
+  // nonce
 
-    return nonceIndex.toString();
+  private nonceKeyStartIndex(): string {
+    return this.findSubstringIndexForPayload("\"nonce\":");
   }
+
+  private nonceLength(): string {
+    return this.buildCircomStringLength(this.payload().nonce);
+  }
+
+  private expectedNonce(): string[] {
+    return this.buildCircomExpectedValue(this.payload().nonce, MAX_NONCE_LENGTH);
+  }
+
+  // iss
+
+  private issKeyStartIndex() {
+    return this.findSubstringIndexForPayload("\"iss\":");
+  }
+
+  private issLength(): string {
+    return this.buildCircomStringLength(this.payload().iss);
+  }
+
+  private expectedIss(): string[] {
+    return this.buildCircomExpectedValue(this.payload().iss, MAX_ISS_LENGTH);
+  }
+
+  // Helpers
 
   private payload(): Payload {
     const payload = this.rawJWT.split(".")[1];
@@ -126,39 +145,23 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
     return json;
   }
 
-  private nonceLength(): string {
-    const nonce = this.payload().nonce;
-    return Buffer.from(nonce, "ascii").byteLength.toString();
-  }
-
-  private expectedNonce(): string[] {
-    const nonce = this.payload().nonce;
-    const res = Buffer.alloc(MAX_NONCE_LENGTH);
-    res.write(nonce, "ascii");
-
+  private buildCircomExpectedValue(value: string, maxLength: number): string[] {
+    const res = Buffer.alloc(maxLength);
+    res.write(value, "ascii");
     return Array.from(res).map((byte) => byte.toString());
   }
 
-  private issKeyStartIndex() {
+  private buildCircomStringLength(value: string): string {
+    return Buffer.from(value, "ascii").byteLength.toString();
+  }
+
+  private findSubstringIndexForPayload(value: string): string {
     const payload = this.rawJWT.split(".")[1];
     const rawJson = Buffer.from(payload, "base64url").toString("utf8");
-    const nonceIndex = rawJson.indexOf("\"iss\":");
-    if (nonceIndex === -1) {
-      throw new Error("Missing nonce key inside JWT payload");
+    const valueIndex = rawJson.indexOf(value);
+    if (valueIndex === -1) {
+      throw new Error(`Missing ${value} inside JWT payload`);
     }
-
-    return nonceIndex.toString();
-  }
-
-  private issLength(): string {
-    const nonce = this.payload().iss;
-    return Buffer.from(nonce, "ascii").byteLength.toString();
-  }
-
-  private expectedIss(): string[] {
-    const iss = this.payload().iss;
-    const res = Buffer.alloc(MAX_ISS_LENGTH);
-    res.write(iss, "ascii");
-    return Array.from(res).map((byte) => byte.toString());
+    return valueIndex.toString();
   }
 }
