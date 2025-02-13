@@ -1,12 +1,16 @@
 {
   "name": "zksync-sso-circuits",
-  "module": "index.ts",
+  "description": "ZKsync Smart Sign On Zk circuits",
+  "version": "0.0.0-development",
   "type": "module",
-  "main": "dist/lib.js",
-  "types": "dist/lib.d.ts",
+  "main": "./dist/_cjs/index.js",
+  "module": "./dist/_esm/index.js",
+  "types": "./dist/_types/index.d.ts",
   "exports": {
     ".": {
-
+      "types": "./dist/_types/index.d.ts",
+      "import": "./dist/_esm/index.js",
+      "require": "./dist/_cjs/index.js"
     }
   },
   "scripts": {
