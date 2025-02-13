@@ -1,3 +1,4 @@
+import { ByteVector } from "./byte-vector.ts";
 import { CIRCOM_BIGINT_K, CIRCOM_BIGINT_N } from "./constants.ts";
 
 export class CircomBigInt {
@@ -8,12 +9,12 @@ export class CircomBigInt {
   }
 
   static fromBase64(base64Str: string): CircomBigInt {
-    const buf = Buffer.from(base64Str, "base64");
-    return this.fromBuffer(buf);
+    const vector = ByteVector.fromBase64String(base64Str);
+    return this.fromByteVector(vector);
   }
 
-  static fromBuffer(buf: Buffer): CircomBigInt {
-    return new CircomBigInt(BigInt(`0x${buf.toString("hex")}`));
+  static fromByteVector(buf: ByteVector): CircomBigInt {
+    return new CircomBigInt(buf.toBigInt());
   }
 
   serialize(): string[] {

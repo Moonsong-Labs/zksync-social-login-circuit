@@ -1,3 +1,4 @@
+import { ByteVector } from "./byte-vector.ts";
 import { CircomBigInt } from "./circom-big-int.ts";
 import { NUM_BLOCKS } from "./constants.ts";
 import type { BinStr, CircuitInput } from "./types.ts";
@@ -24,7 +25,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   private payload: string;
   private signature: string;
   private pubkey: string;
-  private msg: Buffer;
+  private msg: ByteVector;
 
   constructor(rawJWT: string, jwkModulus: string) {
     const [headers, payload, signature] = rawJWT.split(".");
@@ -32,7 +33,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
     this.payload = payload;
     this.signature = signature;
     this.pubkey = jwkModulus;
-    this.msg = Buffer.from(`${this.headers}.${this.payload}`, "utf8");
+    this.msg = ByteVector.fromAsciiString(`${this.headers}.${this.payload}`);
   }
 
   toObject(): MainInputData {
@@ -52,7 +53,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   }
 
   private formatMsgBytes(): string[] {
-    return Array.from(this.msg).map((byte) => byte.toString());
+    return this.msg.toCircomNumberArray();
   }
 
   private buildBlocksFromMsg(): BinStr[][] {
@@ -62,7 +63,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
 
     const blocks: BinStr[][] = this.emptyMsg();
 
-    Array.from(this.msg).forEach((byte, byteN) => {
+    this.msg.bytes().forEach((byte, byteN) => {
       const blockN = Math.floor(byteN / 64);
       const start = byteN % 64;
 
@@ -93,11 +94,12 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
     // K is an amount of zeros
     // We want to add a 64 bit number at the end. That's the reason for the 448 (512 - 65 === 558)
     // L + 1 + K = 448 (mod 512)
-
     // L is a 64 bit number
-    const L = Buffer.alloc(8);
-    L.writeBigUint64BE(BigInt(this.msg.byteLength * 8));
-    const encodedL = Array.from(L).flatMap((byte) => this.byteTo8digits(byte));
+    const L = BigInt(this.msg.byteLength * 8);
+    const encodedL = ByteVector.fromBigInt(L)
+      .padLeft(0, 8)
+      .toCircomBinary();
+
     const finalBlock = firstEmptyBit % 512 < 448 ? lastBlock : lastBlock + 1;
 
     // We append the length at the end of the final block.
@@ -109,12 +111,8 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
     return (finalBlock + 1).toString();
   }
 
-  private byteTo8digits(byte: number): BinStr[] {
-    return byte.toString(2).padStart(8, "0").split("") as BinStr[];
-  }
-
   private nonceKeyStartIndex(): string {
-    const rawJson = Buffer.from(this.payload, "base64url").toString("utf8");
+    const rawJson = ByteVector.fromBase64String(this.payload).toAsciiStr();
     const nonceIndex = rawJson.indexOf("\"nonce\":");
     if (nonceIndex !== -1) {
       throw new Error("Missing nonce key inside JWT payload");
@@ -124,7 +122,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   }
 
   private nonceLength(): string {
-    const rawJson = Buffer.from(this.payload, "base64url").toString("utf8");
+    const rawJson = ByteVector.fromBase64String(this.payload).toAsciiStr();
     const json = JSON.parse(rawJson);
 
     if (!Object.hasOwn(json, "nonce")) {

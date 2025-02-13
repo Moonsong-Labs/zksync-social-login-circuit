@@ -1,4 +1,5 @@
 import { intoChunks } from "./utils.ts";
+import type { BinStr } from "./types.ts";
 
 export class ByteVector {
   private vec: number[];
@@ -21,6 +22,45 @@ export class ByteVector {
     return new ByteVector(asciiCodes);
   }
 
+  static fromBase64String(data: string): ByteVector {
+    const decoded = btoa(data);
+    return this.fromAsciiString(decoded);
+  }
+
+  static fromBigInt(n: bigint): ByteVector {
+    let current = n;
+    const mask = 255n;
+    const data = [];
+    while (current > 0n) {
+      const byte = current & mask;
+      data.push(Number(byte));
+      current = current >> 8n;
+    }
+    return new ByteVector(data.reverse());
+  }
+
+  padLeft(filling: number, finalSize: number): ByteVector {
+    const newSize = finalSize - this.vec.length;
+    const arr = new Array<number>(newSize);
+    arr.fill(filling);
+    return new ByteVector([...arr, this.vec.length]);
+  }
+
+  padRight(filling: number, finalSize: number): ByteVector {
+    const newSize = finalSize - this.vec.length;
+    const arr = new Array<number>(newSize);
+    arr.fill(filling);
+    return new ByteVector([this.vec.length, ...arr]);
+  }
+
+  toCircomBinary(): BinStr[] {
+    return this.vec.flatMap((byte) => this.byteTo8digits(byte));
+  }
+
+  private byteTo8digits(byte: number): BinStr[] {
+    return byte.toString(2).padStart(8, "0").split("") as BinStr[];
+  }
+
   toFieldArray(): bigint[] {
     const chunks = intoChunks(this.vec, 31)
       .map((chunk) => new ByteVector(chunk))
@@ -35,5 +75,38 @@ export class ByteVector {
     });
 
     return parts.reduce((a, b) => a + b);
+  }
+
+  get byteLength(): number {
+    return this.vec.length;
+  }
+
+  get length(): number {
+    return this.byteLength;
+  }
+
+  toCircomNumberArray(): string[] {
+    return this.vec.map((byte) => byte.toString());
+  }
+
+  bytes(): number[] {
+    return [...this.vec];
+  }
+
+  toAsciiStr(): string {
+    const buf = new Uint8Array(this.vec.length);
+    for (let i = 0; i < this.vec.length; i++) {
+      buf[i] = this.vec[i];
+    }
+    return new TextDecoder("ascii").decode(buf);
+  }
+
+  pushLast(newElement: number): void {
+    this.vec.push(newElement);
+  }
+
+  append(encodedL: ByteVector): ByteVector {
+    const vec = [...this.vec, ...encodedL.vec];
+    return new ByteVector(vec);
   }
 }
