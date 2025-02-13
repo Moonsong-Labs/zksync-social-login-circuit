@@ -1,28 +1,6 @@
 import { FIELD_BYTES } from "./constants.ts";
 import type { BinStr } from "./types.ts";
-import { intoChunks } from "./utils.ts";
-
-function base64UrlDecode(base64UrlString: string) {
-  // 1. Replace URL-unsafe characters with standard base64 characters
-  let base64 = base64UrlString.replace(/-/g, "+").replace(/_/g, "/");
-
-  // 2. Add padding if necessary (atob() requires correctly padded input)
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-
-  // 3. Decode the base64 string
-  const binaryString = atob(base64);
-
-  // 4. Convert the binary string to a Uint8Array
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  return bytes;
-}
+import { base64UrlDecode, intoChunks } from "./utils.ts";
 
 export class ByteVector {
   private vec: number[];
