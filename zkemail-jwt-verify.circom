@@ -16,6 +16,10 @@ include "./utils/jwt-verify.circom";
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
 /// @param maxMessageLength Maximum JWT string length (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
+/// @param maxNonceLength
+/// @param maxIssLength
+/// @param maxAudLength
+/// @param maxSubLength
 /// @input message[maxMessageLength] JWT string (header.payload)
 /// @input messageLength Actual length of JWT string
 /// @input pubkey[k] RSA public key in k chunks
@@ -24,27 +28,46 @@ include "./utils/jwt-verify.circom";
 /// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
+/// @input issKeyStartIndex Index for '"iss":' substring in payload
 template JWTVerifier(
     n,
     k,
     maxMessageLength,
     maxB64PayloadLength,
-    maxNonceLength
+    maxNonceLength,
+    maxIssLength,
+    maxAudLength,
+    maxSubLength
 ) {
     signal input message[maxMessageLength]; // JWT message (header + payload)
     signal input messageLength; // Length of the message signed in the JWT
     signal input pubkey[k]; // RSA public key split into k chunks
     signal input signature[k]; // RSA signature split into k chunks
     signal input periodIndex; // Index of the period in the JWT message
+
     signal input nonceKeyStartIndex; // Index for '"nonce":' substring in paylaoad
     signal input nonceLength; // Length for nonce.
-    signal input expectedNonce[maxNonceLength];
+    signal input expectedNonce[maxNonceLength]; // Expected value for nonce
+
+    signal input issKeyStartIndex; // Index for '"iss":' substring in payload
+    signal input issLength; // Real length for iss value.
+    signal input expectedIss[maxIssLength]; // Expected value for iss.
+
+    signal input audKeyStartIndex; // Index for '"aud":' substring in payload
+    signal input audLength; // Real length for aud value.
+    signal input expectedAud[maxAudLength]; // Expected value for aud.
+
+    signal input subKeyStartIndex; // Index for '"sub":' substring in payload
+    signal input subLength; // Real length for sub value.
+    signal input expectedSub[maxSubLength]; // Expected value for sub.
 
     var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
     signal payload[maxPayloadLength];
     signal nonce[maxNonceLength];
-
+    signal iss[maxIssLength];
+    signal aud[maxAudLength];
+    signal sub[maxSubLength];
 
     // Check signature over JWT and extract payload
     payload <== JwtVerify(
@@ -60,8 +83,17 @@ template JWTVerifier(
       periodIndex
     );
 
+    // Extract all data from jwt payload
     nonce <== ExtractNonce(maxPayloadLength, maxNonceLength)(payload, nonceKeyStartIndex, nonceLength);
+    iss <== ExtractIssuer(maxPayloadLength, maxIssLength)(payload, issKeyStartIndex, issLength);
+    aud <== ExtractAud(maxPayloadLength, maxAudLength)(payload, audKeyStartIndex, audLength);
+    sub <== ExtractSub(maxPayloadLength, maxSubLength)(payload, subKeyStartIndex, subLength);
+
+    // Temporal simple checks
     nonce === expectedNonce;
+    iss === expectedIss;
+    aud === expectedAud;
+    sub === expectedSub;
 }
 
 component main = JWTVerifier(
@@ -69,5 +101,8 @@ component main = JWTVerifier(
     17,
     1024,
     1024,
-    64
+    64,
+    32,
+    100,
+    32
 );

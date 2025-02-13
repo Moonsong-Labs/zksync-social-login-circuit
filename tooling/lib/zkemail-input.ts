@@ -1,8 +1,15 @@
 import { ok } from "node:assert";
 
 import { CircomBigInt } from "./circom-big-int.ts";
-import { MAX_NONCE_LENGTH } from "./constants.ts";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
 import type { CircuitInput } from "./types.ts";
+
+type Payload = {
+  nonce: string;
+  iss: string;
+  aud: string;
+  sub: string;
+};
 
 type ZkEmailInputData = {
   message: string[];
@@ -13,6 +20,15 @@ type ZkEmailInputData = {
   nonceKeyStartIndex: string;
   nonceLength: string;
   expectedNonce: string[];
+  issKeyStartIndex: string;
+  issLength: string;
+  expectedIss: string[];
+  audKeyStartIndex: string;
+  audLength: string;
+  expectedAud: string[];
+  subKeyStartIndex: string;
+  subLength: string;
+  expectedSub: string[];
 };
 
 function prepareMessage(
@@ -81,46 +97,111 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
       nonceLength: this.nonceLength(),
       expectedNonce: this.expectedNonce(),
+      issKeyStartIndex: this.issKeyStartIndex(),
+      issLength: this.issLength(),
+      expectedIss: this.expectedIss(),
+      audKeyStartIndex: this.audKeyStartIndex(),
+      audLength: this.audLength(),
+      expectedAud: this.expectedAud(),
+      subKeyStartIndex: this.subKeyStartIndex(),
+      subLength: this.subLength(),
+      expectedSub: this.expectedSub(),
     };
   }
 
-  private nonceKeyStartIndex(): string {
-    const payload = this.rawJWT.split(".")[1];
-    const rawJson = Buffer.from(payload, "base64url").toString("utf8");
-    const nonceIndex = rawJson.indexOf("\"nonce\":");
-    if (nonceIndex === -1) {
-      throw new Error("Missing nonce key inside JWT payload");
-    }
+  // nonce
 
-    return nonceIndex.toString();
+  private nonceKeyStartIndex(): string {
+    return this.findSubstringIndexForPayload("\"nonce\":");
   }
 
-  private extractNonce(): string {
+  private nonceLength(): string {
+    return this.buildCircomStringLength(this.payload().nonce);
+  }
+
+  private expectedNonce(): string[] {
+    return this.buildCircomExpectedValue(this.payload().nonce, MAX_NONCE_LENGTH);
+  }
+
+  // iss
+
+  private issKeyStartIndex() {
+    return this.findSubstringIndexForPayload("\"iss\":");
+  }
+
+  private issLength(): string {
+    return this.buildCircomStringLength(this.payload().iss);
+  }
+
+  private expectedIss(): string[] {
+    return this.buildCircomExpectedValue(this.payload().iss, MAX_ISS_LENGTH);
+  }
+
+  // aud
+
+  private audKeyStartIndex(): string {
+    return this.findSubstringIndexForPayload("\"aud\":");
+  }
+
+  private audLength(): string {
+    return this.buildCircomStringLength(this.payload().aud);
+  }
+
+  private expectedAud(): string[] {
+    return this.buildCircomExpectedValue(this.payload().aud, AUD_MAX_LENGTH);
+  }
+
+  // sub
+
+  private subKeyStartIndex(): string {
+    return this.findSubstringIndexForPayload("\"sub\":");
+  }
+
+  private subLength(): string {
+    return this.buildCircomStringLength(this.payload().sub);
+  }
+
+  private expectedSub(): string[] {
+    return this.buildCircomExpectedValue(this.payload().sub, SUB_MAX_LENGTH);
+  }
+
+  // Helpers
+
+  private payload(): Payload {
     const payload = this.rawJWT.split(".")[1];
     const rawJson = Buffer.from(payload, "base64url").toString("utf8");
     const json = JSON.parse(rawJson);
 
-    if (!Object.hasOwn(json, "nonce")) {
-      throw new Error("Missing nonce insidde JWT payload");
+    for (const prop of ["nonce", "iss", "aud", "sub"]) {
+      if (!Object.hasOwn(json, prop)) {
+        throw new Error(`Missing '${prop}' inside JWT payload`);
+      }
+
+      if (typeof json[prop] !== "string") {
+        throw new Error(`Property '${prop}' inside JWT is not a string`);
+      }
     }
 
-    if (typeof json.nonce !== "string") {
-      throw new Error("nonce inside JWT is not a string");
-    }
-    return json.nonce.toString();
+    return json;
   }
 
-  private nonceLength(): string {
-    const nonce = this.extractNonce();
-
-    return Buffer.from(nonce, "ascii").byteLength.toString();
-  }
-
-  private expectedNonce(): string[] {
-    const nonce = this.extractNonce();
-    const res = Buffer.alloc(MAX_NONCE_LENGTH);
-    res.write(nonce, "ascii");
-
+  private buildCircomExpectedValue(value: string, maxLength: number): string[] {
+    const res = Buffer.alloc(maxLength);
+    res.write(value, "ascii");
     return Array.from(res).map((byte) => byte.toString());
+  }
+
+  private buildCircomStringLength(value: string): string {
+    return Buffer.from(value, "ascii").byteLength.toString();
+  }
+
+  private findSubstringIndexForPayload(value: string): string {
+    const payload = this.rawJWT.split(".")[1];
+    const rawJson = Buffer.from(payload, "base64url").toString("utf8");
+    const valueIndex = rawJson.indexOf(value);
+    if (valueIndex === -1) {
+      throw new Error(`Missing ${value} inside JWT payload`);
+    }
+    return valueIndex.toString();
   }
 }
