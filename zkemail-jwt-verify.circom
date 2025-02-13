@@ -102,7 +102,7 @@ component main = JWTVerifier(
     1024,
     1024,
     64,
-    32,
+    31,
     100,
-    32
+    31
 );

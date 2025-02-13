@@ -1,6 +1,7 @@
-import { poseidon4, poseidon9 } from "poseidon-lite";
+import { poseidon7, poseidon9 } from "poseidon-lite";
 
 import { ByteVector } from "./byte-vector.ts";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
 
 export class OidcDigest {
   private iss: string;
@@ -20,22 +21,11 @@ export class OidcDigest {
   }
 
   toBigInt(): bigint {
-    const iss = this.hashJwtField(this.iss);
-    const aud = this.hashJwtField(this.aud);
-    const sub = this.hashJwtField(this.sub);
+    const sub = ByteVector.fromAsciiString(this.sub).padRight(0, SUB_MAX_LENGTH).toFieldArray(); // 1 Field
+    const aud = ByteVector.fromAsciiString(this.aud).padRight(0, AUD_MAX_LENGTH).toFieldArray(); // 4 Fields
+    const iss = ByteVector.fromAsciiString(this.iss).padRight(0, MAX_ISS_LENGTH).toFieldArray(); // 1 Field
+    const salt = this.salt.toBigInt(); // 1 Field
 
-    return poseidon4([iss, aud, sub, this.salt.toBigInt()]);
-  }
-
-  private hashJwtField(value: string): bigint {
-    const nums = ByteVector.fromAsciiString(value).toFieldArray();
-
-    while (nums.length < 9) {
-      nums.push(0n);
-    }
-
-    // We use poseidon 9 because the max length for these fields is 255 bytes. That packed
-    // into fields makes an array of size 9.
-    return poseidon9(nums);
+    return poseidon7([...sub, ...aud, ...iss, salt]);
   }
 }
