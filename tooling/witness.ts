@@ -1,8 +1,9 @@
-import { cmd } from './lib/cmd.ts';
-import path from 'node:path';
-import { existsSync } from 'node:fs'
+import { existsSync } from "node:fs";
+import path from "node:path";
 
-export async function witnessCommand(filePath: string, _root: string) {
+import { cmd } from "./lib/cmd.ts";
+
+export async function witnessCommand(filePath: string) {
   const fileData = path.parse(filePath);
 
   const input = `inputs/${fileData.name}.input.json`;
@@ -15,7 +16,7 @@ export async function witnessCommand(filePath: string, _root: string) {
   const wasm = `target/${fileData.name}/${fileData.name}_js/${fileData.name}.wasm`;
   const out = `target/${fileData.name}.wtns`;
 
-  if ([wtnsScript, wasm].some(file => !existsSync(file)) ) {
+  if ([wtnsScript, wasm].some((file) => !existsSync(file))) {
     throw new Error("Missing compilation output. Try running `tooling compile :circuit:`");
   }
 
