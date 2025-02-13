@@ -1,8 +1,6 @@
-import { ok } from "node:assert";
-
 import { ByteVector } from "./byte-vector.ts";
 import { CircomBigInt } from "./circom-big-int.ts";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
 import type { CircuitInput } from "./types.ts";
 
 type Payload = {
@@ -32,38 +30,6 @@ type ZkEmailInputData = {
   expectedSub: string[];
 };
 
-// export function sha256Pad(message: ByteVector, maxShaBytes: number): [Uint8Array, number] {
-//   const msgLen = message.length * 8; // bytes to bits
-//   const msgLenBytes = Buffer.alloc(8);
-//   msgLenBytes.writeBigUint64BE(BigInt(msgLen));
-//
-//   let res = Buffer.concat([message, Buffer.from([2 ** 7])]);
-//
-//   // let res = mergeUInt8Arrays(message, int8toBytes(2 ** 7)); // Add the 1 on the end, length 505
-//   // while ((prehash_prepad_m.length * 8 + length_in_bytes.length * 8) % 512 !== 0) {
-//   while ((res.length * 8 + msgLenBytes.length * 8) % 512 !== 0) {
-//     res = Buffer.concat([res, Buffer.from([0])]);
-//   }
-//
-//   res = Buffer.concat([res, msgLenBytes]);
-//   ok((res.length * 8) % 512 === 0, "Padding did not complete properly!");
-//   const messageLen = res.byteLength;
-//   while (res.length < maxShaBytes) {
-//     res = Buffer.concat([res, Buffer.from([0])]);
-//   }
-//
-//   ok(
-//     res.length === maxShaBytes,
-//     `Padding to max length did not complete properly! Your padded message is ${res.length} long but max is ${maxShaBytes}!`,
-//   );
-//
-//   return [res, messageLen];
-// }
-
-export function Uint8ArrayToCharArray(a: Uint8Array): string[] {
-  return Array.from(a).map((x) => x.toString());
-}
-
 export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   private rawJWT: string;
   private jwkModulus: string;
@@ -78,7 +44,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
     const [messagePadded, messagePaddedLen] = this.message();
 
     return {
-      message: messagePadded.toCircomNumberArray(),
+      message: messagePadded.toCircomByteArray(),
       messageLength: messagePaddedLen.toString(),
       pubkey: this.pubkey(),
       signature: this.signature(),
@@ -119,11 +85,15 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       msg.pushLast(0);
     }
 
-    const finalMessage = msg.append(encodedL);
+    // This line is the last step of the sha2 padding
+    const paddedMessage = msg.append(encodedL);
 
-    // const finalBlock = firstEmptyBit % 512 < 448 ? lastBlock : lastBlock + 1;
+    // The circuit takes this length as input
+    const byteLength = paddedMessage.byteLength;
 
-    return [finalMessage, finalMessage.byteLength / 512];
+    // Pad with zeros
+    const finalMessage = paddedMessage.padRight(0, MAX_MSG_LENGTH);
+    return [finalMessage, byteLength];
   }
 
   private pubkey(): string[] {
@@ -195,7 +165,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
 
   private payload(): Payload {
     const payload = this.rawJWT.split(".")[1];
-    const rawJson = Buffer.from(payload, "base64url").toString("utf8");
+    const rawJson = ByteVector.fromBase64String(payload).toAsciiStr();
     const json = JSON.parse(rawJson);
 
     for (const prop of ["nonce", "iss", "aud", "sub"]) {
@@ -212,18 +182,18 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private buildCircomExpectedValue(value: string, maxLength: number): string[] {
-    const res = Buffer.alloc(maxLength);
-    res.write(value, "ascii");
-    return Array.from(res).map((byte) => byte.toString());
+    return ByteVector.fromAsciiString(value)
+      .padRight(0, maxLength)
+      .toCircomByteArray();
   }
 
   private buildCircomStringLength(value: string): string {
-    return Buffer.from(value, "ascii").byteLength.toString();
+    return ByteVector.fromAsciiString(value).byteLength.toString();
   }
 
   private findSubstringIndexForPayload(value: string): string {
     const payload = this.rawJWT.split(".")[1];
-    const rawJson = Buffer.from(payload, "base64url").toString("utf8");
+    const rawJson = ByteVector.fromBase64String(payload).toAsciiStr();
     const valueIndex = rawJson.indexOf(value);
     if (valueIndex === -1) {
       throw new Error(`Missing ${value} inside JWT payload`);
