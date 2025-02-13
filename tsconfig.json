@@ -1,6 +1,6 @@
 {
   "include": [
-    "tooling"
+    "tooling/**/*", "lib/**/*"
   ],
   "compilerOptions": {
     // Incremental builds
@@ -40,10 +40,8 @@
 
     // Skip type checking for node modules
     "skipLibCheck": true,
-
+    "rootDir": "./",
     "sourceMap": true,
-    "rootDir": "./tooling",
-    "declaration": true,
-    "outDir": "dist"
+    "declaration": true
   }
 }

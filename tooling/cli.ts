@@ -11,6 +11,7 @@ import { witnessCommand } from "./witness.js";
 import { zkeyCommand } from "./zkey.js";
 
 config();
+
 const thisDir = import.meta.dirname;
 
 const baseDir = path.join(thisDir, "..");
