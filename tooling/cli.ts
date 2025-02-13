@@ -71,8 +71,8 @@ const args = yargs(process.argv.slice(2))
 
 // .parseAsync()
 
-async function main() {
+async function cli() {
   await args.parseAsync();
 }
 
-main().catch(console.error);
+cli().catch(console.error);
