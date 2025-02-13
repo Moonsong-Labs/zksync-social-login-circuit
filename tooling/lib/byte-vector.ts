@@ -1,3 +1,4 @@
+import { FIELD_BYTES } from "./constants.ts";
 import type { BinStr } from "./types.ts";
 import { intoChunks } from "./utils.ts";
 
@@ -62,6 +63,10 @@ export class ByteVector {
   }
 
   padLeft(filling: number, finalSize: number): ByteVector {
+    if (finalSize < this.vec.length) {
+      throw new Error("Trying to pad to shorter length");
+    }
+
     const newSize = finalSize - this.vec.length;
     const arr = new Array<number>(newSize);
     arr.fill(filling);
@@ -69,6 +74,10 @@ export class ByteVector {
   }
 
   padRight(filling: number, finalSize: number): ByteVector {
+    if (finalSize < this.vec.length) {
+      throw new Error("Trying to pad to shorter length");
+    }
+
     const newSize = finalSize - this.vec.length;
     const arr = new Array<number>(newSize);
     arr.fill(filling);
@@ -84,7 +93,7 @@ export class ByteVector {
   }
 
   toFieldArray(): bigint[] {
-    const chunks = intoChunks(this.vec, 31)
+    const chunks = intoChunks(this.vec, FIELD_BYTES)
       .map((chunk) => new ByteVector(chunk))
       .map((chunk) => chunk.toBigInt());
     return chunks;
