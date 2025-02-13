@@ -4,7 +4,7 @@ import path from "node:path";
 import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { MainCircuitInput } from "./lib/main-input.js";
-import type { CircuitInput } from "./lib/types.js";
+import type { CircuitInput } from "../lib/types.js";
 import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
 
 type InputGenerator = (jwt: string, key: string) => CircuitInput<unknown>;

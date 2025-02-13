@@ -1,10 +1,21 @@
 {
-  "name": "circuits",
+  "name": "zksync-sso-circuits",
   "module": "index.ts",
   "type": "module",
+  "main": "dist/lib.js",
+  "types": "dist/lib.d.ts",
+  "exports": {
+    ".": {
+
+    }
+  },
   "scripts": {
     "tool": "tsx tooling/cli.ts",
-    "build": "tsc"
+    "clean": "rm -rf *.tsbuildinfo dist",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:esm": "tsc --project tsconfig.build.json --module es2020 --outDir ./dist/_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./dist/_esm/package.json",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --outDir ./dist/_cjs --removeComments --verbatimModuleSyntax false && printf '{\"type\":\"commonjs\"}' > ./dist/_cjs/package.json",
+    "build:types": "tsc --project ./tsconfig.build.json --module esnext --declarationDir ./dist/_types --emitDeclarationOnly --declaration --declarationMap"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",

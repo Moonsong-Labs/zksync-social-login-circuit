@@ -1,7 +1,7 @@
-import { ByteVector } from "./byte-vector.js";
+import { ByteVector } from "../../lib/byte-vector.js";
 import { CircomBigInt } from "./circom-big-int.js";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
-import type { CircuitInput } from "./types.js";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "../../lib/constants.js";
+import type { CircuitInput } from "../../lib/types.js";
 
 type Payload = {
   nonce: string;

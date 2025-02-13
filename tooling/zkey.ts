@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import path from "node:path";
+import * as path from "node:path";
 
 import { cmd } from "./lib/cmd.js";
 
