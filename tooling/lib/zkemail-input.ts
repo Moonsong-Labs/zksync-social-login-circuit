@@ -1,5 +1,6 @@
 import { ok } from "node:assert";
 
+import { ByteVector } from "./byte-vector.ts";
 import { CircomBigInt } from "./circom-big-int.ts";
 import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
 import type { CircuitInput } from "./types.ts";
@@ -31,42 +32,33 @@ type ZkEmailInputData = {
   expectedSub: string[];
 };
 
-function prepareMessage(
-  headerString: string,
-  payloadString: string,
-  maxMessageLength: number,
-): [Uint8Array, number] {
-  const message = Buffer.from(`${headerString}.${payloadString}`);
-  return sha256Pad(message, maxMessageLength);
-}
-
-export function sha256Pad(message: Buffer, maxShaBytes: number): [Uint8Array, number] {
-  const msgLen = message.length * 8; // bytes to bits
-  const msgLenBytes = Buffer.alloc(8);
-  msgLenBytes.writeBigUint64BE(BigInt(msgLen));
-
-  let res = Buffer.concat([message, Buffer.from([2 ** 7])]);
-
-  // let res = mergeUInt8Arrays(message, int8toBytes(2 ** 7)); // Add the 1 on the end, length 505
-  // while ((prehash_prepad_m.length * 8 + length_in_bytes.length * 8) % 512 !== 0) {
-  while ((res.length * 8 + msgLenBytes.length * 8) % 512 !== 0) {
-    res = Buffer.concat([res, Buffer.from([0])]);
-  }
-
-  res = Buffer.concat([res, msgLenBytes]);
-  ok((res.length * 8) % 512 === 0, "Padding did not complete properly!");
-  const messageLen = res.byteLength;
-  while (res.length < maxShaBytes) {
-    res = Buffer.concat([res, Buffer.from([0])]);
-  }
-
-  ok(
-    res.length === maxShaBytes,
-    `Padding to max length did not complete properly! Your padded message is ${res.length} long but max is ${maxShaBytes}!`,
-  );
-
-  return [res, messageLen];
-}
+// export function sha256Pad(message: ByteVector, maxShaBytes: number): [Uint8Array, number] {
+//   const msgLen = message.length * 8; // bytes to bits
+//   const msgLenBytes = Buffer.alloc(8);
+//   msgLenBytes.writeBigUint64BE(BigInt(msgLen));
+//
+//   let res = Buffer.concat([message, Buffer.from([2 ** 7])]);
+//
+//   // let res = mergeUInt8Arrays(message, int8toBytes(2 ** 7)); // Add the 1 on the end, length 505
+//   // while ((prehash_prepad_m.length * 8 + length_in_bytes.length * 8) % 512 !== 0) {
+//   while ((res.length * 8 + msgLenBytes.length * 8) % 512 !== 0) {
+//     res = Buffer.concat([res, Buffer.from([0])]);
+//   }
+//
+//   res = Buffer.concat([res, msgLenBytes]);
+//   ok((res.length * 8) % 512 === 0, "Padding did not complete properly!");
+//   const messageLen = res.byteLength;
+//   while (res.length < maxShaBytes) {
+//     res = Buffer.concat([res, Buffer.from([0])]);
+//   }
+//
+//   ok(
+//     res.length === maxShaBytes,
+//     `Padding to max length did not complete properly! Your padded message is ${res.length} long but max is ${maxShaBytes}!`,
+//   );
+//
+//   return [res, messageLen];
+// }
 
 export function Uint8ArrayToCharArray(a: Uint8Array): string[] {
   return Array.from(a).map((x) => x.toString());
@@ -82,17 +74,14 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   toObject(): ZkEmailInputData {
-    const [headerString, payloadString, signature] = this.rawJWT.split(".");
-
     const periodIndex = this.rawJWT.indexOf(".");
-    const maxMessageLength = 1024;
-    const [messagePadded, messagePaddedLen] = prepareMessage(headerString, payloadString, maxMessageLength);
+    const [messagePadded, messagePaddedLen] = this.message();
 
     return {
-      message: Uint8ArrayToCharArray(messagePadded),
+      message: messagePadded.toCircomNumberArray(),
       messageLength: messagePaddedLen.toString(),
-      pubkey: CircomBigInt.fromBase64(this.jwkModulus).serialize(),
-      signature: CircomBigInt.fromBase64(signature).serialize(),
+      pubkey: this.pubkey(),
+      signature: this.signature(),
       periodIndex: periodIndex.toString(),
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
       nonceLength: this.nonceLength(),
@@ -107,6 +96,43 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       subLength: this.subLength(),
       expectedSub: this.expectedSub(),
     };
+  }
+
+  private message(): [ByteVector, number] {
+    const [header, payload] = this.rawJWT.split(".");
+    const msg = ByteVector.fromAsciiString(`${header}.${payload}`);
+    const L = BigInt(msg.byteLength * 8);
+
+    // rfc4634 4.1
+    // Here we want to append a "1" just after the message.
+    msg.pushLast(128); // Push
+
+    // L is the length of the message
+    // L is a 64-bit number
+    const encodedL = ByteVector.fromBigInt(L)
+      .padLeft(0, 8);
+
+    // K is an amount of zeros
+    // We want to add a 64-bit number at the end. That's the reason for the 448 (512 - 65 === 558)
+    // L + 1 + K = 448 (mod 512) -- Translated to bytes -> L + 1 + K = 56 (64)
+    while (msg.byteLength % 64 !== 56) {
+      msg.pushLast(0);
+    }
+
+    const finalMessage = msg.append(encodedL);
+
+    // const finalBlock = firstEmptyBit % 512 < 448 ? lastBlock : lastBlock + 1;
+
+    return [finalMessage, finalMessage.byteLength / 512];
+  }
+
+  private pubkey(): string[] {
+    return CircomBigInt.fromBase64(this.jwkModulus).serialize();
+  }
+
+  private signature(): string[] {
+    const signature = this.rawJWT.split(".")[2];
+    return CircomBigInt.fromBase64(signature).serialize();
   }
 
   // nonce
