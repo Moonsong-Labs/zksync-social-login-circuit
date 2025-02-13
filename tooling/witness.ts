@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 
-import { cmd } from "./lib/cmd.ts";
+import { cmd } from "./lib/cmd.js";
 
 export async function witnessCommand(filePath: string) {
   const fileData = path.parse(filePath);

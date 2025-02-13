@@ -3,12 +3,12 @@ import path from "node:path";
 import { config } from "dotenv";
 import yargs from "yargs";
 
-import { compileCmd } from "./compile.ts";
-import { downloadPtau } from "./download-ptau.ts";
-import { inputCommand } from "./generate-input.ts";
-import { witnessCommand } from "./witness.ts";
-import { zkeyCommand } from "./zkey.ts";
-import { digestCommand } from "./lib/digest.ts";
+import { compileCmd } from "./compile.js";
+import { downloadPtau } from "./download-ptau.js";
+import { inputCommand } from "./generate-input.js";
+import { digestCommand } from "./lib/digest.js";
+import { witnessCommand } from "./witness.js";
+import { zkeyCommand } from "./zkey.js";
 
 config();
 const thisDir = import.meta.dirname;

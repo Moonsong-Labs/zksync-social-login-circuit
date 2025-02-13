@@ -1,11 +1,11 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { cmd } from "./lib/cmd.ts";
-import { env } from "./lib/env.ts";
-import { MainCircuitInput } from "./lib/main-input.ts";
-import type { CircuitInput } from "./lib/types.ts";
-import { ZkEmailCircuitInput } from "./lib/zkemail-input.ts";
+import { cmd } from "./lib/cmd.js";
+import { env } from "./lib/env.js";
+import { MainCircuitInput } from "./lib/main-input.js";
+import type { CircuitInput } from "./lib/types.js";
+import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
 
 type InputGenerator = (jwt: string, key: string) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {

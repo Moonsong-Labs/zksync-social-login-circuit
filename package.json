@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "tool": "tsx tooling/cli.ts"
+    "tool": "tsx tooling/cli.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",

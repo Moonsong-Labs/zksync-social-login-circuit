@@ -1,5 +1,5 @@
-import { ByteVector } from "./byte-vector.ts";
-import { CIRCOM_BIGINT_K, CIRCOM_BIGINT_N } from "./constants.ts";
+import { ByteVector } from "./byte-vector.js";
+import { CIRCOM_BIGINT_K, CIRCOM_BIGINT_N } from "./constants.js";
 
 export class CircomBigInt {
   private value: bigint;

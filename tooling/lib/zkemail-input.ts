@@ -1,7 +1,7 @@
-import { ByteVector } from "./byte-vector.ts";
-import { CircomBigInt } from "./circom-big-int.ts";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
-import type { CircuitInput } from "./types.ts";
+import { ByteVector } from "./byte-vector.js";
+import { CircomBigInt } from "./circom-big-int.js";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
+import type { CircuitInput } from "./types.js";
 
 type Payload = {
   nonce: string;
@@ -64,6 +64,22 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
     };
   }
 
+  private rawPayload(): string {
+    const payload = this.rawJWT.split(".")[1];
+    if (payload === undefined) {
+      throw new Error("Error parsing JWT.");
+    }
+    return payload;
+  }
+
+  private rawSignature(): string {
+    const signature = this.rawJWT.split(".")[2];
+    if (signature === undefined) {
+      throw new Error("Error parsing JWT.");
+    }
+    return signature;
+  }
+
   private message(): [ByteVector, number] {
     const [header, payload] = this.rawJWT.split(".");
     const msg = ByteVector.fromAsciiString(`${header}.${payload}`);
@@ -101,8 +117,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private signature(): string[] {
-    const signature = this.rawJWT.split(".")[2];
-    return CircomBigInt.fromBase64(signature).serialize();
+    return CircomBigInt.fromBase64(this.rawSignature()).serialize();
   }
 
   // nonce
@@ -164,8 +179,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   // Helpers
 
   private payload(): Payload {
-    const payload = this.rawJWT.split(".")[1];
-    const rawJson = ByteVector.fromBase64String(payload).toAsciiStr();
+    const rawJson = ByteVector.fromBase64String(this.rawPayload()).toAsciiStr();
     const json = JSON.parse(rawJson);
 
     for (const prop of ["nonce", "iss", "aud", "sub"]) {
@@ -192,8 +206,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private findSubstringIndexForPayload(value: string): string {
-    const payload = this.rawJWT.split(".")[1];
-    const rawJson = ByteVector.fromBase64String(payload).toAsciiStr();
+    const rawJson = ByteVector.fromBase64String(this.rawPayload()).toAsciiStr();
     const valueIndex = rawJson.indexOf(value);
     if (valueIndex === -1) {
       throw new Error(`Missing ${value} inside JWT payload`);
