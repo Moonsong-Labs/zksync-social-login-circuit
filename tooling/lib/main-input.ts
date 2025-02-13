@@ -53,7 +53,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   }
 
   private formatMsgBytes(): string[] {
-    return this.msg.toCircomNumberArray();
+    return this.msg.toCircomByteArray();
   }
 
   private buildBlocksFromMsg(): BinStr[][] {

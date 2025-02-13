@@ -1,5 +1,27 @@
-import { intoChunks } from "./utils.ts";
 import type { BinStr } from "./types.ts";
+import { intoChunks } from "./utils.ts";
+
+function base64UrlDecode(base64UrlString: string) {
+  // 1. Replace URL-unsafe characters with standard base64 characters
+  let base64 = base64UrlString.replace(/-/g, "+").replace(/_/g, "/");
+
+  // 2. Add padding if necessary (atob() requires correctly padded input)
+  while (base64.length % 4) {
+    base64 += "=";
+  }
+
+  // 3. Decode the base64 string
+  const binaryString = atob(base64);
+
+  // 4. Convert the binary string to a Uint8Array
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
+}
 
 export class ByteVector {
   private vec: number[];
@@ -23,8 +45,8 @@ export class ByteVector {
   }
 
   static fromBase64String(data: string): ByteVector {
-    const decoded = btoa(data);
-    return this.fromAsciiString(decoded);
+    const decoded = base64UrlDecode(data);
+    return new ByteVector(Array.from(decoded));
   }
 
   static fromBigInt(n: bigint): ByteVector {
@@ -43,14 +65,14 @@ export class ByteVector {
     const newSize = finalSize - this.vec.length;
     const arr = new Array<number>(newSize);
     arr.fill(filling);
-    return new ByteVector([...arr, this.vec.length]);
+    return new ByteVector([...arr, ...this.vec]);
   }
 
   padRight(filling: number, finalSize: number): ByteVector {
     const newSize = finalSize - this.vec.length;
     const arr = new Array<number>(newSize);
     arr.fill(filling);
-    return new ByteVector([this.vec.length, ...arr]);
+    return new ByteVector([...this.vec, ...arr]);
   }
 
   toCircomBinary(): BinStr[] {
@@ -85,7 +107,7 @@ export class ByteVector {
     return this.byteLength;
   }
 
-  toCircomNumberArray(): string[] {
+  toCircomByteArray(): string[] {
     return this.vec.map((byte) => byte.toString());
   }
 
