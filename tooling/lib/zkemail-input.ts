@@ -177,7 +177,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
         throw new Error(`Missing '${prop}' inside JWT payload`);
       }
 
-      if (typeof json.nonce !== "string") {
+      if (typeof json[prop] !== "string") {
         throw new Error(`Property '${prop}' inside JWT is not a string`);
       }
     }
