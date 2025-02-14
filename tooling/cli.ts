@@ -66,6 +66,15 @@ const args = yargs(process.argv.slice(2))
     async () => {
       await digestCommand();
     })
+  // .command(
+  //   "verifier <input> <output>",
+  //   "calculates oidc_digest for jwt in env var",
+  //   {
+  //     in
+  //   },
+  //   async () => {
+  //     await digestCommand();
+  //   })
 
   .strictCommands()
   .demandCommand(1);
