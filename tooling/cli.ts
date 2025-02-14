@@ -9,6 +9,7 @@ import { inputCommand } from "./generate-input.js";
 import { digestCommand } from "./lib/digest.js";
 import { witnessCommand } from "./witness.js";
 import { zkeyCommand } from "./zkey.js";
+import { generateVerifier } from "./generate-verifier.js";
 
 config();
 
@@ -66,15 +67,22 @@ const args = yargs(process.argv.slice(2))
     async () => {
       await digestCommand();
     })
-  // .command(
-  //   "verifier <input> <output>",
-  //   "calculates oidc_digest for jwt in env var",
-  //   {
-  //     in
-  //   },
-  //   async () => {
-  //     await digestCommand();
-  //   })
+  .command(
+    "verifier <file>",
+    "calculates oidc_digest for jwt in env var",
+    {
+      ...FILE_ARG_DEF,
+      out: {
+        type: "string",
+        demandOption: false,
+        description: "where to save the contract.",
+        default: null,
+        alias: ["o"],
+      },
+    },
+    async (argv) => {
+      await generateVerifier(argv.file, argv.out);
+    })
 
   .strictCommands()
   .demandCommand(1);
