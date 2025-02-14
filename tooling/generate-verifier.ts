@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { compileCmd } from "./compile.js";
+import { downloadPtau } from "./download-ptau.js";
 import { cmd, ROOT_DIR } from "./lib/cmd.js";
 import { DEFAULT_PTAU, r1csFilePath, zkeyCommand } from "./zkey.js";
-import { downloadPtau } from "./download-ptau.js";
-import { compileCmd } from "./compile.js";
 
 export async function generateVerifier(circuit: string, outFile: string | null): Promise<void> {
   const fileData = path.parse(circuit);
