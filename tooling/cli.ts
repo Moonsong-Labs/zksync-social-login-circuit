@@ -8,7 +8,7 @@ import { downloadPtau } from "./download-ptau.js";
 import { inputCommand } from "./generate-input.js";
 import { digestCommand } from "./lib/digest.js";
 import { witnessCommand } from "./witness.js";
-import { zkeyCommand } from "./zkey.js";
+import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 import { generateVerifier } from "./generate-verifier.js";
 
 config();
@@ -44,7 +44,7 @@ const args = yargs(process.argv.slice(2))
         type: "string",
         demandOption: false,
         description: "path to powers of tau file",
-        default: "ptaus/ppot_0080_20.ptau",
+        default: DEFAULT_PTAU,
       },
     },
     async (argv) => {
