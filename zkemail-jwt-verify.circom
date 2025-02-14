@@ -96,7 +96,7 @@ template JWTVerifier(
     sub === expectedSub;
 }
 
-component main = JWTVerifier(
+component main{public [pubkey, expectedNonce, expectedIss, expectedAud]} = JWTVerifier(
     121,
     17,
     1024,
