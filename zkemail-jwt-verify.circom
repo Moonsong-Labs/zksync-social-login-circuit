@@ -63,10 +63,9 @@ template JWTVerifier(
 
   signal input subKeyStartIndex; // Index for '"sub":' substring in payload
   signal input subLength; // Real length for sub value.
-  signal input expectedSub[maxSubLength]; // Expected value for sub.
 
-  signal input salt;
-  signal input oidcDigest;
+  signal input salt; // Salt used to generate oidcDigest
+  signal input oidcDigest; // Poseidon(iss, aud, sub, salt)
 
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
