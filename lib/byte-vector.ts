@@ -67,10 +67,9 @@ export class ByteVector {
   }
 
   toFieldArray(): bigint[] {
-    const chunks = intoChunks(this.vec, FIELD_BYTES)
-      .map((chunk) => new ByteVector(chunk))
+    return intoChunks(this.vec, FIELD_BYTES)
+      .map((chunk) => new ByteVector(chunk).reverse())
       .map((chunk) => chunk.toBigInt());
-    return chunks;
   }
 
   toBigInt(): bigint {
@@ -117,5 +116,9 @@ export class ByteVector {
 
   private byteTo8digits(byte: number): BinStr[] {
     return byte.toString(2).padStart(8, "0").split("") as BinStr[];
+  }
+
+  reverse(): ByteVector {
+    return new ByteVector(this.vec.reverse());
   }
 }
