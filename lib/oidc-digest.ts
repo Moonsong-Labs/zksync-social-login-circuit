@@ -1,7 +1,7 @@
 import { poseidon7 } from "poseidon-lite";
 
 import { ByteVector } from "./byte-vector.js";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
+import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
 
 export class OidcDigest {
   private iss: string;
@@ -21,11 +21,11 @@ export class OidcDigest {
   }
 
   toBigInt(): bigint {
-    const sub = ByteVector.fromAsciiString(this.sub).padRight(0, SUB_MAX_LENGTH).toFieldArray(); // 1 Field
+    const iss = ByteVector.fromAsciiString(this.iss).padRight(0, ISS_MAX_LENGTH).toFieldArray(); // 1 Field
     const aud = ByteVector.fromAsciiString(this.aud).padRight(0, AUD_MAX_LENGTH).toFieldArray(); // 4 Fields
-    const iss = ByteVector.fromAsciiString(this.iss).padRight(0, MAX_ISS_LENGTH).toFieldArray(); // 1 Field
+    const sub = ByteVector.fromAsciiString(this.sub).padRight(0, SUB_MAX_LENGTH).toFieldArray(); // 1 Field
     const salt = this.salt.toBigInt(); // 1 Field
 
-    return poseidon7([...sub, ...aud, ...iss, salt]);
+    return poseidon7([...iss, ...aud, ...sub, salt]);
   }
 }

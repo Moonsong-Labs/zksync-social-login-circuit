@@ -1,16 +1,19 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
+import type { CircuitInput } from "../lib/types.js";
 import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { MainCircuitInput } from "./lib/main-input.js";
-import type { CircuitInput } from "../lib/types.js";
+import { PoseidonTest } from "./lib/poseidon-test-input.js";
 import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
 
 type InputGenerator = (jwt: string, key: string) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
   main: (jwt: string, key: string) => new MainCircuitInput(jwt, key),
   "zkemail-jwt-verify": (jwt: string, key: string) => new ZkEmailCircuitInput(jwt, key),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  "poseidon-test": (_a, _b) => new PoseidonTest(),
 };
 
 export async function inputCommand(filePath: string, root: string) {
