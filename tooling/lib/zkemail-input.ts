@@ -35,10 +35,12 @@ type ZkEmailInputData = {
 export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   private rawJWT: string;
   private jwkModulus: string;
+  private salt: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string) {
+  constructor(rawJWT: string, jwkModulus: string, salt: bigint) {
     this.rawJWT = rawJWT;
     this.jwkModulus = jwkModulus;
+    this.salt = salt;
   }
 
   toObject(): ZkEmailInputData {
@@ -63,7 +65,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       subKeyStartIndex: this.subKeyStartIndex(),
       subLength: this.subLength(),
       expectedSub: this.expectedSub(),
-      salt: "1",
+      salt: this.salt.toString(),
       oidcDigest: this.oidcDigest(),
     };
   }
@@ -71,7 +73,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   private oidcDigest(): string {
     const payload = this.payload();
 
-    const salt = new ByteVector([1]);
+    const salt = ByteVector.fromBigInt(this.salt);
     const digest = new OidcDigest(payload.iss, payload.aud, payload.sub, salt);
 
     return digest.serialize();
