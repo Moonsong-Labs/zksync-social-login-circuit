@@ -11,6 +11,8 @@ import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 import { generateVerifier } from "./generate-verifier.js";
 import { exportVerifierCmd } from "./export-verifier.js";
+import { prepareZkeyCmd } from "./prepare-zkey.js";
+import { prove } from "./prove.js";
 
 config();
 
@@ -61,6 +63,11 @@ const args = yargs(process.argv.slice(2))
   }, async (argv) => {
     await downloadPtau(argv.size);
   })
+  .command("prepare-zkey <file>", "downloads perpetual power of tau file",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await prepareZkeyCmd(argv.file);
+    })
   .command(
     "oidc-digest",
     "calculates oidc_digest for jwt in env var",
@@ -68,6 +75,14 @@ const args = yargs(process.argv.slice(2))
     async () => {
       await digestCommand();
     })
+  .command(
+    "prove <file>",
+    "Calculates a proof using default inputs",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await prove(argv.file);
+    },
+  )
   .command(
     "verifier <file>",
     "calculates oidc_digest for jwt in env var",
