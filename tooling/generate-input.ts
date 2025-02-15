@@ -8,12 +8,13 @@ import { MainCircuitInput } from "./lib/main-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
 import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
 
-type InputGenerator = (jwt: string, key: string) => CircuitInput<unknown>;
+type InputGenerator = (jwt: string, key: string, salt: bigint) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
-  main: (jwt: string, key: string) => new MainCircuitInput(jwt, key),
-  "zkemail-jwt-verify": (jwt: string, key: string) => new ZkEmailCircuitInput(jwt, key),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  "poseidon-test": (_a, _b) => new PoseidonTest(),
+  main: (jwt: string, key: string, _salt: bigint) => new MainCircuitInput(jwt, key),
+  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint) => new ZkEmailCircuitInput(jwt, key, salt),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  "poseidon-test": (_a: string, _b: string, _salt: bigint) => new PoseidonTest(),
 };
 
 export async function inputCommand(filePath: string, root: string) {
@@ -26,8 +27,9 @@ export async function inputCommand(filePath: string, root: string) {
 
   const rawJWT = env("RAW_JWT");
   const jwkModulus = env("JWK_MODULOUS");
+  const salt = BigInt(env("SALT"));
 
-  const input = generator(rawJWT, jwkModulus).toObject();
+  const input = generator(rawJWT, jwkModulus, salt).toObject();
   const serialized = JSON.stringify(input, null, 2);
   const inputDestinationPath = path.join(root, "inputs", `${circomFileData.name}.input.json`);
 
