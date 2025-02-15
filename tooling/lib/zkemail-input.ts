@@ -1,7 +1,7 @@
-import { ByteVector } from "../../lib/byte-vector.js";
-import { CircomBigInt } from "./circom-big-int.js";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "../../lib/constants.js";
+import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "../../lib/constants.js";
+import { ByteVector, OidcDigest } from "../../lib/index.js";
 import type { CircuitInput } from "../../lib/types.js";
+import { CircomBigInt } from "./circom-big-int.js";
 
 type Payload = {
   nonce: string;
@@ -28,6 +28,8 @@ type ZkEmailInputData = {
   subKeyStartIndex: string;
   subLength: string;
   expectedSub: string[];
+  salt: string;
+  oidcDigest: string;
 };
 
 export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
@@ -61,7 +63,18 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       subKeyStartIndex: this.subKeyStartIndex(),
       subLength: this.subLength(),
       expectedSub: this.expectedSub(),
+      salt: "1",
+      oidcDigest: this.oidcDigest(),
     };
+  }
+
+  private oidcDigest(): string {
+    const payload = this.payload();
+
+    const salt = new ByteVector([1]);
+    const digest = new OidcDigest(payload.iss, payload.aud, payload.sub, salt);
+
+    return digest.serialize();
   }
 
   private rawPayload(): string {
@@ -145,7 +158,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private expectedIss(): string[] {
-    return this.buildCircomExpectedValue(this.payload().iss, MAX_ISS_LENGTH);
+    return this.buildCircomExpectedValue(this.payload().iss, ISS_MAX_LENGTH);
   }
 
   // aud
