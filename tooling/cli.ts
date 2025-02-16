@@ -5,14 +5,15 @@ import yargs from "yargs";
 
 import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
-import { inputCommand } from "./generate-input.js";
-import { digestCommand } from "./lib/digest.js";
-import { witnessCommand } from "./witness.js";
-import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { generateVerifier } from "./generate-verifier.js";
 import { exportVerifierCmd } from "./export-verifier.js";
+import { inputCommand } from "./generate-input.js";
+import { generateVerifier } from "./generate-verifier.js";
+import { getJwtCmd } from "./get-jwt-cmd.js";
+import { digestCommand } from "./lib/digest.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
+import { witnessCommand } from "./witness.js";
+import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 
 config();
 
@@ -106,10 +107,22 @@ const args = yargs(process.argv.slice(2))
     async (argv) => {
       await exportVerifierCmd(argv.file);
     })
+  .command(
+    "get-jwt <nonce>",
+    "Helps to perform oidc flow with given nonce. Prints resulting JWT.",
+    {
+      nonce: {
+        type: "string",
+        demandOption: true,
+        description: "Nonce used to obtain jwt"
+      },
+    },
+    async (argv) => {
+      await getJwtCmd(argv.nonce);
+    },
+  )
   .strictCommands()
   .demandCommand(1);
-
-// .parseAsync()
 
 async function cli() {
   await args.parseAsync();
