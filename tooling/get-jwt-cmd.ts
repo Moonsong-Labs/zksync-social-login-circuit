@@ -1,4 +1,10 @@
+import assert from "node:assert";
+
 import express from "express";
+
+import { createNonce } from "../lib/create-nonce.js";
+import { ByteVector } from "./lib.js";
+import { env } from "./lib/env.js";
 
 function waitForJwt(): Promise<string> {
   const app = express();
@@ -40,10 +46,24 @@ function waitForJwt(): Promise<string> {
   });
 }
 
-export async function getJwtCmd(nonce: string) {
+export async function getJwtCmd(txHash: string) {
+  const rawBlindingFactor = env("BLINDING_FACTOR");
+
+  if (!rawBlindingFactor) {
+    throw new Error("missing BLINDING_FACTOR env var");
+  }
+
+  const nonceFields = ByteVector.fromHex(txHash).padRight(0, 62).toFieldArray();
+
+  assert(nonceFields.length === 2);
+
+  const blindingFactor = BigInt(rawBlindingFactor);
+  const finalHash = createNonce(txHash, blindingFactor);
+
+  const nonce = ByteVector.fromBigInt(finalHash).toBase64Url();
   const clientId = encodeURIComponent("866068535821-e9em0h73pee93q4evoajtnnkldsjhqdk.apps.googleusercontent.com");
   const responseType = "id_token";
-  const ecope = encodeURIComponent("openid email");
+  const ecope = encodeURIComponent("openid");
   const redirectUri = encodeURI("http://localhost:3000/oauth/plain");
   const query = `?client_id=${clientId}&response_type=${responseType}&scope=${ecope}&redirect_uri=${redirectUri}&nonce=${nonce}`;
 
