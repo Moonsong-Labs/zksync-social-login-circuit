@@ -33,3 +33,54 @@ export function base64UrlDecode(base64UrlString: string) {
 
   return bytes;
 }
+
+export function decodeHex(hexString: string): Uint8Array {
+  // Remove any leading/trailing whitespace and ensure even number of hex characters
+  if (hexString.startsWith("0x")) {
+    hexString = hexString.substring(2);
+  }
+
+  hexString = hexString.trim();
+  if (hexString.length % 2 !== 0) {
+    throw new Error("Invalid hex string: must have an even number of characters");
+  }
+
+  const len = hexString.length / 2;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    const hexByte = hexString.substring(i * 2, i * 2 + 2);
+    const byte = parseInt(hexByte, 16);
+    if (isNaN(byte)) {
+      throw new Error("Invalid hex string: contains non-hex characters");
+    }
+    bytes[i] = byte;
+  }
+
+  return bytes;
+}
+
+export function base64UrlEncode(bytes: Uint8Array) {
+  let base64 = "";
+  const encodings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  for (let i = 0; i < bytes.length; i += 3) {
+    const byte1 = bytes[i]!;
+    const byte2 = i + 1 < bytes.length ? bytes[i + 1]! : 0;
+    const byte3 = i + 2 < bytes.length ? bytes[i + 2]! : 0;
+
+    const triplet = (byte1 << 16) | (byte2 << 8) | byte3;
+
+    for (let j = 0; j < 4; j++) {
+      if (i * 8 + j * 6 > bytes.length * 8) {
+        base64 += "=";
+      } else {
+        base64 += encodings[(triplet >>> 6 * (3 - j)) & 0x3F];
+      }
+    }
+  }
+
+  // Replace characters for base64url
+  base64 = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return base64;
+}
