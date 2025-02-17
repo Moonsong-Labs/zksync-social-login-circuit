@@ -22,14 +22,19 @@ function ASCII_EQUAL() {
   return 61;
 }
 
+/// @title Base64UrlToBase64
+/// @notice Asumes input is encoded as base64url and translates to regular base64.
+/// @dev We use this to translate from a base64 received into jwt to zkemail's base64 decoder.
+/// @param n Length of the array to re encode.
+/// @input b64Url Array of base64url characters.
 template Base64UrlToBase64(n) {
   signal input b64Url[n];
   signal output b64[n];
 
-  // replace '-' to '+';
+  // replace '-' with '+';
   signal partial1[n] <== ReplaceAll(n)(b64Url, ASCII_MINUS(), ASCII_PLUS());
-  // replace '_' to '/';
+  // replace '_' with '/';
   signal partial2[n] <== ReplaceAll(n)(partial1, ASCII_UNDERSCORE(), ASCII_SLASH());
-  // replace \0 to '=' (to recreate the padding back);
+  // replace '\0' with '=' (to recreate the padding back);
   b64 <== ReplaceAll(n)(partial2, 0, ASCII_EQUAL());
 }
