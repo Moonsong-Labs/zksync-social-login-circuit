@@ -1,7 +1,7 @@
+import { MAX_B64_NONCE_LENGTH } from "../../lib/constants.js";
 import { createNonce } from "../../lib/create-nonce.js";
 import { ByteVector } from "../../lib/index.js";
 import type { CircuitInput } from "../../lib/types.js";
-import { MAX_B64_NONCE_LENGTH } from "../../lib/constants.js";
 
 type BlindingFactorInputData = {
   b64Nonce: string[];
