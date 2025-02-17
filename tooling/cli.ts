@@ -114,7 +114,7 @@ const args = yargs(process.argv.slice(2))
       nonce: {
         type: "string",
         demandOption: true,
-        description: "Nonce used to obtain jwt"
+        description: "Nonce used to obtain jwt",
       },
     },
     async (argv) => {
