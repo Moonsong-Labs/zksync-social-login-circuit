@@ -58,14 +58,13 @@ export async function getJwtCmd(txHash: string) {
   assert(nonceFields.length === 2);
 
   const blindingFactor = BigInt(rawBlindingFactor);
-  const finalHash = createNonce(txHash, blindingFactor);
 
-  const nonce = ByteVector.fromBigInt(finalHash).toBase64Url();
+  const nonce = createNonce(txHash, blindingFactor);
   const clientId = encodeURIComponent("866068535821-e9em0h73pee93q4evoajtnnkldsjhqdk.apps.googleusercontent.com");
   const responseType = "id_token";
-  const ecope = encodeURIComponent("openid");
+  const scope = encodeURIComponent("openid");
   const redirectUri = encodeURI("http://localhost:3000/oauth/plain");
-  const query = `?client_id=${clientId}&response_type=${responseType}&scope=${ecope}&redirect_uri=${redirectUri}&nonce=${nonce}`;
+  const query = `?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}&nonce=${nonce}`;
 
   console.log(`https://accounts.google.com/o/oauth2/v2/auth${query}`);
 
