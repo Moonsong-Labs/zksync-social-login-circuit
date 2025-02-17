@@ -60,7 +60,7 @@ export function decodeHex(hexString: string): Uint8Array {
   return bytes;
 }
 
-export function base64UrlEncode(bytes: Uint8Array) {
+export function base64Encode(bytes: Uint8Array) {
   let base64 = "";
   const encodings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -80,7 +80,5 @@ export function base64UrlEncode(bytes: Uint8Array) {
     }
   }
 
-  // Replace characters for base64url
-  base64 = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   return base64;
 }
