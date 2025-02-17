@@ -4,7 +4,7 @@ include "@zk-email/circuits/lib/base64.circom";
 include "@zk-email/circuits/utils/bytes.circom";
 include "circomlib/circuits/poseidon.circom";
 include "./bytes-to-field.circom";
-include "circomlib/circuits/comparators.circom";
+include "./base64url-to-base64.circom";
 
 function MAX_NONCE_BASE64_LENGTH() {
   return 44;
@@ -18,37 +18,13 @@ function MAX_BYTES_FIELD() {
   return 32;
 }
 
-template ReplaceAll(n) {
-  signal input in[n];
-  signal input from;
-  signal input to;
-  signal output out[n];
-
-  signal parts[n][2];
-
-  component equals[n];
-  for (var i = 0; i < n; i++) {
-    equals[i] = IsZero();
-    equals[i].in <== in[i] - from;
-    parts[i][0] <== equals[i].out * to;
-    parts[i][1] <== (1 - equals[i].out) * in[i];
-  }
-
-  for (var i = 0; i < n; i++) {
-    out[i] <== parts[i][0] + parts[i][1];
-  }
-}
-
-
 template VerifyNonce() {
   var maxNonceB64Length = MAX_NONCE_BASE64_LENGTH();
   signal input b64UrlNonce[maxNonceB64Length];
   signal input blindingFactor;
   signal input txHash[2];
 
-  signal b64NoncePartial[maxNonceB64Length] <== ReplaceAll(maxNonceB64Length)(b64UrlNonce, 45, 43);
-  signal b64NoncePartial2[maxNonceB64Length] <== ReplaceAll(maxNonceB64Length)(b64NoncePartial, 0, 61);
-  signal b64Nonce[maxNonceB64Length] <== ReplaceAll(maxNonceB64Length)(b64NoncePartial2, 95, 47);
+  signal b64Nonce[maxNonceB64Length] <== Base64UrlToBase64(maxNonceB64Length)(b64UrlNonce);
 
   var maxNonceLength = MAX_LENGTH_DECODED_NONCE();
   assert(maxNonceLength == 33);
