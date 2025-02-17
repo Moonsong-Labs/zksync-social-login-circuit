@@ -15,6 +15,7 @@ export class JWT {
   iss: string;
   aud: string;
   sub: string;
+  kid: string;
 
   constructor(raw: string) {
     this.raw = raw;
@@ -27,21 +28,34 @@ export class JWT {
     this.signature = signature;
 
     const rawJson = ByteVector.fromBase64String(payload).toAsciiStr();
-    const json = JSON.parse(rawJson);
+    const rawHeader = ByteVector.fromBase64String(payload).toAsciiStr();
+    const jsonPayload = JSON.parse(rawJson);
+    const jsonHeader = JSON.parse(rawHeader);
 
     for (const prop of ["nonce", "iss", "aud", "sub"]) {
-      if (!Object.hasOwn(json, prop)) {
+      if (!Object.hasOwn(jsonPayload, prop)) {
         throw new Error(`Missing '${prop}' inside JWT payload`);
       }
 
-      if (typeof json.nonce !== "string") {
+      if (typeof jsonPayload.nonce !== "string") {
         throw new Error(`Property '${prop}' inside JWT is not a string`);
       }
     }
 
-    this.nonce = json.nonce;
-    this.iss = json.iss;
-    this.aud = json.aud;
-    this.sub = json.sub;
+    for (const prop of ["kid"]) {
+      if (!Object.hasOwn(jsonHeader, prop)) {
+        throw new Error(`Missing '${prop}' inside JWT payload`);
+      }
+
+      if (typeof jsonHeader.nonce !== "string") {
+        throw new Error(`Property '${prop}' inside JWT is not a string`);
+      }
+    }
+
+    this.nonce = jsonPayload.nonce;
+    this.iss = jsonPayload.iss;
+    this.aud = jsonPayload.aud;
+    this.sub = jsonPayload.sub;
+    this.kid = jsonHeader.kid;
   }
 }

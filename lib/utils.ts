@@ -14,7 +14,7 @@ export function intoChunks<T>(arr: T[], chunkSize: number): T[][] {
 
 export function base64UrlDecode(base64UrlString: string) {
   // 1. Replace URL-unsafe characters with standard base64 characters
-  let base64 = base64UrlString.replace(/-/g, "+").replace(/_/g, "/");
+  let base64 = base64UrlString.replaceAll("-", "+").replaceAll("_", "/");
 
   // 2. Add padding if necessary (atob() requires correctly padded input)
   while (base64.length % 4) {
@@ -60,7 +60,7 @@ export function decodeHex(hexString: string): Uint8Array {
   return bytes;
 }
 
-export function base64Encode(bytes: Uint8Array) {
+export function base64UrlEncode(bytes: Uint8Array): string {
   let base64 = "";
   const encodings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -78,6 +78,12 @@ export function base64Encode(bytes: Uint8Array) {
         base64 += encodings[(triplet >>> 6 * (3 - j)) & 0x3F];
       }
     }
+  }
+
+  base64 = base64.replaceAll("+", "-").replaceAll("/", "_");
+
+  while (base64.length % 4) {
+    base64 += "=";
   }
 
   return base64;
