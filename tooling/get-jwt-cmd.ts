@@ -5,6 +5,7 @@ import express from "express";
 import { createNonce } from "../lib/create-nonce.js";
 import { ByteVector } from "./lib.js";
 import { env } from "./lib/env.js";
+import { JWT } from "./lib/jwt.js";
 
 function waitForJwt(): Promise<string> {
   const app = express();
@@ -60,6 +61,7 @@ export async function getJwtCmd(txHash: string) {
   const blindingFactor = BigInt(rawBlindingFactor);
 
   const nonce = createNonce(txHash, blindingFactor);
+  console.log(`Nonce: ${nonce}`);
   const clientId = encodeURIComponent("866068535821-e9em0h73pee93q4evoajtnnkldsjhqdk.apps.googleusercontent.com");
   const responseType = "id_token";
   const scope = encodeURIComponent("openid");
@@ -69,5 +71,16 @@ export async function getJwtCmd(txHash: string) {
   console.log(`https://accounts.google.com/o/oauth2/v2/auth${query}`);
 
   const rawJwt = await waitForJwt();
-  console.log(rawJwt);
+
+  const res = await fetch("https://www.googleapis.com/oauth2/v3/certs");
+  const jwks = await res.json() as { keys: { kid: string; n: string } [] };
+  const parsed = new JWT(rawJwt);
+  //
+  const jwk = jwks.keys.find((jwk) => jwk.kid === parsed.kid);
+
+  if (jwk === undefined) {
+    throw new Error("Unable to get jwk");
+  }
+
+  console.log(`${rawJwt}\n\n${jwk.n}`);
 }

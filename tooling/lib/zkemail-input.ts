@@ -1,4 +1,9 @@
-import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "../../lib/constants.js";
+import {
+  AUD_MAX_LENGTH,
+  ISS_MAX_LENGTH,
+  MAX_B64_NONCE_LENGTH,
+  MAX_MSG_LENGTH,
+} from "../../lib/constants.js";
 import { ByteVector, OidcDigest } from "../../lib/index.js";
 import type { CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
@@ -18,7 +23,6 @@ type ZkEmailInputData = {
   periodIndex: string;
   nonceKeyStartIndex: string;
   nonceLength: string;
-  expectedNonce: string[];
   issKeyStartIndex: string;
   issLength: string;
   expectedIss: string[];
@@ -27,20 +31,25 @@ type ZkEmailInputData = {
   expectedAud: string[];
   subKeyStartIndex: string;
   subLength: string;
-  expectedSub: string[];
   salt: string;
   oidcDigest: string;
+  txHash: string[];
+  blindingFactor: string;
 };
 
 export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   private rawJWT: string;
   private jwkModulus: string;
   private salt: bigint;
+  private rawTxHash: string;
+  private blinding: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string, salt: bigint) {
+  constructor(rawJWT: string, jwkModulus: string, salt: bigint, txHash: string, blinding: bigint) {
     this.rawJWT = rawJWT;
     this.jwkModulus = jwkModulus;
     this.salt = salt;
+    this.rawTxHash = txHash;
+    this.blinding = blinding;
   }
 
   toObject(): ZkEmailInputData {
@@ -55,7 +64,6 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       periodIndex: periodIndex.toString(),
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
       nonceLength: this.nonceLength(),
-      expectedNonce: this.expectedNonce(),
       issKeyStartIndex: this.issKeyStartIndex(),
       issLength: this.issLength(),
       expectedIss: this.expectedIss(),
@@ -64,10 +72,15 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       expectedAud: this.expectedAud(),
       subKeyStartIndex: this.subKeyStartIndex(),
       subLength: this.subLength(),
-      expectedSub: this.expectedSub(),
       salt: this.salt.toString(),
       oidcDigest: this.oidcDigest(),
+      txHash: this.serializeTxHash(),
+      blindingFactor: this.blinding.toString(),
     };
+  }
+
+  private serializeTxHash(): string[] {
+    return ByteVector.fromHex(this.rawTxHash).toFieldArray().map((n) => n.toString());
   }
 
   private oidcDigest(): string {
@@ -142,11 +155,11 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private nonceLength(): string {
-    return this.buildCircomStringLength(this.payload().nonce);
-  }
-
-  private expectedNonce(): string[] {
-    return this.buildCircomExpectedValue(this.payload().nonce, MAX_NONCE_LENGTH);
+    const length = this.buildCircomStringLength(this.payload().nonce);
+    if (Number(length) > MAX_B64_NONCE_LENGTH) {
+      throw new Error("Nonce too long");
+    }
+    return length;
   }
 
   // iss
@@ -185,10 +198,6 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
 
   private subLength(): string {
     return this.buildCircomStringLength(this.payload().sub);
-  }
-
-  private expectedSub(): string[] {
-    return this.buildCircomExpectedValue(this.payload().sub, SUB_MAX_LENGTH);
   }
 
   // Helpers

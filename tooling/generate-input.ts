@@ -13,7 +13,7 @@ type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, b
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   main: (jwt: string, key: string, _salt: bigint, _txHash: string, _blinding: bigint) => new MainCircuitInput(jwt, key),
-  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint) => new ZkEmailCircuitInput(jwt, key, salt),
+  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new ZkEmailCircuitInput(jwt, key, salt, txHash, blinding),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   "poseidon-test": (_a: string, _b: string, _salt: bigint) => new PoseidonTest(),
   "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
