@@ -108,7 +108,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   }
 
   private nonceKeyStartIndex(): string {
-    const rawJson = ByteVector.fromBase64String(this.jwt.payload).toAsciiStr();
+    const rawJson = ByteVector.fromBase64UrlString(this.jwt.payload).toAsciiStr();
     const nonceIndex = rawJson.indexOf("\"nonce\":");
     if (nonceIndex !== -1) {
       throw new Error("Missing nonce key inside JWT payload");
@@ -118,7 +118,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
   }
 
   private nonceLength(): string {
-    const rawJson = ByteVector.fromBase64String(this.jwt.payload).toAsciiStr();
+    const rawJson = ByteVector.fromBase64UrlString(this.jwt.payload).toAsciiStr();
     const json = JSON.parse(rawJson);
 
     if (!Object.hasOwn(json, "nonce")) {

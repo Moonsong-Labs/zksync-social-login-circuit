@@ -8,5 +8,5 @@ export function createNonce(txHashHex: string, blindingFactor: bigint): string {
   const nonceFields = ByteVector.fromHex(txHashHex).padRight(0, 62).toFieldArray();
   assert(nonceFields.length === 2);
   const hash = poseidon3([...nonceFields, blindingFactor]);
-  return ByteVector.fromBigInt(hash).toBase64();
+  return ByteVector.fromBigInt(hash).toBase64Url();
 }

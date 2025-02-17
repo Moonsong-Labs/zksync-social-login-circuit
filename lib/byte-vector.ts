@@ -23,7 +23,7 @@ export class ByteVector {
     return new ByteVector(asciiCodes);
   }
 
-  static fromBase64String(data: string): ByteVector {
+  static fromBase64UrlString(data: string): ByteVector {
     const decoded = base64UrlDecode(data);
     return new ByteVector(Array.from(decoded));
   }
@@ -127,7 +127,7 @@ export class ByteVector {
     return new ByteVector(this.vec.reverse());
   }
 
-  toBase64(): string {
+  toBase64Url(): string {
     const buf = new Uint8Array(this.vec.length);
     this.vec.forEach((byte, i) => buf[i] = byte);
     return base64UrlEncode(buf);
