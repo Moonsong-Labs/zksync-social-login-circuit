@@ -4,7 +4,7 @@ import type { BinStr, CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
 import { JWT } from "./jwt.js";
 
-type MainInputData = {
+type FrozenByteSha2Data = {
   msg: string[][];
   msgBytes: string[];
   msgBytesLength: string;
@@ -21,7 +21,7 @@ function assertBinStr(str: string): asserts str is BinStr {
   }
 }
 
-export class MainCircuitInput implements CircuitInput<MainInputData> {
+export class FrozenFireSha2Input implements CircuitInput<FrozenByteSha2Data> {
   private jwt: JWT;
   private pubKey: string;
   private msg: ByteVector;
@@ -32,7 +32,7 @@ export class MainCircuitInput implements CircuitInput<MainInputData> {
     this.msg = ByteVector.fromAsciiString(`${this.jwt.header}.${this.jwt.payload}`);
   }
 
-  toObject(): MainInputData {
+  toObject(): FrozenByteSha2Data {
     const blocks = this.buildBlocksFromMsg();
     const tBlock = this.sha2Pad(blocks);
 
