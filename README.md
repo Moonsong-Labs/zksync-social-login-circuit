@@ -8,7 +8,27 @@ There is also code to generate to interact
 with the circuits in nice way inside the user's
 browser.
 
-## Getting started
+## About the repo
+
+This repo contains code writen using the [circom language](https://docs.circom.io/).
+In order to generate proofs and verify those proofs several steps are needed:
+
+1. Compile the circuit
+2. Generate the input
+3. Perform the trusted setup
+4. Generate the zkey file
+5. Prepare zkey file
+6. Generate witness
+7. Generate proof
+8. Verify proof
+
+This repo contains not only the circuits itself, but also
+some tools to facilitate all those processes.
+
+There is also a `lib` folder that contains helper
+code to generate proofs for these circuits in the browser itself.
+
+# Gettings started
 
 First, install dependencies:
 
@@ -16,7 +36,7 @@ First, install dependencies:
 pnpm install
 ```
 
-Because working with cirom requires a ton of little steps, this
+Because working with circom requires a ton of little steps, this
 project has an internal CLI tool that can be used to perform
 the steps needed to make the circuit work:
 
@@ -45,3 +65,15 @@ pnpm tool verifier <file.circom>
 # Export verifier to sso contracts pacakage
 pnpm tool export-verifier <file.circom>
 ```
+
+
+## Circuits
+
+The main circuit for this project is: [`jwt-tx-validation.circom`](./jwt-tx-validation.circom)
+
+That circuit is in charge of performing all the validations on the JWT.
+
+Inside the `utils` folder we have several templates that are used as components of the main one.
+
+Inside the `test` folder there are circuits use for testing purposes only.
+
