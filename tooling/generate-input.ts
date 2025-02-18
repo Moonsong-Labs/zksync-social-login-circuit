@@ -2,12 +2,12 @@ import { writeFileSync } from "node:fs";
 import path from "node:path";
 
 import type { CircuitInput } from "../lib/types.js";
+import { BlindingFactorInputTest } from "./lib/blinding-factor-input.js";
 import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { MainCircuitInput } from "./lib/main-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
 import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
-import { BlindingFactorInputTest } from "./lib/blinding-factor-input.js";
 
 type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
