@@ -19,4 +19,3 @@ export async function cmd(strCmd: string): Promise<void> {
     spawned.on("disconnect", () => reject());
   });
 }
-
