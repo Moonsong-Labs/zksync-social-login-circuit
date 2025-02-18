@@ -8,7 +8,9 @@ import { downloadPtau } from "./download-ptau.js";
 import { inputCommand } from "./generate-input.js";
 import { digestCommand } from "./lib/digest.js";
 import { witnessCommand } from "./witness.js";
-import { zkeyCommand } from "./zkey.js";
+import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { generateVerifier } from "./generate-verifier.js";
+import { exportVerifierCmd } from "./export-verifier.js";
 
 config();
 
@@ -43,7 +45,7 @@ const args = yargs(process.argv.slice(2))
         type: "string",
         demandOption: false,
         description: "path to powers of tau file",
-        default: "ptaus/ppot_0080_20.ptau",
+        default: DEFAULT_PTAU,
       },
     },
     async (argv) => {
@@ -66,7 +68,29 @@ const args = yargs(process.argv.slice(2))
     async () => {
       await digestCommand();
     })
-
+  .command(
+    "verifier <file>",
+    "calculates oidc_digest for jwt in env var",
+    {
+      ...FILE_ARG_DEF,
+      out: {
+        type: "string",
+        demandOption: false,
+        description: "where to save the contract.",
+        default: null,
+        alias: ["o"],
+      },
+    },
+    async (argv) => {
+      await generateVerifier(argv.file, argv.out);
+    })
+  .command(
+    "export-verifier <file>",
+    "calculates oidc_digest for jwt in env var",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await exportVerifierCmd(argv.file);
+    })
   .strictCommands()
   .demandCommand(1);
 
