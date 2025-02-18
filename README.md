@@ -4,7 +4,7 @@ This repo contains circuits to verify that a JWT was signed
 by a given public key, and issues by a specific issuer,
 to a given user in the context of a given app.
 
-There is also code to generate to interact
+There is also code to interact
 with the circuits in nice way inside the user's
 browser.
 
