@@ -1,3 +1,7 @@
+/**
+ * author: @zkemail
+ * https://github.com/zkemail/jwt-tx-builder/blob/e5d79009fc5d00b97fcdcdeec697e1b9689a46b2/packages/circuits/utils/bytes.circom
+ */
 pragma circom 2.1.6;
 
 include "circomlib/circuits/comparators.circom";

@@ -1,11 +1,21 @@
+/**
+ * Based on @zkemail original code.
+ * Original: https://github.com/zkemail/jwt-tx-builder/blob/e5d79009fc5d00b97fcdcdeec697e1b9689a46b2/packages/circuits/jwt-verifier.circom
+ */
 pragma circom 2.2.0;
 
 include "@zk-email/circuits/lib/rsa.circom";
 include "circomlib/circuits/bitify.circom";
 
-/**
- * Verifies the result of a sha256 using RSA.
- */
+
+/// @title RsaVerify
+/// @dev Verifies `signature` for `msg` using `pubkey` with RSA.
+/// @dev `msg` is size 256 because this is meant to be used with RSA-sha256.
+/// @dev This uses big number representation in the form of n chunks of k size.
+/// @param n Amount of chunks used to represent big numbers.
+/// @param k Size of the chunks used to represent big numbers.
+/// @input msg[256] Message to verify. Size is 256 because it's meant to be used with sha256.
+/// @input pubkey[k] Public key represented as a big number of k chunks of size n.
 template RsaVerify(n, k) {
     signal input msg[256];
     signal input pubkey[k]; // pubkey

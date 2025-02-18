@@ -1,5 +1,8 @@
+/**
+ * author: @TheFrozenFire
+ * source: https://github.com/TheFrozenFire/snark-jwt-verify/blob/62522f195491f83eafb920171a34c5d9ebfa6e13/circuits/sha256.circom
+ */
 pragma circom 2.0.0;
-
 include "circomlib/circuits/sha256/constants.circom";
 include "circomlib/circuits/sha256/sha256compression.circom";
 include "circomlib/circuits/comparators.circom";
