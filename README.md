@@ -4,8 +4,7 @@ This repo contains circuits to verify that a JWT was signed
 by a given public key, and issued by a specific issuer,
 to a given user in the context of a given app.
 
-There is also code to interact
-with the circuits in a user-friendly way directly 
+There is also code to interact with the circuits in a user-friendly way directly
 from the browser.
 
 ## About the repo
@@ -28,7 +27,7 @@ some tools to facilitate all those processes.
 There is also a `lib` folder that contains helper
 code to generate proofs for these circuits in the browser itself.
 
-# Gettings started
+## Gettings started
 
 First, install dependencies:
 
@@ -66,14 +65,13 @@ pnpm tool verifier <file.circom>
 pnpm tool export-verifier <file.circom>
 ```
 
-
 ## Circuits
 
 The main circuit for this project is: [`jwt-tx-validation.circom`](./jwt-tx-validation.circom)
 
 That circuit is in charge of performing all the validations on the JWT.
 
-Inside the `utils` folder we have several templates that are used as components of the main one.
+Inside the `utils` folder we have several templates that are used
+as components of the main one.
 
 Inside the `test` folder there are circuits used exclusively for testing purposes.
-
