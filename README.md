@@ -1,16 +1,17 @@
 # ZkSync SSO social recovery circuits
 
-This repo contains circuits to verify that a JWT was signed
-by a given public key, and issued by a specific issuer,
-to a given user in the context of a given app.
+This repo contains circuits to verify that a JWT was signed by a given public
+key, and issued by a specific issuer, to a given user in the context of a given
+app.
 
 There is also code to interact with the circuits in a user-friendly way directly
 from the browser.
 
 ## About the repo
 
-This repo contains code written using the [circom language](https://docs.circom.io/).
-In order to generate and verify proofs, several steps are required:
+This repo contains code written using the
+[circom language](https://docs.circom.io/). In order to generate and verify
+proofs, several steps are required:
 
 1. Compile the circuit
 2. Generate the input
@@ -21,11 +22,11 @@ In order to generate and verify proofs, several steps are required:
 7. Generate proof
 8. Verify proof
 
-This repo contains not only the circuits itself, but also
-some tools to facilitate all those processes.
+This repo contains not only the circuits itself, but also some tools to
+facilitate all those processes.
 
-There is also a `lib` folder that contains helper
-code to generate proofs for these circuits in the browser itself.
+There is also a `lib` folder that contains helper code to generate proofs for
+these circuits in the browser itself.
 
 ## Gettings started
 
@@ -35,9 +36,9 @@ First, install dependencies:
 pnpm install
 ```
 
-Because working with circom requires a ton of little steps, this
-project has an internal CLI tool that can be used to perform
-the steps needed to make the circuit work:
+Because working with circom requires a ton of little steps, this project has an
+internal CLI tool that can be used to perform the steps needed to make the
+circuit work:
 
 ```bash
 # Compile the circuit
@@ -67,11 +68,13 @@ pnpm tool export-verifier <file.circom>
 
 ## Circuits
 
-The main circuit for this project is: [`jwt-tx-validation.circom`](./jwt-tx-validation.circom)
+The main circuit for this project is:
+[`jwt-tx-validation.circom`](./jwt-tx-validation.circom)
 
 That circuit is in charge of performing all the validations on the JWT.
 
-Inside the `utils` folder we have several templates that are used
-as components of the main one.
+Inside the `utils` folder we have several templates that are used as components
+of the main one.
 
-Inside the `test` folder there are circuits used exclusively for testing purposes.
+Inside the `test` folder there are circuits used exclusively for testing
+purposes.
