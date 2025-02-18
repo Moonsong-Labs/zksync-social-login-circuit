@@ -1,7 +1,7 @@
-import { poseidon7, poseidon9 } from "poseidon-lite";
+import { poseidon7 } from "poseidon-lite";
 
-import { ByteVector } from "./byte-vector.ts";
-import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, SUB_MAX_LENGTH } from "./constants.ts";
+import { ByteVector } from "./byte-vector.js";
+import { AUD_MAX_LENGTH, MAX_ISS_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
 
 export class OidcDigest {
   private iss: string;

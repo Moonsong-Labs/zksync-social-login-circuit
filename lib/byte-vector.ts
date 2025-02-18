@@ -1,6 +1,6 @@
-import { FIELD_BYTES } from "./constants.ts";
-import type { BinStr } from "./types.ts";
-import { base64UrlDecode, intoChunks } from "./utils.ts";
+import { FIELD_BYTES } from "./constants.js";
+import type { BinStr } from "./types.js";
+import { base64UrlDecode, intoChunks } from "./utils.js";
 
 export class ByteVector {
   private vec: number[];
@@ -66,10 +66,6 @@ export class ByteVector {
     return this.vec.flatMap((byte) => this.byteTo8digits(byte));
   }
 
-  private byteTo8digits(byte: number): BinStr[] {
-    return byte.toString(2).padStart(8, "0").split("") as BinStr[];
-  }
-
   toFieldArray(): bigint[] {
     const chunks = intoChunks(this.vec, FIELD_BYTES)
       .map((chunk) => new ByteVector(chunk))
@@ -105,7 +101,7 @@ export class ByteVector {
   toAsciiStr(): string {
     const buf = new Uint8Array(this.vec.length);
     for (let i = 0; i < this.vec.length; i++) {
-      buf[i] = this.vec[i];
+      buf[i] = this.vec[i]!;
     }
     return new TextDecoder("ascii").decode(buf);
   }
@@ -117,5 +113,9 @@ export class ByteVector {
   append(encodedL: ByteVector): ByteVector {
     const vec = [...this.vec, ...encodedL.vec];
     return new ByteVector(vec);
+  }
+
+  private byteTo8digits(byte: number): BinStr[] {
+    return byte.toString(2).padStart(8, "0").split("") as BinStr[];
   }
 }

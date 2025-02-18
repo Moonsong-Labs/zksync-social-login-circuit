@@ -1,9 +1,25 @@
 {
-  "name": "circuits",
-  "module": "index.ts",
+  "name": "zksync-sso-circuits",
+  "description": "ZKsync Smart Sign On Zk circuits",
+  "version": "0.0.0-development",
   "type": "module",
+  "main": "./dist/_cjs/index.js",
+  "module": "./dist/_esm/index.js",
+  "types": "./dist/_types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/_types/index.d.ts",
+      "import": "./dist/_esm/index.js",
+      "require": "./dist/_cjs/index.js"
+    }
+  },
   "scripts": {
-    "tool": "tsx tooling/cli.ts"
+    "tool": "tsx tooling/cli.ts",
+    "clean": "rm -rf *.tsbuildinfo dist",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:esm": "tsc --project tsconfig.build.json --module es2020 --outDir ./dist/_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./dist/_esm/package.json",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --outDir ./dist/_cjs --removeComments --verbatimModuleSyntax false && printf '{\"type\":\"commonjs\"}' > ./dist/_cjs/package.json",
+    "build:types": "tsc --project ./tsconfig.build.json --module esnext --declarationDir ./dist/_types --emitDeclarationOnly --declaration --declarationMap"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
