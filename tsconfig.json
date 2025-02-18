@@ -1,7 +1,5 @@
 {
-  "include": [
-    "tooling/**/*", "lib/**/*"
-  ],
+  "include": ["tooling/**/*", "lib/**/*"],
   "compilerOptions": {
     // Incremental builds
     // NOTE: Enabling incremental builds speeds up `tsc`. Keep in mind though that it does not reliably bust the cache when the `tsconfig.json` file changes.
@@ -17,7 +15,7 @@
     "noUnusedLocals": true, // Not enabled by default in `strict` mode.
     // "noUnusedParameters": true, // Not enabled by default in `strict` mode.
     // "exactOptionalPropertyTypes": true,
-     "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true,
 
     // JavaScript support
     "allowJs": false,
