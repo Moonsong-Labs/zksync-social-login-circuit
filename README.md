@@ -10,7 +10,7 @@ from the browser.
 
 ## About the repo
 
-This repo contains code writen using the [circom language](https://docs.circom.io/).
+This repo contains code written using the [circom language](https://docs.circom.io/).
 In order to generate and verify proofs, several steps are required:
 
 1. Compile the circuit
