@@ -8,6 +8,7 @@ import { downloadPtau } from "./download-ptau.ts";
 import { inputCommand } from "./generate-input.ts";
 import { witnessCommand } from "./witness.ts";
 import { zkeyCommand } from "./zkey.ts";
+import { digestCommand } from "./lib/digest.ts";
 
 config();
 const thisDir = import.meta.dirname;
@@ -57,14 +58,21 @@ const args = yargs(process.argv.slice(2))
   }, async (argv) => {
     await downloadPtau(argv.size);
   })
+  .command(
+    "oidc-digest",
+    "calculates oidc_digest for jwt in env var",
+    {},
+    async () => {
+      await digestCommand();
+    })
 
   .strictCommands()
   .demandCommand(1);
 
 // .parseAsync()
 
-async function main() {
+async function cli() {
   await args.parseAsync();
 }
 
-main().catch(console.error);
+cli().catch(console.error);
