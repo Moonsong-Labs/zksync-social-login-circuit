@@ -1,8 +1,8 @@
 import { ByteVector } from "../../lib/byte-vector.js";
-import { CircomBigInt } from "./circom-big-int.js";
 import { NUM_BLOCKS } from "../../lib/constants.js";
-import { JWT } from "./jwt.js";
 import type { BinStr, CircuitInput } from "../../lib/types.js";
+import { CircomBigInt } from "./circom-big-int.js";
+import { JWT } from "./jwt.js";
 
 type MainInputData = {
   msg: string[][];
