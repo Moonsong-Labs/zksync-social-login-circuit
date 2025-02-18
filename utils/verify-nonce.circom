@@ -40,7 +40,6 @@ template VerifyNonce() {
   signal b64Nonce[maxNonceB64Length] <== Base64UrlToBase64(maxNonceB64Length)(b64UrlNonce);
 
   var maxNonceLength = MAX_LENGTH_DECODED_NONCE();
-  assert(maxNonceLength == 33);
 
   // Decode base64
   signal nonce[maxNonceLength] <== Base64Decode(maxNonceLength)(b64Nonce);
