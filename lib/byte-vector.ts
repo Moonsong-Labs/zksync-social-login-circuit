@@ -1,6 +1,6 @@
 import { FIELD_BYTES } from "./constants.js";
 import type { BinStr } from "./types.js";
-import { base64UrlDecode, intoChunks } from "./utils.js";
+import { base64UrlDecode, base64UrlEncode, decodeHex, intoChunks } from "./utils.js";
 
 export class ByteVector {
   private vec: number[];
@@ -23,7 +23,7 @@ export class ByteVector {
     return new ByteVector(asciiCodes);
   }
 
-  static fromBase64String(data: string): ByteVector {
+  static fromBase64UrlString(data: string): ByteVector {
     const decoded = base64UrlDecode(data);
     return new ByteVector(Array.from(decoded));
   }
@@ -38,6 +38,11 @@ export class ByteVector {
       current = current >> 8n;
     }
     return new ByteVector(data.reverse());
+  }
+
+  static fromHex(hex: string): ByteVector {
+    const decoded = decodeHex(hex);
+    return new ByteVector(Array.from(decoded));
   }
 
   padLeft(filling: number, finalSize: number): ByteVector {
@@ -67,10 +72,9 @@ export class ByteVector {
   }
 
   toFieldArray(): bigint[] {
-    const chunks = intoChunks(this.vec, FIELD_BYTES)
-      .map((chunk) => new ByteVector(chunk))
+    return intoChunks(this.vec, FIELD_BYTES)
+      .map((chunk) => new ByteVector(chunk).reverse())
       .map((chunk) => chunk.toBigInt());
-    return chunks;
   }
 
   toBigInt(): bigint {
@@ -117,5 +121,15 @@ export class ByteVector {
 
   private byteTo8digits(byte: number): BinStr[] {
     return byte.toString(2).padStart(8, "0").split("") as BinStr[];
+  }
+
+  reverse(): ByteVector {
+    return new ByteVector(this.vec.reverse());
+  }
+
+  toBase64Url(): string {
+    const buf = new Uint8Array(this.vec.length);
+    this.vec.forEach((byte, i) => buf[i] = byte);
+    return base64UrlEncode(buf);
   }
 }

@@ -9,7 +9,7 @@ export class CircomBigInt {
   }
 
   static fromBase64(base64Str: string): CircomBigInt {
-    const vector = ByteVector.fromBase64String(base64Str);
+    const vector = ByteVector.fromBase64UrlString(base64Str);
     return this.fromByteVector(vector);
   }
 

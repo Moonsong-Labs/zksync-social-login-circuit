@@ -5,12 +5,15 @@ import yargs from "yargs";
 
 import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
+import { exportVerifierCmd } from "./export-verifier.js";
 import { inputCommand } from "./generate-input.js";
+import { generateVerifier } from "./generate-verifier.js";
+import { getJwtCmd } from "./get-jwt-cmd.js";
 import { digestCommand } from "./lib/digest.js";
+import { prepareZkeyCmd } from "./prepare-zkey.js";
+import { prove } from "./prove.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { generateVerifier } from "./generate-verifier.js";
-import { exportVerifierCmd } from "./export-verifier.js";
 
 config();
 
@@ -61,6 +64,11 @@ const args = yargs(process.argv.slice(2))
   }, async (argv) => {
     await downloadPtau(argv.size);
   })
+  .command("prepare-zkey <file>", "downloads perpetual power of tau file",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await prepareZkeyCmd(argv.file);
+    })
   .command(
     "oidc-digest",
     "calculates oidc_digest for jwt in env var",
@@ -68,6 +76,14 @@ const args = yargs(process.argv.slice(2))
     async () => {
       await digestCommand();
     })
+  .command(
+    "prove <file>",
+    "Calculates a proof using default inputs",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await prove(argv.file);
+    },
+  )
   .command(
     "verifier <file>",
     "calculates oidc_digest for jwt in env var",
@@ -91,10 +107,22 @@ const args = yargs(process.argv.slice(2))
     async (argv) => {
       await exportVerifierCmd(argv.file);
     })
+  .command(
+    "get-jwt <nonce>",
+    "Helps to perform oidc flow with given nonce. Prints resulting JWT.",
+    {
+      nonce: {
+        type: "string",
+        demandOption: true,
+        description: "Nonce used to obtain jwt",
+      },
+    },
+    async (argv) => {
+      await getJwtCmd(argv.nonce);
+    },
+  )
   .strictCommands()
   .demandCommand(1);
-
-// .parseAsync()
 
 async function cli() {
   await args.parseAsync();

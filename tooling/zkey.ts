@@ -9,6 +9,10 @@ export function r1csFilePath(name: string) {
   return `target/${name}/${name}.r1cs`;
 }
 
+export function rawZkeyFilePath(name: string): string {
+  return `target/${name}/${name}.zkey`;
+}
+
 export async function zkeyCommand(filePath: string, ptauPath: string) {
   const fileData = path.parse(filePath);
 
@@ -18,6 +22,6 @@ export async function zkeyCommand(filePath: string, ptauPath: string) {
 
   const r1cs = r1csFilePath(fileData.name);
 
-  const out = `target/${fileData.name}/${fileData.name}.zkey`;
+  const out = rawZkeyFilePath(fileData.name);
   await cmd(`snarkjs g16s ${r1cs} ${ptauPath} ${out}`);
 }
