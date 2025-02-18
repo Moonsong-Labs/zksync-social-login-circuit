@@ -8,7 +8,7 @@ include "./utils/jwt-data.circom";
 include "./utils/verify-oidc-digest.circom";
 include "./utils/verify-nonce.circom";
 
-/// @title JWTVerifier
+/// @title JwtTxValidation
 /// @notice Verifies JWT signatures and extracts header/payload components
 /// @dev This template verifies RSA-SHA256 signed JWTs and decodes Base64 encoded components.
 ///      It works by:
@@ -34,7 +34,7 @@ include "./utils/verify-nonce.circom";
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
-template JWTVerifier(
+template JwtTxValidation(
   n,
   k,
   maxMessageLength,
@@ -129,7 +129,7 @@ template JWTVerifier(
   VerifyNonce()(nonce, blindingFactor, txHash);
 }
 
-component main{public [pubkey, expectedIss, expectedAud, oidcDigest, txHash]} = JWTVerifier(
+component main{public [pubkey, expectedIss, expectedAud, oidcDigest, txHash]} = JwtTxValidation(
   121,
   17,
   1024,
