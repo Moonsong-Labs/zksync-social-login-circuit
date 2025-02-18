@@ -75,5 +75,5 @@ That circuit is in charge of performing all the validations on the JWT.
 
 Inside the `utils` folder we have several templates that are used as components of the main one.
 
-Inside the `test` folder there are circuits use for testing purposes only.
+Inside the `test` folder there are circuits used exclusively for testing purposes.
 
