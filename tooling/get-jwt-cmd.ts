@@ -75,7 +75,6 @@ export async function getJwtCmd(txHash: string) {
   const res = await fetch("https://www.googleapis.com/oauth2/v3/certs");
   const jwks = await res.json() as { keys: { kid: string; n: string } [] };
   const parsed = new JWT(rawJwt);
-  //
   const jwk = jwks.keys.find((jwk) => jwk.kid === parsed.kid);
 
   if (jwk === undefined) {
