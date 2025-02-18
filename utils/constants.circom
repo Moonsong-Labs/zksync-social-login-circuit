@@ -35,6 +35,11 @@ function SUB_KEY_LENGTH() {
     return 6;
 }
 
+function AUD_KEY_LENGTH() {
+    // len("aud":)
+    return 6;
+}
+
 // TODO: Assign a proper value to this
 function ISSUER_MAX_BYTES() {
     return 32;
@@ -56,11 +61,6 @@ function TIMESTAMP_LENGTH() {
 
 function INVITATION_CODE_LENGTH() {
     return 64;
-}
-
-function SUB_VALUE_LENGTH() {
-    // length of the "sub" field in JWT which identifies an unique user
-    return 21;
 }
 
 function JWT_TYP() {
@@ -86,6 +86,11 @@ function NONCE() {
 function ISS_KEY() {
     // "iss":
     return [34, 105, 115, 115, 34, 58];
+}
+
+function AUD_KEY() {
+    // "aud":
+    return [ 34, 97, 117, 100, 34, 58 ];
 }
 
 function IAT_KEY() {
