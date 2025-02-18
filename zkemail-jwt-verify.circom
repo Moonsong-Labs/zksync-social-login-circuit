@@ -6,6 +6,7 @@ include "@zk-email/circuits/utils/bytes.circom";
 include "circomlib/circuits/poseidon.circom";
 include "./utils/jwt-data.circom";
 include "./utils/verify-oidc-digest.circom";
+include "./utils/verify-nonce.circom";
 
 /// @title JWTVerifier
 /// @notice Verifies JWT signatures and extracts header/payload components
@@ -51,7 +52,6 @@ template JWTVerifier(
 
   signal input nonceKeyStartIndex; // Index for '"nonce":' substring in paylaoad
   signal input nonceLength; // Length for nonce.
-  signal input expectedNonce[maxNonceLength]; // Expected value for nonce
 
   signal input issKeyStartIndex; // Index for '"iss":' substring in payload
   signal input issLength; // Real length for iss value.
@@ -66,6 +66,9 @@ template JWTVerifier(
 
   signal input salt; // Salt used to generate oidcDigest
   signal input oidcDigest; // Poseidon(iss, aud, sub, salt)
+
+  signal input txHash[2];
+  signal input blindingFactor;
 
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
@@ -122,14 +125,16 @@ template JWTVerifier(
     salt,
     oidcDigest
   );
+
+  VerifyNonce()(nonce, blindingFactor, txHash);
 }
 
-component main{public [pubkey, expectedNonce, expectedIss, expectedAud, oidcDigest]} = JWTVerifier(
+component main{public [pubkey, expectedIss, expectedAud, oidcDigest, txHash]} = JWTVerifier(
   121,
   17,
   1024,
   1024,
-  64,
+  44,
   31,
   100,
   31

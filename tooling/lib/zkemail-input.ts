@@ -1,14 +1,8 @@
-import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_MSG_LENGTH, MAX_NONCE_LENGTH, SUB_MAX_LENGTH } from "../../lib/constants.js";
+import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "../../lib/constants.js";
 import { ByteVector, OidcDigest } from "../../lib/index.js";
 import type { CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
-
-type Payload = {
-  nonce: string;
-  iss: string;
-  aud: string;
-  sub: string;
-};
+import { JWT } from "./jwt.js";
 
 type ZkEmailInputData = {
   message: string[];
@@ -18,7 +12,6 @@ type ZkEmailInputData = {
   periodIndex: string;
   nonceKeyStartIndex: string;
   nonceLength: string;
-  expectedNonce: string[];
   issKeyStartIndex: string;
   issLength: string;
   expectedIss: string[];
@@ -27,24 +20,29 @@ type ZkEmailInputData = {
   expectedAud: string[];
   subKeyStartIndex: string;
   subLength: string;
-  expectedSub: string[];
   salt: string;
   oidcDigest: string;
+  txHash: string[];
+  blindingFactor: string;
 };
 
 export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
-  private rawJWT: string;
+  private jwt: JWT;
   private jwkModulus: string;
   private salt: bigint;
+  private rawTxHash: string;
+  private blinding: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string, salt: bigint) {
-    this.rawJWT = rawJWT;
+  constructor(rawJWT: string, jwkModulus: string, salt: bigint, txHash: string, blinding: bigint) {
+    this.jwt = new JWT(rawJWT);
     this.jwkModulus = jwkModulus;
     this.salt = salt;
+    this.rawTxHash = txHash;
+    this.blinding = blinding;
   }
 
   toObject(): ZkEmailInputData {
-    const periodIndex = this.rawJWT.indexOf(".");
+    const periodIndex = this.jwt.raw.indexOf(".");
     const [messagePadded, messagePaddedLen] = this.message();
 
     return {
@@ -55,7 +53,6 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       periodIndex: periodIndex.toString(),
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
       nonceLength: this.nonceLength(),
-      expectedNonce: this.expectedNonce(),
       issKeyStartIndex: this.issKeyStartIndex(),
       issLength: this.issLength(),
       expectedIss: this.expectedIss(),
@@ -64,40 +61,26 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
       expectedAud: this.expectedAud(),
       subKeyStartIndex: this.subKeyStartIndex(),
       subLength: this.subLength(),
-      expectedSub: this.expectedSub(),
       salt: this.salt.toString(),
       oidcDigest: this.oidcDigest(),
+      txHash: this.serializeTxHash(),
+      blindingFactor: this.blinding.toString(),
     };
   }
 
-  private oidcDigest(): string {
-    const payload = this.payload();
+  private serializeTxHash(): string[] {
+    return ByteVector.fromHex(this.rawTxHash).toFieldArray().map((n) => n.toString());
+  }
 
+  private oidcDigest(): string {
     const salt = ByteVector.fromBigInt(this.salt);
-    const digest = new OidcDigest(payload.iss, payload.aud, payload.sub, salt);
+    const digest = new OidcDigest(this.jwt.iss, this.jwt.aud, this.jwt.sub, salt);
 
     return digest.serialize();
   }
 
-  private rawPayload(): string {
-    const payload = this.rawJWT.split(".")[1];
-    if (payload === undefined) {
-      throw new Error("Error parsing JWT.");
-    }
-    return payload;
-  }
-
-  private rawSignature(): string {
-    const signature = this.rawJWT.split(".")[2];
-    if (signature === undefined) {
-      throw new Error("Error parsing JWT.");
-    }
-    return signature;
-  }
-
   private message(): [ByteVector, number] {
-    const [header, payload] = this.rawJWT.split(".");
-    const msg = ByteVector.fromAsciiString(`${header}.${payload}`);
+    const msg = ByteVector.fromAsciiString(this.jwt.message());
     const L = BigInt(msg.byteLength * 8);
 
     // rfc4634 4.1
@@ -132,7 +115,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private signature(): string[] {
-    return CircomBigInt.fromBase64(this.rawSignature()).serialize();
+    return CircomBigInt.fromBase64(this.jwt.signature).serialize();
   }
 
   // nonce
@@ -142,11 +125,11 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private nonceLength(): string {
-    return this.buildCircomStringLength(this.payload().nonce);
-  }
-
-  private expectedNonce(): string[] {
-    return this.buildCircomExpectedValue(this.payload().nonce, MAX_NONCE_LENGTH);
+    const length = this.buildCircomStringLength(this.jwt.nonce);
+    if (Number(length) > MAX_B64_NONCE_LENGTH) {
+      throw new Error("Nonce too long");
+    }
+    return length;
   }
 
   // iss
@@ -156,11 +139,11 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private issLength(): string {
-    return this.buildCircomStringLength(this.payload().iss);
+    return this.buildCircomStringLength(this.jwt.iss);
   }
 
   private expectedIss(): string[] {
-    return this.buildCircomExpectedValue(this.payload().iss, ISS_MAX_LENGTH);
+    return this.buildCircomExpectedValue(this.jwt.iss, ISS_MAX_LENGTH);
   }
 
   // aud
@@ -170,11 +153,11 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private audLength(): string {
-    return this.buildCircomStringLength(this.payload().aud);
+    return this.buildCircomStringLength(this.jwt.aud);
   }
 
   private expectedAud(): string[] {
-    return this.buildCircomExpectedValue(this.payload().aud, AUD_MAX_LENGTH);
+    return this.buildCircomExpectedValue(this.jwt.aud, AUD_MAX_LENGTH);
   }
 
   // sub
@@ -184,32 +167,10 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private subLength(): string {
-    return this.buildCircomStringLength(this.payload().sub);
-  }
-
-  private expectedSub(): string[] {
-    return this.buildCircomExpectedValue(this.payload().sub, SUB_MAX_LENGTH);
+    return this.buildCircomStringLength(this.jwt.sub);
   }
 
   // Helpers
-
-  private payload(): Payload {
-    const rawJson = ByteVector.fromBase64String(this.rawPayload()).toAsciiStr();
-    const json = JSON.parse(rawJson);
-
-    for (const prop of ["nonce", "iss", "aud", "sub"]) {
-      if (!Object.hasOwn(json, prop)) {
-        throw new Error(`Missing '${prop}' inside JWT payload`);
-      }
-
-      if (typeof json.nonce !== "string") {
-        throw new Error(`Property '${prop}' inside JWT is not a string`);
-      }
-    }
-
-    return json;
-  }
-
   private buildCircomExpectedValue(value: string, maxLength: number): string[] {
     return ByteVector.fromAsciiString(value)
       .padRight(0, maxLength)
@@ -221,7 +182,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
   }
 
   private findSubstringIndexForPayload(value: string): string {
-    const rawJson = ByteVector.fromBase64String(this.rawPayload()).toAsciiStr();
+    const rawJson = ByteVector.fromBase64UrlString(this.jwt.payload).toAsciiStr();
     const valueIndex = rawJson.indexOf(value);
     if (valueIndex === -1) {
       throw new Error(`Missing ${value} inside JWT payload`);
