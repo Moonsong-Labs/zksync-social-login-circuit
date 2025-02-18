@@ -22,9 +22,11 @@
     "build:types": "tsc --project ./tsconfig.build.json --module esnext --declarationDir ./dist/_types --emitDeclarationOnly --declaration --declarationMap"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
     "@types/yargs": "^17.0.33",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "tsx": "^4.19.2"
   },
   "peerDependencies": {
