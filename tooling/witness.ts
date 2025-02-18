@@ -14,7 +14,7 @@ export async function witnessCommand(filePath: string) {
 
   const wtnsScript = `target/${fileData.name}/${fileData.name}_js/generate_witness.js`;
   const wasm = `target/${fileData.name}/${fileData.name}_js/${fileData.name}.wasm`;
-  const out = `target/${fileData.name}.wtns`;
+  const out = `target/${fileData.name}/${fileData.name}.wtns`;
 
   if ([wtnsScript, wasm].some((file) => !existsSync(file))) {
     throw new Error("Missing compilation output. Try running `tooling compile :circuit:`");
