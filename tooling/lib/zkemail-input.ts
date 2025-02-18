@@ -4,7 +4,7 @@ import type { CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
 import { JWT } from "./jwt.js";
 
-type ZkEmailInputData = {
+type JwtTxValidationData = {
   message: string[];
   messageLength: string;
   pubkey: string[];
@@ -26,7 +26,7 @@ type ZkEmailInputData = {
   blindingFactor: string;
 };
 
-export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
+export class JwtTxValidationInputs implements CircuitInput<JwtTxValidationData> {
   private jwt: JWT;
   private jwkModulus: string;
   private salt: bigint;
@@ -41,7 +41,7 @@ export class ZkEmailCircuitInput implements CircuitInput<ZkEmailInputData> {
     this.blinding = blinding;
   }
 
-  toObject(): ZkEmailInputData {
+  toObject(): JwtTxValidationData {
     const periodIndex = this.jwt.raw.indexOf(".");
     const [messagePadded, messagePaddedLen] = this.message();
 

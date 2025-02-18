@@ -5,17 +5,15 @@ import type { CircuitInput } from "../lib/types.js";
 import { BlindingFactorInputTest } from "./lib/blinding-factor-input.js";
 import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
-import { MainCircuitInput } from "./lib/main-input.js";
+import { FrozenFireSha2Input } from "./lib/frozen-fire-sha2-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
-import { ZkEmailCircuitInput } from "./lib/zkemail-input.js";
+import { JwtTxValidationInputs } from "./lib/zkemail-input.js";
 
 type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  main: (jwt: string, key: string, _salt: bigint, _txHash: string, _blinding: bigint) => new MainCircuitInput(jwt, key),
-  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new ZkEmailCircuitInput(jwt, key, salt, txHash, blinding),
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  "poseidon-test": (_a: string, _b: string, _salt: bigint) => new PoseidonTest(),
+  "frozen-fire-sha2": (jwt: string, key: string, _salt: bigint, _txHash: string, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
+  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
+  "poseidon-test": () => new PoseidonTest(),
   "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
     new BlindingFactorInputTest(jwt, key, salt, txHash, blinding),
 };
