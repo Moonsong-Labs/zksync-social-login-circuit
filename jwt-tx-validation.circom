@@ -50,7 +50,7 @@ template JwtTxValidation(
   signal input signature[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
-  signal input nonceKeyStartIndex; // Index for '"nonce":' substring in paylaoad
+  signal input nonceKeyStartIndex; // Index for '"nonce":' substring in payload
   signal input nonceLength; // Length for nonce.
 
   signal input issKeyStartIndex; // Index for '"iss":' substring in payload

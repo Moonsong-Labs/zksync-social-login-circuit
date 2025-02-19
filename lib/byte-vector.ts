@@ -78,7 +78,7 @@ export class ByteVector {
   }
 
   toBigInt(): bigint {
-    // Because we cansider this was read from left to right, the result number is "big endian"-ish.
+    // Because we consider this was read from left to right, the result number is "big endian"-ish.
     const parts = this.vec.reverse().map((byte, i) => {
       return BigInt(byte) << 8n * BigInt(i);
     });
