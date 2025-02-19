@@ -1,5 +1,4 @@
 pragma circom 2.2.0;
-// include "@zk-email/circuits/lib/sha.circom";
 include "circomlib/circuits/sha256/sha256.circom";
 include "utils/sha256_unsafe.circom";
 include "../utils/rsa_verify.circom";
