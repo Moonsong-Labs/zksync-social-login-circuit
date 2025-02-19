@@ -1,4 +1,4 @@
-# ZkSync SSO social recovery circuits
+# ZKSync SSO social recovery circuits
 
 This repo contains circuits to verify that a JWT was signed by a given public
 key, and issued by a specific issuer, to a given user in the context of a given

@@ -23,7 +23,7 @@ function ASCII_EQUAL() {
 }
 
 /// @title Base64UrlToBase64
-/// @notice Asumes input is encoded as base64url and translates to regular base64.
+/// @notice Assumes input is encoded as base64url and translates to regular base64.
 /// @dev We use this to translate from a base64 received into jwt to zkemail's base64 decoder.
 /// @param n Length of the array to re encode.
 /// @input b64Url Array of base64url characters.
