@@ -1,4 +1,4 @@
-import { ByteVector } from "../../lib/index.js";
+import { ByteVector } from "./index.js";
 
 function assertDef<T>(input: T | undefined): asserts input is T {
   if (input === undefined) {
