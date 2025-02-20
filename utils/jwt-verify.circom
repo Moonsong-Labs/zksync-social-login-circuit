@@ -1,3 +1,7 @@
+/**
+ * Based on @zkemail original code.
+ * source: https://github.com/zkemail/jwt-tx-builder/blob/e5d79009fc5d00b97fcdcdeec697e1b9689a46b2/packages/circuits/jwt-verifier.circom
+ */
 pragma circom 2.2.0;
 
 include "circomlib/circuits/bitify.circom";
