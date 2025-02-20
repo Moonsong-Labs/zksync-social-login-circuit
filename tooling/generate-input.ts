@@ -12,7 +12,7 @@ import { JwtTxValidationInputs } from "./lib/zkemail-input.js";
 type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
   "frozen-fire-sha2": (jwt: string, key: string, _salt: bigint, _txHash: string, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
-  "zkemail-jwt-verify": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
+  "jwt-tx-validation": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
   "poseidon-test": () => new PoseidonTest(),
   "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
     new BlindingFactorInputTest(jwt, key, salt, txHash, blinding),
