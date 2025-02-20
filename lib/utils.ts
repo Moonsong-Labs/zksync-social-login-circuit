@@ -60,6 +60,18 @@ export function decodeHex(hexString: string): Uint8Array {
   return bytes;
 }
 
+export function encodeHex(bytes: Uint8Array): string {
+  const parts: string[] = ["0x"];
+  const hexChars = "0123456789abcdef";
+  for (const byte of bytes) {
+    const leftHalf = (byte & 0b11110000) >> 4;
+    const rightHalf = byte & 0b00001111;
+    parts.push(`${hexChars[leftHalf]}${hexChars[rightHalf]}`);
+  }
+
+  return parts.join("");
+}
+
 export function base64UrlEncode(bytes: Uint8Array): string {
   let base64 = "";
   const encodings = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
