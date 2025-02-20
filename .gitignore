@@ -179,3 +179,8 @@ dist
 target
 ptaus
 inputs
+
+
+
+.nx/cache
+.nx/workspace-data
