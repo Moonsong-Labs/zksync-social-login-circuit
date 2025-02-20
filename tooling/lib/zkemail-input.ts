@@ -2,7 +2,7 @@ import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } 
 import { ByteVector, OidcDigest } from "../../lib/index.js";
 import type { CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
-import { JWT } from "./jwt.js";
+import { JWT } from "../../lib/jwt.js";
 
 type JwtTxValidationData = {
   message: string[];
