@@ -16,7 +16,6 @@ template BytesToField(n) {
 
   for (var i = 0; i < n; i++) {
     var shifts = i * 8;
-    var a = (1 << shifts) * revert[i];
     members[i] <== (1 << shifts) * revert[i];
   }
 
