@@ -1,13 +1,13 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { JwtTxValidationInputs } from "../lib/jwt-tx-validation-input.js";
 import type { CircuitInput } from "../lib/types.js";
 import { BlindingFactorInputTest } from "./lib/blinding-factor-input.js";
 import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { FrozenFireSha2Input } from "./lib/frozen-fire-sha2-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
-import { JwtTxValidationInputs } from "./lib/zkemail-input.js";
 
 type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => CircuitInput<unknown>;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
