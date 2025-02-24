@@ -20,6 +20,10 @@ export class OidcDigest {
     return this.toBigInt().toString();
   }
 
+  toHex(): string {
+    return ByteVector.fromBigInt(this.toBigInt()).toHex();
+  }
+
   toBigInt(): bigint {
     const iss = ByteVector.fromAsciiString(this.iss).padRight(0, ISS_MAX_LENGTH).toFieldArray(); // 1 Field
     const aud = ByteVector.fromAsciiString(this.aud).padRight(0, AUD_MAX_LENGTH).toFieldArray(); // 4 Fields
