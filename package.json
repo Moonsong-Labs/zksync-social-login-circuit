@@ -25,11 +25,12 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
+    "@types/snarkjs": "^0.7.9",
     "@types/yargs": "^17.0.33",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "tsx": "^4.19.2",
     "nx": "19.8.6",
+    "tsx": "^4.19.2",
     "yargs": "^17.7.2"
   },
   "peerDependencies": {
@@ -39,7 +40,8 @@
     "@zk-email/circuits": "^6.2.0",
     "change-case": "^5.4.4",
     "circomlib": "^2.0.5",
-    "poseidon-lite": "^0.3.0"
+    "poseidon-lite": "^0.3.0",
+    "snarkjs": "^0.7.5"
   },
   "nx": {}
 }
