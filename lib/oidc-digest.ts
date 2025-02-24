@@ -1,6 +1,6 @@
 import { poseidon7 } from "poseidon-lite";
 
-import { ByteVector } from "./byte-vector.js";
+import { ByteVector, type Hex } from "./byte-vector.js";
 import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
 
 export class OidcDigest {
@@ -20,7 +20,7 @@ export class OidcDigest {
     return this.toBigInt().toString();
   }
 
-  toHex(): string {
+  toHex(): Hex {
     return ByteVector.fromBigInt(this.toBigInt()).toHex();
   }
 
