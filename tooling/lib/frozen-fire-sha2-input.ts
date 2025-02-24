@@ -1,7 +1,7 @@
 import { ByteVector } from "../../lib/byte-vector.js";
 import { NUM_BLOCKS } from "../../lib/constants.js";
 import type { BinStr, CircuitInput } from "../../lib/types.js";
-import { CircomBigInt } from "./circom-big-int.js";
+import { CircomBigInt } from "../../lib/circom-big-int.js";
 import { JWT } from "../../lib/jwt.js";
 
 type FrozenByteSha2Data = {
