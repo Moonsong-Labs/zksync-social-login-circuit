@@ -10,7 +10,7 @@ type PoseidonTestInput = {
   oidcDigest: string;
 };
 
-export class PoseidonTest implements CircuitInput<PoseidonTestInput> {
+export class PoseidonTest implements CircuitInput {
   toObject(): PoseidonTestInput {
     const rawIss = "google.com";
     const expectedIss = ByteVector.fromAsciiString(rawIss)

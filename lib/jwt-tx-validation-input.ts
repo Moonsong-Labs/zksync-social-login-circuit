@@ -26,7 +26,7 @@ type JwtTxValidationData = {
   blindingFactor: string;
 };
 
-export class JwtTxValidationInputs implements CircuitInput<JwtTxValidationData> {
+export class JwtTxValidationInputs implements CircuitInput {
   private jwt: JWT;
   private jwkModulus: string;
   private salt: bigint;

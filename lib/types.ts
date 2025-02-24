@@ -1,5 +1,12 @@
 export type BinStr = "0" | "1";
+import type {
+  CircuitSignals,
+  Groth16Proof,
+  PublicSignals,
+} from "snarkjs";
 
-export interface CircuitInput<T> {
-  toObject(): T;
+export type { CircuitSignals, Groth16Proof, PublicSignals};
+
+export interface CircuitInput {
+  toObject(): CircuitSignals;
 }
