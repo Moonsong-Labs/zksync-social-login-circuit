@@ -7,7 +7,7 @@ export class OidcDigest {
   private iss: string;
   private aud: string;
   private sub: string;
-  private salt: ByteVector;
+  public salt: ByteVector;
 
   constructor(iss: string, aud: string, sub: string, salt: ByteVector) {
     this.iss = iss;
