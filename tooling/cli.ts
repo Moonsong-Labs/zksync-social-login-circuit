@@ -14,6 +14,7 @@ import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { exportCircuitCmd } from "./export-circuit.js";
 
 config();
 
@@ -107,6 +108,14 @@ const args = yargs(process.argv.slice(2))
     async (argv) => {
       await exportVerifierCmd(argv.file);
     })
+  .command(
+    "export-circuit",
+    "Exports circuit files directly into Auth Server public folder",
+    {},
+    async () => {
+      await exportCircuitCmd();
+    },
+  )
   .command(
     "get-jwt <nonce>",
     "Helps to perform oidc flow with given nonce. Prints resulting JWT.",

@@ -1,8 +1,8 @@
-import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "../../lib/constants.js";
-import { ByteVector, OidcDigest } from "../../lib/index.js";
-import type { CircuitInput } from "../../lib/types.js";
 import { CircomBigInt } from "./circom-big-int.js";
-import { JWT } from "../../lib/jwt.js";
+import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
+import { ByteVector, OidcDigest } from "./index.js";
+import { JWT } from "./jwt.js";
+import type { CircuitInput } from "./types.js";
 
 type JwtTxValidationData = {
   message: string[];
@@ -26,7 +26,7 @@ type JwtTxValidationData = {
   blindingFactor: string;
 };
 
-export class JwtTxValidationInputs implements CircuitInput<JwtTxValidationData> {
+export class JwtTxValidationInputs implements CircuitInput {
   private jwt: JWT;
   private jwkModulus: string;
   private salt: bigint;

@@ -1,13 +1,13 @@
 import { poseidon7 } from "poseidon-lite";
 
-import { ByteVector } from "./byte-vector.js";
+import { ByteVector, type Hex } from "./byte-vector.js";
 import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, SUB_MAX_LENGTH } from "./constants.js";
 
 export class OidcDigest {
   private iss: string;
   private aud: string;
   private sub: string;
-  private salt: ByteVector;
+  public salt: ByteVector;
 
   constructor(iss: string, aud: string, sub: string, salt: ByteVector) {
     this.iss = iss;
@@ -18,6 +18,10 @@ export class OidcDigest {
 
   serialize(): string {
     return this.toBigInt().toString();
+  }
+
+  toHex(): Hex {
+    return ByteVector.fromBigInt(this.toBigInt()).toHex();
   }
 
   toBigInt(): bigint {
