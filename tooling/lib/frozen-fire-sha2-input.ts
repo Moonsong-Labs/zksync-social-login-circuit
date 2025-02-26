@@ -1,8 +1,8 @@
 import { ByteVector } from "../../lib/byte-vector.js";
+import { CircomBigInt } from "../../lib/circom-big-int.js";
 import { NUM_BLOCKS } from "../../lib/constants.js";
-import type { BinStr, CircuitInput } from "../../lib/types.js";
-import { CircomBigInt } from "./circom-big-int.js";
 import { JWT } from "../../lib/jwt.js";
+import type { BinStr, CircuitInput } from "../../lib/types.js";
 
 type FrozenByteSha2Data = {
   msg: string[][];
@@ -21,7 +21,7 @@ function assertBinStr(str: string): asserts str is BinStr {
   }
 }
 
-export class FrozenFireSha2Input implements CircuitInput<FrozenByteSha2Data> {
+export class FrozenFireSha2Input implements CircuitInput {
   private jwt: JWT;
   private pubKey: string;
   private msg: ByteVector;

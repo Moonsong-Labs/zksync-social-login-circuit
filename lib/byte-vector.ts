@@ -2,6 +2,8 @@ import { FIELD_BYTES } from "./constants.js";
 import type { BinStr } from "./types.js";
 import { base64UrlDecode, base64UrlEncode, decodeHex, encodeHex, intoChunks } from "./utils.js";
 
+export type Hex = `0x${string}`;
+
 export class ByteVector {
   private vec: number[];
 
@@ -133,9 +135,9 @@ export class ByteVector {
     return base64UrlEncode(buf);
   }
 
-  toHex(): string {
+  toHex(): Hex {
     const buf = new Uint8Array(this.vec.length);
     this.vec.forEach((byte, i) => buf[i] = byte);
-    return encodeHex(buf);
+    return encodeHex(buf) as Hex;
   }
 }
