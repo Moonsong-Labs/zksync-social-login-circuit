@@ -5,7 +5,7 @@ import { cmd } from "./lib/cmd.js";
 import { rawZkeyFilePath } from "./zkey.js";
 
 export function preparedZkeyFile(name: string): string {
-  return `target/${name}/${name}.prepared.zkey`;
+  return `target/${name}/${name}.final.zkey`;
 }
 
 export async function prepareZkeyCmd(file: string) {
@@ -13,8 +13,12 @@ export async function prepareZkeyCmd(file: string) {
   await cmd(`mkdir -p ptaus`);
 
   const inZkey = rawZkeyFilePath(parsed.name);
-  const outZkey = `target/${parsed.name}/${parsed.name}.prepared.zkey`;
+  const phase2Zkey = `target/${parsed.name}/${parsed.name}.phase2.zkey`;
 
   const entropy = randomBytes(32).toString("hex");
-  await cmd(`snarkjs zkc ${inZkey} ${outZkey} -e="${entropy}" -v`);
+  await cmd(`snarkjs zkc ${inZkey} ${phase2Zkey} -e="${entropy}" -v`);
+
+  const beacon = randomBytes(32).toString("hex");
+  const finalZkey = `target/${parsed.name}/${parsed.name}.final.zkey`;
+  await cmd(`snarkjs zkb ${phase2Zkey} ${finalZkey} ${beacon} 10 -v`);
 }
