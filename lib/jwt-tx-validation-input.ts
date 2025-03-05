@@ -4,7 +4,7 @@ import { ByteVector, OidcDigest } from "./index.js";
 import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
 
-type JwtTxValidationData = {
+export type JwtTxValidationData = {
   message: string[];
   messageLength: string;
   pubkey: string[];
