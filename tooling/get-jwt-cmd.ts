@@ -3,9 +3,9 @@ import assert from "node:assert";
 import express from "express";
 
 import { createNonce } from "../lib/create-nonce.js";
+import { JWT } from "../lib/jwt.js";
 import { ByteVector } from "./lib.js";
 import { env } from "./lib/env.js";
-import { JWT } from "../lib/jwt.js";
 
 function waitForJwt(): Promise<string> {
   const app = express();
