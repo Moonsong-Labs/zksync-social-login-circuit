@@ -5,6 +5,7 @@ import yargs from "yargs";
 
 import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
+import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
 import { inputCommand } from "./generate-input.js";
 import { generateVerifier } from "./generate-verifier.js";
@@ -14,7 +15,6 @@ import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { exportCircuitCmd } from "./export-circuit.js";
 
 config();
 
