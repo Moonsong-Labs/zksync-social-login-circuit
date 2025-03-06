@@ -5,6 +5,7 @@ import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
 import { cmd, ROOT_DIR } from "./lib/cmd.js";
 import { DEFAULT_PTAU, r1csFilePath, zkeyCommand } from "./zkey.js";
+import { preparedZkeyFile } from "./prepare-zkey.js";
 
 export async function generateVerifier(circuit: string, outFile: string | null): Promise<void> {
   const fileData = path.parse(circuit);
@@ -12,7 +13,7 @@ export async function generateVerifier(circuit: string, outFile: string | null):
   const outPath = outFile === null
     ? `target/${name}/verifier.sol`
     : outFile;
-  const zkey = `target/${name}/${name}.zkey`;
+  const zkey = preparedZkeyFile(name);
 
   if (!fs.existsSync(path.join(ROOT_DIR, zkey))) {
     console.log("Missing zkey file. Trying to recreate:");
