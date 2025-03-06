@@ -7,6 +7,10 @@ import { cmd, ROOT_DIR } from "./lib/cmd.js";
 import { DEFAULT_PTAU, r1csFilePath, zkeyCommand } from "./zkey.js";
 import { preparedZkeyFile } from "./prepare-zkey.js";
 
+export function defaultVerifierPath(name: string): string {
+  return `target/${name}/verifier.sol`;
+}
+
 export async function generateVerifier(circuit: string, outFile: string | null): Promise<void> {
   const fileData = path.parse(circuit);
   const name = fileData.name;
