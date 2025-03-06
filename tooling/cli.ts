@@ -3,7 +3,9 @@ import path from "node:path";
 import { config } from "dotenv";
 import yargs from "yargs";
 
+import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
+import { deployVerifier } from "./deploy-verifier.js";
 import { downloadPtau } from "./download-ptau.js";
 import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
@@ -13,12 +15,10 @@ import { getJwtCmd } from "./get-jwt-cmd.js";
 import { digestCommand } from "./lib/digest.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
-import { witnessCommand } from "./witness.js";
-import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 import { verificationKeyCmd } from "./verification-key.js";
 import { verifyCmd } from "./verify.js";
-import { deployVerifier } from "./deploy-verifier.js";
-import { callVerifierCmd } from "./call-verifier.js";
+import { witnessCommand } from "./witness.js";
+import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 
 config();
 
