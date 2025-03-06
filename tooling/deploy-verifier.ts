@@ -2,8 +2,8 @@
 
 import path from "node:path";
 
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
 import { defaultVerifierPath } from "./generate-verifier.js";
+import { cmd, ROOT_DIR } from "./lib/cmd.js";
 
 export async function deployVerifier(circuit: string): Promise<void> {
   const data = path.parse(circuit);

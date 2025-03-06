@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import { cmd } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { proofPath, publicInputPath } from "./prove.js";
-import { cmd } from "./lib/cmd.js";
 
 export async function callVerifierCmd(circuit: string) {
   const fileData = path.parse(circuit);
