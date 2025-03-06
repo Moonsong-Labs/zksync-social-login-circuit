@@ -5,6 +5,14 @@ import { cmd } from "./lib/cmd.js";
 import { preparedZkeyFile } from "./prepare-zkey.js";
 import { witnessFile } from "./witness.js";
 
+export function proofPath(name: string): string {
+  return `target/${name}/proof.json`;
+}
+
+export function publicInputPath(name: string): string {
+  return `target/${name}/public-input.json`;
+}
+
 export async function prove(filePath: string) {
   const fileData = path.parse(filePath);
 
@@ -18,5 +26,5 @@ export async function prove(filePath: string) {
   const outProof = `target/${fileData.name}/proof.json`;
   const outPublic = `target/${fileData.name}/public-input.json`;
 
-  await cmd(`snarkjs g16p ${zkey} ${witness} ${outProof} ${outPublic}`);
+  await cmd(`snarkjs g16p ${zkey} ${witness} ${outProof} ${outPublic} -v`);
 }

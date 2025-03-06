@@ -15,6 +15,8 @@ import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { verificationKeyCmd } from "./verification-key.js";
+import { verifyCmd } from "./verify.js";
 
 config();
 
@@ -100,6 +102,20 @@ const args = yargs(process.argv.slice(2))
     },
     async (argv) => {
       await generateVerifier(argv.file, argv.out);
+    })
+  .command(
+    "vkey <file>",
+    "exports verification key for a circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verificationKeyCmd(argv.file);
+    })
+  .command(
+    "verify <file>",
+    "exports verification key for a circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verifyCmd(argv.file);
     })
   .command(
     "export-verifier <file>",
