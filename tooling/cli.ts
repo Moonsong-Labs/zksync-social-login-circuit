@@ -17,6 +17,8 @@ import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 import { verificationKeyCmd } from "./verification-key.js";
 import { verifyCmd } from "./verify.js";
+import { deployVerifier } from "./deploy-verifier.js";
+import { callVerifierCmd } from "./call-verifier.js";
 
 config();
 
@@ -124,6 +126,22 @@ const args = yargs(process.argv.slice(2))
     async (argv) => {
       await exportVerifierCmd(argv.file);
     })
+  .command(
+    "deploy-verifier <file>",
+    "deploys verifier to local anvil",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await deployVerifier(argv.file);
+    },
+  )
+  .command(
+    "call-verifier <file>",
+    "cast calls verifier",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await callVerifierCmd(argv.file);
+    },
+  )
   .command(
     "export-circuit",
     "Exports circuit files directly into Auth Server public folder",
