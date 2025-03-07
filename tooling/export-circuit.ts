@@ -25,7 +25,7 @@ export async function exportCircuitCmd(): Promise<void> {
 
   const zkOrigin = preparedZkeyFile(mainName);
   if (!fs.existsSync(zkOrigin)) {
-    throw new Error("Missing wasm file. Try running running `pnpm tool compile` first");
+    throw new Error("Missing zkey file. Please generate and prepare it first.");
   }
 
   const zkDst = path.join(outDir, "circuit.zkey");

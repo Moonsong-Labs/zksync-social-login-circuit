@@ -4,7 +4,7 @@ import path from "node:path";
 import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
 import { cmd, ROOT_DIR } from "./lib/cmd.js";
-import { preparedZkeyFile } from "./prepare-zkey.js";
+import { preparedZkeyFile, prepareZkeyCmd } from "./prepare-zkey.js";
 import { DEFAULT_PTAU, r1csFilePath, zkeyCommand } from "./zkey.js";
 
 export function defaultVerifierPath(name: string): string {
@@ -31,6 +31,7 @@ export async function generateVerifier(circuit: string, outFile: string | null):
       await compileCmd(circuit);
     }
     await zkeyCommand(circuit, DEFAULT_PTAU);
+    await prepareZkeyCmd(circuit);
   }
 
   await cmd(`snarkjs zkey export solidityverifier ${zkey} ${outPath}`);
