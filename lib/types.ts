@@ -5,7 +5,7 @@ import type {
   PublicSignals,
 } from "snarkjs";
 
-export type { CircuitSignals, Groth16Proof, PublicSignals};
+export type { CircuitSignals, Groth16Proof, PublicSignals };
 
 export interface CircuitInput {
   toObject(): CircuitSignals;
