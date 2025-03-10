@@ -1,7 +1,7 @@
 import { ByteVector } from "../../lib/byte-vector.js";
+import { JWT } from "../../lib/jwt.js";
 import { OidcDigest } from "../../lib/oidc-digest.js";
 import { env } from "./env.js";
-import { JWT } from "../../lib/jwt.js";
 
 export async function digestCommand() {
   const jwt = new JWT(env("RAW_JWT"));
