@@ -29,11 +29,11 @@ export type JwtTxValidationData = {
 export class JwtTxValidationInputs implements CircuitInput {
   private jwt: JWT;
   private jwkModulus: string;
-  private salt: bigint;
+  private salt: string;
   private rawTxHash: string;
   private blinding: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string, salt: bigint, txHash: string, blinding: bigint) {
+  constructor(rawJWT: string, jwkModulus: string, salt: string, txHash: string, blinding: bigint) {
     this.jwt = new JWT(rawJWT);
     this.jwkModulus = jwkModulus;
     this.salt = salt;
@@ -72,9 +72,8 @@ export class JwtTxValidationInputs implements CircuitInput {
     return ByteVector.fromHex(this.rawTxHash).toFieldArray().map((n) => n.toString());
   }
 
-  private oidcDigest(): string {
-    const salt = ByteVector.fromBigInt(this.salt);
-    const digest = new OidcDigest(this.jwt.iss, this.jwt.aud, this.jwt.sub, salt);
+  private oidcDigest(): string {;
+    const digest = new OidcDigest(this.jwt.iss, this.jwt.aud, this.jwt.sub, this.salt);
 
     return digest.serialize();
   }

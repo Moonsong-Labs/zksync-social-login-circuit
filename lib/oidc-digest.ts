@@ -9,11 +9,11 @@ export class OidcDigest {
   private sub: string;
   public salt: ByteVector;
 
-  constructor(iss: string, aud: string, sub: string, salt: ByteVector) {
+  constructor(iss: string, aud: string, sub: string, salt: string) {
     this.iss = iss;
     this.aud = aud;
     this.sub = sub;
-    this.salt = salt;
+    this.salt = ByteVector.fromHex(salt);
   }
 
   serialize(): string {
