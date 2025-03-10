@@ -7,3 +7,8 @@ export function env(key: string): string {
   }
   return value;
 }
+
+export function envOrDefault(key: string, defaultValue: string): string {
+  const value = process.env[key];
+  return value === undefined ? defaultValue : value;
+}
