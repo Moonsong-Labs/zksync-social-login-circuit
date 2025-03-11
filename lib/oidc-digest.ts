@@ -9,7 +9,7 @@ export class OidcDigest {
   private sub: string;
   public salt: ByteVector;
 
-  constructor(iss: string, aud: string, sub: string, salt: string) {
+  constructor(iss: string, aud: string, sub: string, salt: Hex) {
     this.iss = iss;
     this.aud = aud;
     this.sub = sub;

@@ -28,13 +28,13 @@ export class PoseidonTest implements CircuitInput {
       .padRight(0, SUB_MAX_LENGTH)
       .toCircomByteArray();
 
-    const salt = new ByteVector([1]);
+    const salt = "0x01";
 
     return {
       expectedIss,
       expectedAud,
       expectedSub,
-      salt: salt.toBigInt().toString(),
+      salt: BigInt(salt).toString(),
       oidcDigest: new OidcDigest(rawIss, rawAud, rawSub, salt).serialize(),
     };
   }

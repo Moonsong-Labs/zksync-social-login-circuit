@@ -19,6 +19,7 @@ import { verificationKeyCmd } from "./verification-key.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { OidcDigest } from "../lib/index.js";
 
 config();
 
