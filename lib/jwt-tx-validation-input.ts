@@ -1,10 +1,11 @@
+import type { Hex } from "./byte-vector.js";
 import { CircomBigInt } from "./circom-big-int.js";
 import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
 import { ByteVector, OidcDigest } from "./index.js";
 import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
 
-type JwtTxValidationData = {
+export type JwtTxValidationData = {
   message: string[];
   messageLength: string;
   pubkey: string[];
@@ -29,11 +30,11 @@ type JwtTxValidationData = {
 export class JwtTxValidationInputs implements CircuitInput {
   private jwt: JWT;
   private jwkModulus: string;
-  private salt: bigint;
+  private salt: Hex;
   private rawTxHash: string;
   private blinding: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string, salt: bigint, txHash: string, blinding: bigint) {
+  constructor(rawJWT: string, jwkModulus: string, salt: Hex, txHash: string, blinding: bigint) {
     this.jwt = new JWT(rawJWT);
     this.jwkModulus = jwkModulus;
     this.salt = salt;
@@ -73,9 +74,7 @@ export class JwtTxValidationInputs implements CircuitInput {
   }
 
   private oidcDigest(): string {
-    const salt = ByteVector.fromBigInt(this.salt);
-    const digest = new OidcDigest(this.jwt.iss, this.jwt.aud, this.jwt.sub, salt);
-
+    const digest = new OidcDigest(this.jwt.iss, this.jwt.aud, this.jwt.sub, this.salt);
     return digest.serialize();
   }
 
