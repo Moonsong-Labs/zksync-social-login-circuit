@@ -3,8 +3,11 @@ import path from "node:path";
 import { config } from "dotenv";
 import yargs from "yargs";
 
+import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
+import { deployVerifier } from "./deploy-verifier.js";
 import { downloadPtau } from "./download-ptau.js";
+import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
 import { inputCommand } from "./generate-input.js";
 import { generateVerifier } from "./generate-verifier.js";
@@ -12,9 +15,11 @@ import { getJwtCmd } from "./get-jwt-cmd.js";
 import { digestCommand } from "./lib/digest.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
+import { verificationKeyCmd } from "./verification-key.js";
+import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { exportCircuitCmd } from "./export-circuit.js";
+import { OidcDigest } from "../lib/index.js";
 
 config();
 
@@ -102,12 +107,42 @@ const args = yargs(process.argv.slice(2))
       await generateVerifier(argv.file, argv.out);
     })
   .command(
+    "vkey <file>",
+    "exports verification key for a circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verificationKeyCmd(argv.file);
+    })
+  .command(
+    "verify <file>",
+    "exports verification key for a circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verifyCmd(argv.file);
+    })
+  .command(
     "export-verifier <file>",
     "calculates oidc_digest for jwt in env var",
     FILE_ARG_DEF,
     async (argv) => {
       await exportVerifierCmd(argv.file);
     })
+  .command(
+    "deploy-verifier <file>",
+    "deploys verifier to local anvil",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await deployVerifier(argv.file);
+    },
+  )
+  .command(
+    "call-verifier <file>",
+    "cast calls verifier",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await callVerifierCmd(argv.file);
+    },
+  )
   .command(
     "export-circuit",
     "Exports circuit files directly into Auth Server public folder",

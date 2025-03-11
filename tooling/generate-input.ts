@@ -9,10 +9,10 @@ import { env } from "./lib/env.js";
 import { FrozenFireSha2Input } from "./lib/frozen-fire-sha2-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
 
-type InputGenerator = (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => CircuitInput<unknown>;
+type InputGenerator = (jwt: string, key: string, salt: string, txHash: string, blinding: bigint) => CircuitInput;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
-  "frozen-fire-sha2": (jwt: string, key: string, _salt: bigint, _txHash: string, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
-  "jwt-tx-validation": (jwt: string, key: string, salt: bigint, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
+  "frozen-fire-sha2": (jwt: string, key: string, _salt: string, _txHash: string, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
+  "jwt-tx-validation": (jwt: string, key: string, salt: string, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
   "poseidon-test": () => new PoseidonTest(),
   "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
     new BlindingFactorInputTest(jwt, key, salt, txHash, blinding),
@@ -28,7 +28,7 @@ export async function inputCommand(filePath: string, root: string) {
 
   const rawJWT = env("RAW_JWT");
   const jwkModulus = env("JWK_MODULOUS");
-  const salt = BigInt(env("SALT"));
+  const salt = env("SALT");
   const txHash = env("TX_HASH");
   const blindingFactor = BigInt(env("BLINDING_FACTOR"));
 

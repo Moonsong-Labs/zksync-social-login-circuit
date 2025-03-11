@@ -3,9 +3,9 @@ import assert from "node:assert";
 import express from "express";
 
 import { createNonce } from "../lib/create-nonce.js";
+import { JWT } from "../lib/jwt.js";
 import { ByteVector } from "./lib.js";
 import { env } from "./lib/env.js";
-import { JWT } from "../lib/jwt.js";
 
 function waitForJwt(): Promise<string> {
   const app = express();
@@ -43,7 +43,7 @@ function waitForJwt(): Promise<string> {
       res.send("<script>const a = encodeURIComponent(location.href); fetch('/finish/?url=' + a)</script>");
     });
 
-    const server = app.listen(3000, () => console.log("Listening..."));
+    const server = app.listen(3002, () => console.log("Listening..."));
   });
 }
 
@@ -65,7 +65,7 @@ export async function getJwtCmd(txHash: string) {
   const clientId = encodeURIComponent("866068535821-e9em0h73pee93q4evoajtnnkldsjhqdk.apps.googleusercontent.com");
   const responseType = "id_token";
   const scope = encodeURIComponent("openid");
-  const redirectUri = encodeURI("http://localhost:3000/oauth/plain");
+  const redirectUri = encodeURI("http://localhost:3002/oauth/plain");
   const query = `?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}&nonce=${nonce}`;
 
   console.log(`https://accounts.google.com/o/oauth2/v2/auth${query}`);

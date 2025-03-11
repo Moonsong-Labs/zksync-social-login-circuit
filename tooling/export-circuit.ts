@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { cmd, ROOT_DIR } from "./lib/cmd.js";
+import { preparedZkeyFile } from "./prepare-zkey.js";
 
 export async function exportCircuitCmd(): Promise<void> {
   const publicDir = path.join(ROOT_DIR, "..", "auth-server", "public");
@@ -22,9 +23,9 @@ export async function exportCircuitCmd(): Promise<void> {
   const wasmDst = path.join(outDir, "witness.wasm");
   fs.copyFileSync(wasmOrigin, wasmDst);
 
-  const zkOrigin = path.join(ROOT_DIR, "target", mainName, `${mainName}.prepared.zkey`);
+  const zkOrigin = preparedZkeyFile(mainName);
   if (!fs.existsSync(zkOrigin)) {
-    throw new Error("Missing wasm file. Try running running `pnpm tool compile` first");
+    throw new Error("Missing zkey file. Please generate and prepare it first.");
   }
 
   const zkDst = path.join(outDir, "circuit.zkey");
