@@ -12,7 +12,7 @@ type BlindingFactorInputData = {
 export class BlindingFactorInputTest implements CircuitInput {
   private blindingFactor: bigint;
   private txHash: string;
-  constructor(_rawJWT: string, _jwkModulus: string, _salt: bigint, txHash: string, blinding: bigint) {
+  constructor(_rawJWT: string, _jwkModulus: string, _salt: string, txHash: string, blinding: bigint) {
     this.txHash = txHash;
     this.blindingFactor = blinding;
   }
