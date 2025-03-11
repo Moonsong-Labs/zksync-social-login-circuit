@@ -17,9 +17,6 @@ export async function callVerifierCmd(circuit: string) {
 
   const serializedPub = JSON.stringify(pubInputs).replaceAll("\"", "");
 
-  // const piA = `[${proof.pi_a[0]},${proof.pi_a[1]}]`;
-  // const piB = `[[${proof.pi_b[0][0]},${proof.pi_b[0][1]}],[${proof.pi_b[1][0]},${proof.pi_b[1][1]}]]`;
-  // const piC = `[${proof.pi_c[0]},${proof.pi_c[1]}]`;
   const piA = `[${proof.pi_a[0]},${proof.pi_a[1]}]`;
   const piB = `[[${proof.pi_b[0][1]},${proof.pi_b[0][0]}],[${proof.pi_b[1][1]},${proof.pi_b[1][0]}]]`;
   const piC = `[${proof.pi_c[0]},${proof.pi_c[1]}]`;
