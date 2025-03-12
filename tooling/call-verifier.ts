@@ -23,7 +23,7 @@ export async function callVerifierCmd(circuit: string) {
 
   const privKey = envOrDefault(
     "SEC_KEY",
-    "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
+    "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a",
   );
 
   await cmd(`cast send --private-key=${privKey} --rpc-url ${rpcUrl} ${addr} ${fnSign} ${piA} ${piB} ${piC} ${serializedPub}`);
