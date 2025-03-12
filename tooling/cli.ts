@@ -3,6 +3,7 @@ import path from "node:path";
 import { config } from "dotenv";
 import yargs from "yargs";
 
+import { OidcDigest } from "../lib/index.js";
 import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
 import { deployVerifier } from "./deploy-verifier.js";
@@ -19,7 +20,6 @@ import { verificationKeyCmd } from "./verification-key.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { OidcDigest } from "../lib/index.js";
 
 config();
 
