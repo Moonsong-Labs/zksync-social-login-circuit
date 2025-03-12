@@ -129,7 +129,7 @@ template JwtTxValidation(
   VerifyNonce()(nonce, blindingFactor, txHash);
 }
 
-component main{public [pubkey, expectedIss, expectedAud, oidcDigest, txHash]} = JwtTxValidation(
+component main{public [pubkey, oidcDigest, txHash]} = JwtTxValidation(
   121,
   17,
   1024,
