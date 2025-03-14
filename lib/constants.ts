@@ -7,3 +7,4 @@ export const ISS_MAX_LENGTH = 31;
 export const AUD_MAX_LENGTH = 100;
 export const SUB_MAX_LENGTH = 31;
 export const FIELD_BYTES = 31;
+export const DEFAULT_PTAU_SIZE = 20;
