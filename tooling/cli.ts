@@ -1,9 +1,8 @@
-import path from "node:path";
-
 import { config } from "dotenv";
 import yargs from "yargs";
 
-import { OidcDigest } from "../lib/index.js";
+import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
+import { allCmd } from "./all.js";
 import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
 import { deployVerifier } from "./deploy-verifier.js";
@@ -23,10 +22,6 @@ import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 
 config();
 
-const thisDir = import.meta.dirname;
-
-const baseDir = path.join(thisDir, "..");
-
 const FILE_ARG_DEF = {
   file: {
     type: "string",
@@ -40,7 +35,7 @@ const args = yargs(process.argv.slice(2))
     await compileCmd(argv.file);
   })
   .command("input <file>", "generates input for circuit if it knows how to.", FILE_ARG_DEF, async (argv) => {
-    await inputCommand(argv.file, baseDir);
+    await inputCommand(argv.file);
   })
   .command("witness <file>", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
     await witnessCommand(argv.file);
@@ -65,7 +60,7 @@ const args = yargs(process.argv.slice(2))
     size: {
       type: "number",
       demandOption: true,
-      default: 20,
+      default: DEFAULT_PTAU_SIZE,
     },
   }, async (argv) => {
     await downloadPtau(argv.size);
@@ -164,6 +159,12 @@ const args = yargs(process.argv.slice(2))
     async (argv) => {
       await getJwtCmd(argv.nonce);
     },
+  )
+  .command(
+    "all <file>",
+    "Performs all neded tasks to export verifier and prepared zkey",
+    FILE_ARG_DEF,
+    async (argv) => allCmd(argv.file),
   )
   .strictCommands()
   .demandCommand(1);
