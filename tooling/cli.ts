@@ -1,7 +1,9 @@
 import { config } from "dotenv";
+import { getAddress, type Hex } from "viem";
 import yargs from "yargs";
 
 import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
+import { createNonceV2 } from "../lib/create-nonce.js";
 import { allCmd } from "./all.js";
 import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
@@ -13,6 +15,7 @@ import { inputCommand } from "./generate-input.js";
 import { generateVerifier } from "./generate-verifier.js";
 import { getJwtCmd } from "./get-jwt-cmd.js";
 import { digestCommand } from "./lib/digest.js";
+import { env } from "./lib/env.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { verificationKeyCmd } from "./verification-key.js";
@@ -165,6 +168,25 @@ const args = yargs(process.argv.slice(2))
     "Performs all neded tasks to export verifier and prepared zkey",
     FILE_ARG_DEF,
     async (argv) => allCmd(argv.file),
+  ).command(
+    "create-nonce <address> <nonce>",
+    "Creates a nonce for a given address and nonce",
+    {
+      address: {
+        type: "string",
+        demandOption: true,
+        description: "Address to create nonce for",
+      },
+      nonce: {
+        type: "string",
+        demandOption: true,
+        description: "OidcRecoveryValidator Contract nonce",
+      },
+    },
+    async (argv) => {
+      const nonce = createNonceV2(getAddress(argv.address), BigInt(argv.nonce), BigInt(env("BLINDING_FACTOR")));
+      console.log(nonce);
+    },
   )
   .strictCommands()
   .demandCommand(1);
