@@ -9,6 +9,7 @@ import { cmd, ROOT_DIR } from "./lib/cmd.js";
 import { env } from "./lib/env.js";
 import { FrozenFireSha2Input } from "./lib/frozen-fire-sha2-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
+import { VerifyNonceTestInput } from "./verify-nonce-test-input.js";
 
 type InputGenerator = (jwt: string, key: string, salt: Hex, txHash: string, blinding: bigint) => CircuitInput;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
@@ -17,6 +18,7 @@ const INPUT_GENERATORS: Record<string, InputGenerator> = {
   "poseidon-test": () => new PoseidonTest(),
   "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
     new BlindingFactorInputTest(jwt, key, salt, txHash, blinding),
+  "verify-nonce-test": (jwt, key, salt, txHash, blinding) => new VerifyNonceTestInput(jwt, key, salt, txHash, blinding),
 };
 
 export async function inputCommand(filePath: string) {

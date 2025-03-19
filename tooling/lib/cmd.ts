@@ -15,7 +15,7 @@ export async function cmd(strCmd: string): Promise<void> {
     const spawned = spawn(first, rest, { stdio: "inherit", cwd: ROOT_DIR });
     spawned.on("close", () => resolve());
     spawned.on("error", () => reject());
-    spawned.on("exit", () => resolve());
+    spawned.on("exit", (code) => code == 0 ? resolve() : reject(new Error(`cmd \`${strCmd}\` failed. exit code: ${code}`)));
     spawned.on("disconnect", () => reject());
   });
 }
