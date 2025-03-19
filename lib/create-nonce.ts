@@ -25,5 +25,6 @@ export function createNonceV2(address: Address, contractNonce: bigint, blindingF
   const senderHash = keccak256(encoded);
   const nonceFields = ByteVector.fromHex(senderHash).padRight(0, 62).toFieldArray();
   const hash = poseidon3([...nonceFields, blindingFactor]);
-  return [senderHash, ByteVector.fromBigInt(hash).toBase64Url()];
+  const nonceBytes = ByteVector.fromBigInt(hash).padLeft(0, 32);
+  return [senderHash, nonceBytes.toBase64Url()];
 }
