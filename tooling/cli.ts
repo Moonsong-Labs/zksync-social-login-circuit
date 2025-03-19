@@ -1,9 +1,9 @@
 import { config } from "dotenv";
-import { getAddress, type Hex } from "viem";
+import { getAddress } from "viem";
 import yargs from "yargs";
 
 import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
-import { createNonceV2 } from "../lib/create-nonce.js";
+import { createNonceV2 } from "../lib/index.js";
 import { allCmd } from "./all.js";
 import { callVerifierCmd } from "./call-verifier.js";
 import { compileCmd } from "./compile.js";
@@ -18,6 +18,7 @@ import { digestCommand } from "./lib/digest.js";
 import { env } from "./lib/env.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
+import { runCmd } from "./run-cmd.js";
 import { verificationKeyCmd } from "./verification-key.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
@@ -168,7 +169,16 @@ const args = yargs(process.argv.slice(2))
     "Performs all neded tasks to export verifier and prepared zkey",
     FILE_ARG_DEF,
     async (argv) => allCmd(argv.file),
-  ).command(
+  )
+  .command(
+    "run <file>",
+    "Generates inputs, wasm and witness for a circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await runCmd(argv.file);
+    },
+  )
+  .command(
     "create-nonce <address> <nonce>",
     "Creates a nonce for a given address and nonce",
     {
