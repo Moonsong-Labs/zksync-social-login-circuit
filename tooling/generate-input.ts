@@ -32,7 +32,7 @@ export async function inputCommand(filePath: string) {
   const rawJWT = env("RAW_JWT");
   const jwkModulus = env("JWK_MODULOUS");
   const salt = env("SALT") as Hex;
-  const nonceContent = env("TX_HASH") as Hex;
+  const nonceContent = env("NONCE_CONTENT") as Hex;
   const blindingFactor = BigInt(env("BLINDING_FACTOR"));
 
   const input = generator(rawJWT, jwkModulus, salt, nonceContent, blindingFactor).toObject();
