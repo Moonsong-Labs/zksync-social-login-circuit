@@ -37,9 +37,9 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@zk-email/circuits": "^6.2.0",
+    "@zk-email/circuits": "=6.3.2",
     "change-case": "^5.4.4",
-    "circomlib": "^2.0.5",
+    "circomlib": "=2.0.5",
     "poseidon-lite": "^0.3.0",
     "snarkjs": "^0.7.5",
     "viem": "^2.23.11"
