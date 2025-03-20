@@ -23,7 +23,7 @@ export type JwtTxValidationData = {
   subLength: string;
   salt: string;
   oidcDigest: string;
-  txHash: string[];
+  nonceContentHash: string[];
   blindingFactor: string;
 };
 
@@ -31,14 +31,14 @@ export class JwtTxValidationInputs implements CircuitInput {
   private jwt: JWT;
   private jwkModulus: string;
   private salt: Hex;
-  private rawTxHash: string;
+  private rawNonceContentHash: Hex;
   private blinding: bigint;
 
-  constructor(rawJWT: string, jwkModulus: string, salt: Hex, txHash: string, blinding: bigint) {
+  constructor(rawJWT: string, jwkModulus: string, salt: Hex, nonceContentHash: Hex, blinding: bigint) {
     this.jwt = new JWT(rawJWT);
     this.jwkModulus = jwkModulus;
     this.salt = salt;
-    this.rawTxHash = txHash;
+    this.rawNonceContentHash = nonceContentHash;
     this.blinding = blinding;
   }
 
@@ -64,13 +64,13 @@ export class JwtTxValidationInputs implements CircuitInput {
       subLength: this.subLength(),
       salt: this.salt.toString(),
       oidcDigest: this.oidcDigest(),
-      txHash: this.serializeTxHash(),
+      nonceContentHash: this.serializeNonceContentHash(),
       blindingFactor: this.blinding.toString(),
     };
   }
 
-  private serializeTxHash(): string[] {
-    return ByteVector.fromHex(this.rawTxHash).toFieldArray().map((n) => n.toString());
+  private serializeNonceContentHash(): string[] {
+    return ByteVector.fromHex(this.rawNonceContentHash).toFieldArray().map((n) => n.toString());
   }
 
   private oidcDigest(): string {

@@ -11,14 +11,14 @@ import { FrozenFireSha2Input } from "./lib/frozen-fire-sha2-input.js";
 import { PoseidonTest } from "./lib/poseidon-test-input.js";
 import { VerifyNonceTestInput } from "./verify-nonce-test-input.js";
 
-type InputGenerator = (jwt: string, key: string, salt: Hex, txHash: string, blinding: bigint) => CircuitInput;
+type InputGenerator = (jwt: string, key: string, salt: Hex, nonceContent: Hex, blinding: bigint) => CircuitInput;
 const INPUT_GENERATORS: Record<string, InputGenerator> = {
-  "frozen-fire-sha2": (jwt: string, key: string, _salt: Hex, _txHash: string, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
-  "jwt-tx-validation": (jwt: string, key: string, salt: Hex, txHash: string, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, txHash, blinding),
+  "frozen-fire-sha2": (jwt: string, key: string, _salt: Hex, _txHash: Hex, _blinding: bigint) => new FrozenFireSha2Input(jwt, key),
+  "jwt-tx-validation": (jwt: string, key: string, salt: Hex, nonceContent: Hex, blinding: bigint) => new JwtTxValidationInputs(jwt, key, salt, nonceContent, blinding),
   "poseidon-test": () => new PoseidonTest(),
-  "blinding-factor": (jwt, key, salt, txHash: string, blinding: bigint) =>
-    new BlindingFactorInputTest(jwt, key, salt, txHash, blinding),
-  "verify-nonce-test": (jwt, key, salt, txHash, blinding) => new VerifyNonceTestInput(jwt, key, salt, txHash, blinding),
+  "blinding-factor": (jwt, key, salt, nonceContent: Hex, blinding: bigint) =>
+    new BlindingFactorInputTest(jwt, key, salt, nonceContent, blinding),
+  "verify-nonce-test": (jwt, key, salt, nonceContent, blinding) => new VerifyNonceTestInput(jwt, key, salt, nonceContent, blinding),
 };
 
 export async function inputCommand(filePath: string) {
@@ -32,10 +32,10 @@ export async function inputCommand(filePath: string) {
   const rawJWT = env("RAW_JWT");
   const jwkModulus = env("JWK_MODULOUS");
   const salt = env("SALT") as Hex;
-  const txHash = env("TX_HASH");
+  const nonceContent = env("NONCE_CONTENT") as Hex;
   const blindingFactor = BigInt(env("BLINDING_FACTOR"));
 
-  const input = generator(rawJWT, jwkModulus, salt, txHash, blindingFactor).toObject();
+  const input = generator(rawJWT, jwkModulus, salt, nonceContent, blindingFactor).toObject();
   const serialized = JSON.stringify(input, null, 2);
   const inputDestinationPath = path.join(ROOT_DIR, "inputs", `${circomFileData.name}.input.json`);
 
