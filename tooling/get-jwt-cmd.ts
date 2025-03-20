@@ -47,20 +47,20 @@ function waitForJwt(): Promise<string> {
   });
 }
 
-export async function getJwtCmd(txHash: string) {
+export async function getJwtCmd(nonceContent: string) {
   const rawBlindingFactor = env("BLINDING_FACTOR");
 
   if (!rawBlindingFactor) {
     throw new Error("missing BLINDING_FACTOR env var");
   }
 
-  const nonceFields = ByteVector.fromHex(txHash).padRight(0, 62).toFieldArray();
+  const nonceFields = ByteVector.fromHex(nonceContent).padRight(0, 62).toFieldArray();
 
   assert(nonceFields.length === 2);
 
   const blindingFactor = BigInt(rawBlindingFactor);
 
-  const nonce = createNonce(txHash, blindingFactor);
+  const nonce = createNonce(nonceContent, blindingFactor);
   console.log(`Nonce: ${nonce}`);
   const clientId = encodeURIComponent("866068535821-e9em0h73pee93q4evoajtnnkldsjhqdk.apps.googleusercontent.com");
   const responseType = "id_token";

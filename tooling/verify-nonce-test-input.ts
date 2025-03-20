@@ -14,7 +14,7 @@ export class VerifyNonceTestInput implements CircuitInput {
     return {
       b64UrlNonce: ByteVector.fromAsciiString(this.base64Url).toCircomByteArray(),
       blindingFactor: env("BLINDING_FACTOR"),
-      txHash: ByteVector.fromHex("0xdf6f6a92220f473b9f2f25d75029a2f33e4a0dfeeafdfed9e4f498737ab2f37d")
+      content: ByteVector.fromHex("0xdf6f6a92220f473b9f2f25d75029a2f33e4a0dfeeafdfed9e4f498737ab2f37d")
         .toFieldArray()
         .map((f) => f.toString()),
     };
