@@ -34,7 +34,7 @@ template VerifyNonce() {
   var maxNonceB64Length = MAX_NONCE_BASE64_LENGTH();
   signal input b64UrlNonce[maxNonceB64Length];
   signal input blindingFactor;
-  signal input txHash[2];
+  signal input content[2];
 
   // Translate from base64Url to base64.
   signal b64Nonce[maxNonceB64Length] <== Base64UrlToBase64(maxNonceB64Length)(b64UrlNonce);
@@ -55,7 +55,7 @@ template VerifyNonce() {
   signal packedNonce <== bytesToField.out;
 
   // Calculate hash tx_hash and blindingFactor.
-  signal recalculatedHash <== Poseidon(3)([txHash[0], txHash[1], blindingFactor]);
+  signal recalculatedHash <== Poseidon(3)([content[0], content[1], blindingFactor]);
 
   // Ensure nonce value is the expected one.
   recalculatedHash === packedNonce;
