@@ -3,9 +3,9 @@ import { type Address, encodeAbiParameters, keccak256 } from "viem";
 
 import { ByteVector, type Hex } from "./byte-vector.js";
 
-export function createNonce(txHashHex: string, blindingFactor: bigint): string {
+export function createNonce(contentHex: string, blindingFactor: bigint): string {
   // Padding to complete 2 fields
-  const nonceFields = ByteVector.fromHex(txHashHex).padRight(0, 62).toFieldArray();
+  const nonceFields = ByteVector.fromHex(contentHex).padRight(0, 62).toFieldArray();
   const hash = poseidon3([...nonceFields, blindingFactor]);
   return ByteVector.fromBigInt(hash).padLeft(0, 32).toBase64Url();
 }
@@ -23,8 +23,7 @@ export function createNonceV2(address: Address, contractNonce: bigint, blindingF
     [address, contractNonce],
   );
   const senderHash = keccak256(encoded);
-  const nonceFields = ByteVector.fromHex(senderHash).padRight(0, 62).toFieldArray();
-  const hash = poseidon3([...nonceFields, blindingFactor]);
-  const nonceBytes = ByteVector.fromBigInt(hash).padLeft(0, 32);
-  return [senderHash, nonceBytes.toBase64Url()];
+  const nonce = createNonce(senderHash, blindingFactor);
+
+  return [senderHash, nonce];
 }

@@ -6,27 +6,27 @@ import type { CircuitInput } from "../../lib/types.js";
 type BlindingFactorInputData = {
   b64Nonce: string[];
   blindingFactor: string;
-  txHash: string[];
+  nonceContent: string[];
 };
 
 export class BlindingFactorInputTest implements CircuitInput {
   private blindingFactor: bigint;
-  private txHash: string;
-  constructor(_rawJWT: string, _jwkModulus: string, _salt: string, txHash: string, blinding: bigint) {
-    this.txHash = txHash;
+  private nonceContent: string;
+  constructor(_rawJWT: string, _jwkModulus: string, _salt: string, nonceContent: string, blinding: bigint) {
+    this.nonceContent = nonceContent;
     this.blindingFactor = blinding;
   }
 
   toObject(): BlindingFactorInputData {
-    const nonce = createNonce(this.txHash, this.blindingFactor);
-    const txHash = ByteVector.fromHex(this.txHash);
+    const nonce = createNonce(this.nonceContent, this.blindingFactor);
+    const nonceContent = ByteVector.fromHex(this.nonceContent);
 
     const b64Nonce = ByteVector.fromAsciiString(nonce).padRight(0, MAX_B64_NONCE_LENGTH).toCircomByteArray();
 
     return {
       b64Nonce: b64Nonce,
       blindingFactor: this.blindingFactor.toString(),
-      txHash: txHash.toFieldArray().map((n) => n.toString()),
+      nonceContent: nonceContent.toFieldArray().map((n) => n.toString()),
     };
   }
 }

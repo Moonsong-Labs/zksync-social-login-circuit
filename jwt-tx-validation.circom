@@ -67,7 +67,7 @@ template JwtTxValidation(
   signal input salt; // Salt used to generate oidcDigest
   signal input oidcDigest; // Poseidon(iss, aud, sub, salt)
 
-  signal input txHash[2];
+  signal input nonceContentHash[2];
   signal input blindingFactor;
 
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
@@ -126,10 +126,10 @@ template JwtTxValidation(
     oidcDigest
   );
 
-  VerifyNonce()(nonce, blindingFactor, txHash);
+  VerifyNonce()(nonce, blindingFactor, nonceContentHash);
 }
 
-component main{public [pubkey, oidcDigest, txHash]} = JwtTxValidation(
+component main{public [pubkey, oidcDigest, nonceContentHash]} = JwtTxValidation(
   121,
   17,
   1024,
