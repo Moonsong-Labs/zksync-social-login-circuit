@@ -7,12 +7,14 @@ import { compileCmd } from "./compile.js";
 import { downloadPtau } from "./download-ptau.js";
 import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
+import { exportVerifierTestCmd } from "./export-verifier-test.js";
 import { inputCommand } from "./generate-input.js";
 import { defaultVerifierPath, generateVerifier } from "./generate-verifier.js";
 import { ROOT_DIR } from "./lib/cmd.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { verificationKeyCmd } from "./verification-key.js";
+import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
@@ -44,5 +46,7 @@ export async function allCmd(circuit: string) {
   await verifyCmd(circuit);
   await generateVerifier(circuit, defaultVerifierPath(fileData.name));
   await exportVerifierCmd(circuit);
+  await verifierTestCmd(circuit);
+  await exportVerifierTestCmd(circuit);
   await exportCircuitCmd();
 }
