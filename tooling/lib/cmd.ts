@@ -4,6 +4,16 @@ import { join } from "node:path";
 const thisDir = import.meta.dirname;
 export const ROOT_DIR = join(thisDir, "..", "..");
 
+export async function cmdArgs(cmd: string, args: string[]) {
+  return new Promise<void>((resolve, reject) => {
+    const spawned = spawn(cmd, args, { stdio: "inherit", cwd: ROOT_DIR });
+    spawned.on("close", () => resolve());
+    spawned.on("error", () => reject());
+    spawned.on("exit", (code) => code == 0 ? resolve() : reject(new Error(`cmd \`${cmd}\` with args [${JSON.stringify(args)}] failed. exit code: ${code}`)));
+    spawned.on("disconnect", () => reject());
+  });
+}
+
 export async function cmd(strCmd: string): Promise<void> {
   const [first, ...rest] = strCmd.split(/\s+/);
 
