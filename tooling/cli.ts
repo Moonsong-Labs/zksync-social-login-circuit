@@ -20,9 +20,11 @@ import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { runCmd } from "./run-cmd.js";
 import { verificationKeyCmd } from "./verification-key.js";
+import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { exportVerifierTestCmd } from "./export-verifier-test.js";
 
 config();
 
@@ -127,6 +129,13 @@ const args = yargs(process.argv.slice(2))
       await exportVerifierCmd(argv.file);
     })
   .command(
+    "export-verifier-test <file>",
+    "calculates oidc_digest for jwt in env var",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await exportVerifierTestCmd(argv.file);
+    })
+  .command(
     "deploy-verifier <file>",
     "deploys verifier to local anvil",
     FILE_ARG_DEF,
@@ -176,6 +185,14 @@ const args = yargs(process.argv.slice(2))
     FILE_ARG_DEF,
     async (argv) => {
       await runCmd(argv.file);
+    },
+  )
+  .command(
+    "verifier-for-test <file>",
+    "Generates a verifier to be use in testing environments",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verifierTestCmd(argv.file);
     },
   )
   .command(
