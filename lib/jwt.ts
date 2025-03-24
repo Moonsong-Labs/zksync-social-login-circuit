@@ -16,6 +16,7 @@ export class JWT {
   aud: string;
   sub: string;
   kid: string;
+  email: string | null;
 
   constructor(raw: string) {
     this.raw = raw;
@@ -56,6 +57,7 @@ export class JWT {
     this.iss = jsonPayload.iss;
     this.aud = jsonPayload.aud;
     this.sub = jsonPayload.sub;
+    this.email = jsonPayload.email ?? null;
     this.kid = jsonHeader.kid;
   }
 
