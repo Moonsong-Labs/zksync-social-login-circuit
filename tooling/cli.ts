@@ -11,6 +11,7 @@ import { deployVerifier } from "./deploy-verifier.js";
 import { downloadPtau } from "./download-ptau.js";
 import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
+import { exportVerifierTestCmd } from "./export-verifier-test.js";
 import { inputCommand } from "./generate-input.js";
 import { generateVerifier } from "./generate-verifier.js";
 import { getJwtCmd } from "./get-jwt-cmd.js";
@@ -24,7 +25,6 @@ import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { exportVerifierTestCmd } from "./export-verifier-test.js";
 
 config();
 
