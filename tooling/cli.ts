@@ -211,7 +211,12 @@ const args = yargs(process.argv.slice(2))
       },
     },
     async (argv) => {
-      const nonce = createNonceV2(getAddress(argv.address), BigInt(argv.nonce), BigInt(env("BLINDING_FACTOR")));
+      const nonce = createNonceV2(
+        getAddress(argv.address),
+        BigInt(argv.nonce),
+        BigInt(env("BLINDING_FACTOR")),
+        BigInt(env("TIMESTAMP_LIMIT")),
+      );
       console.log(nonce);
     },
   )
