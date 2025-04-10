@@ -1,4 +1,14 @@
+import path from "node:path";
+
 import { cmd } from "./lib/cmd.js";
+
+export function ptauPath(size: number): string {
+  return path.join("ptaus", `ppot_0080_${size}.ptau`);
+}
+
+export function defaultPtauPath(): string {
+  return ptauPath(20);
+}
 
 export async function downloadPtau(size: number) {
   const formatedSize = size.toString().padStart(2, "0");
