@@ -10,11 +10,24 @@ export function createNonce(contentHex: string, blindingFactor: bigint): string 
   return ByteVector.fromBigInt(hash).padLeft(0, 32).toBase64Url();
 }
 
-export function createNonceV2(address: Address, contractNonce: bigint, blindingFactor: bigint, timestampLimit: bigint): [Hex, string] {
+export function createNonceV2(
+  senderAddress: Address,
+  targetAddres: Address,
+  passkeyHash: Hex,
+  contractNonce: bigint,
+  blindingFactor: bigint,
+  timestampLimit: bigint,
+): [Hex, string] {
   const encoded = encodeAbiParameters(
     [
       {
         type: "address",
+      },
+      {
+        type: "address",
+      },
+      {
+        type: "bytes32",
       },
       {
         type: "uint256",
@@ -23,7 +36,7 @@ export function createNonceV2(address: Address, contractNonce: bigint, blindingF
         type: "uint256",
       },
     ],
-    [address, contractNonce, timestampLimit],
+    [senderAddress, targetAddres, passkeyHash, contractNonce, timestampLimit],
   );
   const senderHash = keccak256(encoded);
   const nonce = createNonce(senderHash, blindingFactor);
