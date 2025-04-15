@@ -1,6 +1,6 @@
 import type { Hex } from "./byte-vector.js";
 import { CircomBigInt } from "./circom-big-int.js";
-import { AUD_MAX_LENGTH, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
+import { AUD_MAX_LENGTH, FIELD_BYTES, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
 import { ByteVector, OidcDigest } from "./index.js";
 import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
@@ -70,7 +70,7 @@ export class JwtTxValidationInputs implements CircuitInput {
   }
 
   private serializeNonceContentHash(): string[] {
-    return ByteVector.fromHex(this.rawNonceContentHash).toFieldArray().map((n) => n.toString());
+    return ByteVector.fromHex(this.rawNonceContentHash).toBnChunks(FIELD_BYTES).map((n) => n.toString());
   }
 
   private oidcDigest(): string {
