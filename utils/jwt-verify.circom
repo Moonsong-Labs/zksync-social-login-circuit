@@ -13,6 +13,9 @@ include "@zk-email/circuits/lib/base64.circom";
 include "./bytes.circom";
 include "./array.circom";
 
+function ASCII_DOT() {
+  return 46;
+}
 
 /// @title JwtVerify
 /// @notice Verifies JWT signatures and extracts payload
@@ -80,12 +83,13 @@ template JwtVerify (
   signal period <== ItemAtIndex(maxMessageLength)(message, periodIndex);
   period === 46;
 
-  // Assert that period is unique
-  signal periodCount <== CountCharOccurrences(maxMessageLength)(message, 46);
-  periodCount === 1;
-
   // Find the real message length
   signal realMessageLength <== FindRealMessageLength(maxMessageLength)(message);
+
+  // Assert that period is unique
+  signal periodCount <== CountCharOccurrencesUpTo(maxMessageLength)(message, realMessageLength, ASCII_DOT());
+  periodCount === 1;
+
   signal b64HeaderLength <== periodIndex;
   signal b64PayloadLength <== realMessageLength - b64HeaderLength - 1;
   signal b64Payload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageLength, maxB64PayloadLength)(message, b64HeaderLength + 1, b64PayloadLength);
