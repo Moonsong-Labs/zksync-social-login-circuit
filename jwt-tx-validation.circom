@@ -19,7 +19,8 @@ include "./utils/verify-nonce.circom";
 ///      5. Computing public key hash for external reference
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
-/// @param maxMessageLength Maximum JWT string length (must be multiple of 64 for SHA256)
+/// @param maxMessageLength Maximum raw JWT string length (This is header.payload,
+///        where both are base64url encoded) (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
 /// @param maxNonceLength
 /// @param maxIssLength
@@ -33,6 +34,9 @@ include "./utils/verify-nonce.circom";
 /// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
+///        Even when this circuit works with any 44 charecter base64url nonce, it's
+///        meant to be used wit a nonce calculated as `Poseidon3(sender_hash[0..31], sender_hash.subarray[31..32], blinding_factor)`
+///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, recoverNonce, timeLimit))`
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
 template JwtTxValidation(
   n,

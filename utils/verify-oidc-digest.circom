@@ -14,8 +14,10 @@ include "circomlib/circuits/poseidon.circom";
 /// @input iss[maxIssLength] value for iss extracted from jwt.
 /// @input aud[maxAudLength] value for aud extracted from jwt.
 /// @input sub[maxSubLength] value for sub extracted from jwt.
-/// @input salt salt used to anonymize the result. Provided by user.
-/// @input expectedDigest Expected value for oidc_digest. Provided by user.
+/// @input salt salt used to anonymize the result.
+/// @input expectedDigest Expected value for oidc_digest. This value is build by the user
+///        when the proof is generated, and then reconstructed by the smart contract when the proof
+///        is verified.
 template VerifyOidcDigest(
   maxIssLength,
   maxAudLength,
