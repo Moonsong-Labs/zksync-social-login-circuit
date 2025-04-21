@@ -36,7 +36,7 @@ include "./utils/verify-nonce.circom";
 /// @input expectedNonce Value expected for nonce.
 ///        Even when this circuit works with any 44 charecter base64url nonce, it's
 ///        meant to be used wit a nonce calculated as `Poseidon3(sender_hash[0..31], sender_hash.subarray[31..32], blinding_factor)`
-///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, recoverNonce, timeLimit))`
+///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))`
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
 template JwtTxValidation(
   n,

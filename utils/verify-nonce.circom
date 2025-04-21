@@ -27,7 +27,7 @@ function MAX_BYTES_FIELD() {
 ///      2. Decide base64.
 ///      3. Calculate expected value (Poseidon(sender_hash || blinding_factor))
 ///      4. Ensures decoded nonce matches calculated hash
-///      The sender hash is calculated as keccak256(abi.encode(auxAddress, recoverNonce, timeLimit))
+///      The sender hash is calculated as keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))
 /// @input b64UrlNonce[44] the nonce encoded as base64url.
 /// @input blindingFactor Factor used to prevent google to identify user's transactions.
 /// @input txHash[2] Hash of the current transaction. The tx hash is 32 bytes long, this why its encoded in the following way:
