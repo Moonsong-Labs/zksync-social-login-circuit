@@ -25,6 +25,7 @@ import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { runTestCmd } from "./run-test-cmd.js";
 
 config();
 
@@ -185,6 +186,14 @@ const args = yargs(process.argv.slice(2))
     FILE_ARG_DEF,
     async (argv) => {
       await runCmd(argv.file);
+    },
+  )
+  .command(
+    "run-test <file>",
+    "Generates inputs, wasm and witness for a test circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await runTestCmd(argv.file);
     },
   )
   .command(
