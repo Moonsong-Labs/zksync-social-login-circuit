@@ -10,6 +10,8 @@ include "./constants.circom";
 
 /// @title ExtractNonce
 /// @notice Extracts and validates nonce from nonce field
+/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev nonceKeyStartIndex and nonceKeyStartIndex + nonceLength have to be in correct range
 /// @param maxNonceLength Maximum length of JWT payload
 /// @param maxNonceLength Maximum length of nonce string
 /// @input payload[maxNonceLength] JWT payload bytes
@@ -33,6 +35,8 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
     // Extract nonce
     signal nonceStartIndex <== nonceKeyStartIndex + nonceKeyLength + 1;
+
+    // `RevealSubstring` asserts nonceStartIndex and nonceStartIndex + nonceLength are in valid range.
     nonce <== RevealSubstring(maxPayloadLength, maxNonceLength, 0)(payload, nonceStartIndex, nonceLength);
 }
 
@@ -40,6 +44,8 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
 /// @title ExtractIssuer
 /// @notice Extracts and validates the 'iss' (Issuer) from JWT payload
+/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev issKeyStartIndex and issKeyStartIndex + issLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxIssLength Maximum length of issuer value in bytes
 /// @input payload[maxPayloadLength] JWT payload bytes
@@ -63,11 +69,15 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
     // Reveal the iss in the payload
     signal issStartIndex <== issKeyStartIndex + issKeyLength + 1;
+
+    // `RevealSubstring` asserts issStartIndex and issStartIndex + issLength are in valid range.
     iss <== RevealSubstring(maxPayloadLength, maxIssLength, 0)(payload, issStartIndex, issLength);
 }
 
 /// @title ExtractAud
 /// @notice Extracts and validates the 'aud' (Audience) from JWT payload
+/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxAudLength Maximum length of aud value in bytes
 /// @input payload[maxPayloadLength] JWT payload bytes
@@ -91,12 +101,16 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
 
     // Reveal the aud in the payload
     signal audStartIndex <== audKeyStartIndex + audKeyLength + 1;
+
+    // `RevealSubstring` asserts audStartIndex and audStartIndex + audLength are in valid range.
     aud <== RevealSubstring(maxPayloadLength, maxAudLength, 0)(payload, audStartIndex, audLength);
 }
 
 
 /// @title ExtractSub
 /// @notice Extracts and validates the 'sub' (Subject) from JWT payload
+/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxSubLength Maximum length of sub value in bytes
 /// @input payload[maxPayloadLength] JWT payload bytes
@@ -120,5 +134,7 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
 
     // Reveal the sub in the payload
     signal subStartIndex <== subKeyStartIndex + subKeyLength + 1;
+
+    // `RevealSubstring` asserts subStartIndex and subStartIndex + subLength are in valid range.
     sub <== RevealSubstring(maxPayloadLength, maxSubLength, 0)(payload, subStartIndex, subLength);
 }
