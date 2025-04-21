@@ -13,7 +13,7 @@ export function createNonce(contentHex: string, blindingFactor: bigint): string 
 
 export function createNonceV2(
   senderAddress: Address,
-  targetAddres: Address,
+  targetAddress: Address,
   passkeyHash: Hex,
   contractNonce: bigint,
   blindingFactor: bigint,
@@ -37,7 +37,7 @@ export function createNonceV2(
         type: "uint256",
       },
     ],
-    [senderAddress, targetAddres, passkeyHash, contractNonce, timestampLimit],
+    [senderAddress, targetAddress, passkeyHash, contractNonce, timestampLimit],
   );
   const senderHash = keccak256(encoded);
   const nonce = createNonce(senderHash, blindingFactor);
