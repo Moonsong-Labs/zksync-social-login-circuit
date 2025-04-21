@@ -1,6 +1,6 @@
 import type { Hex } from "./byte-vector.js";
 import { CircomBigInt } from "./circom-big-int.js";
-import { AUD_MAX_LENGTH, FIELD_BYTES, ISS_MAX_LENGTH, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
+import { FIELD_BYTES, MAX_B64_NONCE_LENGTH, MAX_MSG_LENGTH } from "./constants.js";
 import { ByteVector, OidcDigest } from "./index.js";
 import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
@@ -15,10 +15,8 @@ export type JwtTxValidationData = {
   nonceLength: string;
   issKeyStartIndex: string;
   issLength: string;
-  expectedIss: string[];
   audKeyStartIndex: string;
   audLength: string;
-  expectedAud: string[];
   subKeyStartIndex: string;
   subLength: string;
   salt: string;
@@ -56,10 +54,8 @@ export class JwtTxValidationInputs implements CircuitInput {
       nonceLength: this.nonceLength(),
       issKeyStartIndex: this.issKeyStartIndex(),
       issLength: this.issLength(),
-      expectedIss: this.expectedIss(),
       audKeyStartIndex: this.audKeyStartIndex(),
       audLength: this.audLength(),
-      expectedAud: this.expectedAud(),
       subKeyStartIndex: this.subKeyStartIndex(),
       subLength: this.subLength(),
       salt: this.salt.toString(),
@@ -141,10 +137,6 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.buildCircomStringLength(this.jwt.iss);
   }
 
-  private expectedIss(): string[] {
-    return this.buildCircomExpectedValue(this.jwt.iss, ISS_MAX_LENGTH);
-  }
-
   // aud
 
   private audKeyStartIndex(): string {
@@ -155,10 +147,6 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.buildCircomStringLength(this.jwt.aud);
   }
 
-  private expectedAud(): string[] {
-    return this.buildCircomExpectedValue(this.jwt.aud, AUD_MAX_LENGTH);
-  }
-
   // sub
 
   private subKeyStartIndex(): string {
@@ -167,13 +155,6 @@ export class JwtTxValidationInputs implements CircuitInput {
 
   private subLength(): string {
     return this.buildCircomStringLength(this.jwt.sub);
-  }
-
-  // Helpers
-  private buildCircomExpectedValue(value: string, maxLength: number): string[] {
-    return ByteVector.fromAsciiString(value)
-      .padRight(0, maxLength)
-      .toCircomByteArray();
   }
 
   private buildCircomStringLength(value: string): string {

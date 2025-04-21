@@ -27,7 +27,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
     // Verify nonce key
     var nonceKeyLength = NONCE_LENGTH();
-    var nonceKey[nonceKeyLength] = NONCE();
+    var nonceKey[nonceKeyLength] = NONCE_KEY();
     signal nonceKeyMatch[nonceKeyLength] <== RevealSubstring(maxPayloadLength, nonceKeyLength, 1)(payload, nonceKeyStartIndex, nonceKeyLength);
     for (var i = 0; i < nonceKeyLength; i++) {
         nonceKeyMatch[i] === nonceKey[i];
