@@ -44,7 +44,7 @@ template JwtVerify (
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
   signal output payload[maxPayloadLength];
 
-  // Assert message length fits in ceil(log2(maxMessageLength))
+  // Assert message length fits in ceil(log2(maxMessageLength)) bits
   component n2bMessageLength = Num2Bits(log2Ceil(maxMessageLength));
   n2bMessageLength.in <== messageLength;
 
