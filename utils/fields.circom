@@ -12,7 +12,7 @@ include "./constants.circom";
 /// @notice Extracts and validates nonce from nonce field
 /// @dev maxNonceLength length has to be lower or equal maxPayloadLength
 /// @dev nonceKeyStartIndex and nonceKeyStartIndex + nonceLength have to be in correct range
-/// @param maxNonceLength Maximum length of JWT payload
+/// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxNonceLength Maximum length of nonce string
 /// @input payload[maxNonceLength] JWT payload bytes
 /// @input nonceKeyStartIndex Starting index of nonce field

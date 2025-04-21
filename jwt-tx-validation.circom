@@ -31,7 +31,7 @@ include "./utils/verify-nonce.circom";
 /// @input pubkey[k] RSA public key in k chunks
 /// @input signature[k] RSA signature in k chunks
 /// @input periodIndex Location of period separating header.payload
-/// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
+/// @input nonceKeyStartIndex Index for '"nonce":' substring inside the payload
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
 ///        Even when this circuit works with any 44 charecter base64url nonce, it's
