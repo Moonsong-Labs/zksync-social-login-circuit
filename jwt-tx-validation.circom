@@ -34,7 +34,7 @@ include "./utils/verify-nonce.circom";
 /// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
-///        Even when this circuit works with any 44 charecter base64url nonce, it's
+///        Even when this circuit works with any 44 character base64url nonce, it's
 ///        meant to be used wit a nonce calculated as `Poseidon3(sender_hash[0..31], sender_hash.subarray[31..32], blinding_factor)`
 ///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))`
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
