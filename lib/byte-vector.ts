@@ -73,6 +73,11 @@ export class ByteVector {
     return this.vec.flatMap((byte) => this.byteTo8digits(byte));
   }
 
+  toBnChunks(chunkSizeBytes: number): bigint[] {
+    return intoChunks(this.vec, chunkSizeBytes)
+      .map((chunk) => new ByteVector(chunk).toBigInt());
+  }
+
   toFieldArray(): bigint[] {
     return intoChunks(this.vec, FIELD_BYTES)
       .map((chunk) => new ByteVector(chunk).reverse())
