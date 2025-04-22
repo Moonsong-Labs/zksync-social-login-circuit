@@ -17,7 +17,7 @@ include "@zk-email/circuits/utils/array.circom";
 /// @param maxLength The maximum possible length of the padded message
 /// @input in[maxLength] The padded message array
 /// @output realLength The length of the real message (before padding)
-template FindRealMessageLength(maxLength) {
+template FindRealMessageLengthInBytes(maxLength) {
   signal input in[maxLength];
   signal output realLength;
 

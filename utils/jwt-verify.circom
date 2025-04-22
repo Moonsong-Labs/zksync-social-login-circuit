@@ -37,7 +37,7 @@ template JwtVerify (
 ) {
   signal input message[maxMessageLength]; // JWT message (header + payload)
   signal input messageLength; // Length of the message signed in the JWT
-  signal input pubkey[k]; // RSA public key split into k chunks
+  signal input pubkeyChunks[k]; // RSA public key split into k chunks
   signal input signature[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
@@ -52,30 +52,30 @@ template JwtVerify (
   AssertZeroPadding(maxMessageLength)(message, messageLength);
 
   // Calculate SHA256 hash of the JWT message
-  signal sha[256] <== Sha256Bytes(maxMessageLength)(message, messageLength);
+  signal shaBits[256] <== Sha256Bytes(maxMessageLength)(message, messageLength);
 
   // Pack SHA output bytes to int[] for RSA input message
-  var rsaMessageSize = (256 + n) \ n; // Adjust based on RSA chunk size
-  component rsaMessage[rsaMessageSize];
-  for (var i = 0; i < rsaMessageSize; i++) {
+  var rsaMessageSizeChunks = (256 + n) \ n; // Adjust based on RSA chunk size
+  component rsaMessage[rsaMessageSizeChunks];
+  for (var i = 0; i < rsaMessageSizeChunks; i++) {
     rsaMessage[i] = Bits2Num(n);
   }
   for (var i = 0; i < 256; i++) {
-    rsaMessage[i \ n].in[i % n] <== sha[255 - i];
+    rsaMessage[i \ n].in[i % n] <== shaBits[255 - i];
   }
-  for (var i = 256; i < n * rsaMessageSize; i++) {
+  for (var i = 256; i < n * rsaMessageSizeChunks; i++) {
     rsaMessage[i \ n].in[i % n] <== 0;
   }
 
   // Verify RSA signature
   component rsaVerifier = RSAVerifier65537(n, k);
-  for (var i = 0; i < rsaMessageSize; i++) {
+  for (var i = 0; i < rsaMessageSizeChunks; i++) {
     rsaVerifier.message[i] <== rsaMessage[i].out;
   }
-  for (var i = rsaMessageSize; i < k; i++) {
+  for (var i = rsaMessageSizeChunks; i < k; i++) {
     rsaVerifier.message[i] <== 0;
   }
-  rsaVerifier.modulus <== pubkey;
+  rsaVerifier.modulus <== pubkeyChunks;
   rsaVerifier.signature <== signature;
 
   // Assert that period exists at periodIndex
@@ -83,7 +83,7 @@ template JwtVerify (
   period === 46;
 
   // Find the real message length
-  signal realMessageLength <== FindRealMessageLength(maxMessageLength)(message);
+  signal realMessageLength <== FindRealMessageLengthInBytes(maxMessageLength)(message);
 
   // Assert that period is unique
   signal periodCount <== CountCharOccurrencesUpTo(maxMessageLength)(message, realMessageLength, ASCII_DOT());
