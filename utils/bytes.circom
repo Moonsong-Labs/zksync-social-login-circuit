@@ -18,7 +18,7 @@ include "@zk-email/circuits/utils/array.circom";
 /// @input in[maxLength] The padded message array
 /// @output realLength The length of the real message (before padding)
 template FindRealMessageLengthInBytes(maxLength) {
-  signal input in[maxLength];
+  signal input inBytes[maxLength];
   signal output realLength;
 
   // Signal to track if we've found 128
@@ -34,7 +34,7 @@ template FindRealMessageLengthInBytes(maxLength) {
   // Iterate through the array
   for (var i = 0; i < maxLength; i++) {
     // Check if current element is 128
-    is128[i] <== IsEqual()([in[i], 128]);
+    is128[i] <== IsEqual()([inBytes[i], 128]);
 
     // Update found signal
     found[i + 1] <== found[i] + is128[i] - found[i] * is128[i];

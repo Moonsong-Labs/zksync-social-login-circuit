@@ -6,9 +6,9 @@ import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
 
 export type JwtTxValidationData = {
-  messageAscii: string[];
-  messageAsciiLength: string;
-  pubkeyChunks: string[];
+  messageBytes: string[];
+  messageByteLength: string;
+  rsaModulusChunks: string[];
   signatureChunks: string[];
   periodIndex: string;
   nonceKeyStartIndex: string;
@@ -45,9 +45,9 @@ export class JwtTxValidationInputs implements CircuitInput {
     const [messagePadded, messagePaddedLen] = this.message();
 
     return {
-      messageAscii: messagePadded.toCircomByteArray(),
-      messageAsciiLength: messagePaddedLen.toString(),
-      pubkeyChunks: this.pubkeyChunks(),
+      messageBytes: messagePadded.toCircomByteArray(),
+      messageByteLength: messagePaddedLen.toString(),
+      rsaModulusChunks: this.rsaModulusChunks(),
       signatureChunks: this.signatureChunks(),
       periodIndex: periodIndex.toString(),
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
@@ -105,7 +105,7 @@ export class JwtTxValidationInputs implements CircuitInput {
     return [finalMessage, byteLength];
   }
 
-  private pubkeyChunks(): string[] {
+  private rsaModulusChunks(): string[] {
     return CircomBigInt.fromBase64(this.jwkModulus).serialize();
   }
 

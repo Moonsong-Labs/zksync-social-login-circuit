@@ -19,16 +19,16 @@ include "./utils/verify-nonce.circom";
 ///      5. Computing public key hash for external reference
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
-/// @param maxMessageLength Maximum raw JWT string length (This is header.payload,
+/// @param maxMessageByteLength Maximum raw JWT string length (This is header.payload,
 ///        where both are base64url encoded) (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
-/// @param maxNonceLength
-/// @param maxIssLength
-/// @param maxAudLength
-/// @param maxSubLength
-/// @input messageAscii[maxMessageLength] JWT string (header.payload)
-/// @input messageAsciiLength Actual length of JWT string
-/// @input pubkeyChunks[k] RSA public key in k chunks
+/// @param maxNonceAsciiLength
+/// @param maxIssAsciiLength
+/// @param maxAudAsciiLength
+/// @param maxSubAsciiLength
+/// @input messageBytes[maxMessageByteLength] JWT string (header.payload) with sha256 pad
+/// @input messageByteLength Actual length of JWT string
+/// @input rsaModulusChunks[k] RSA public key modulus in k chunks of n bits
 /// @input signatureChunks[k] RSA signature in k chunks
 /// @input periodIndex Location of period separating header.payload
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
@@ -51,21 +51,21 @@ include "./utils/verify-nonce.circom";
 template JwtTxValidation(
   n,
   k,
-  maxMessageLength,
+  maxMessageByteLength,
   maxB64PayloadLength,
-  maxNonceLength,
-  maxIssLength,
-  maxAudLength,
-  maxSubLength
+  maxNonceAsciiLength,
+  maxIssAsciiLength,
+  maxAudAsciiLength,
+  maxSubAsciiLength
 ) {
   assert(n*k >= 2048); // n*k has to fit a 2048 bit public key.
   assert(n < 127); // Each field needs enough room to fit carry on during big int operations.
-  assert(maxMessageLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
+  assert(maxMessageByteLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
   assert(maxB64PayloadLength % 4 == 0); // Because it's b64 encoded.
 
-  signal input messageAscii[maxMessageLength]; // JWT message (header + payload)
-  signal input messageAsciiLength; // Length of the message signed in the JWT
-  signal input pubkeyChunks[k]; // RSA public key split into k chunks
+  signal input messageBytes[maxMessageByteLength]; // JWT message (header + payload)
+  signal input messageByteLength; // Length of the message signed in the JWT
+  signal input rsaModulusChunks[k]; // RSA public key modulus split into k chunks
   signal input signatureChunks[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
@@ -90,32 +90,32 @@ template JwtTxValidation(
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
   signal payload[maxPayloadLength];
-  signal nonce[maxNonceLength];
-  signal iss[maxIssLength];
-  signal aud[maxAudLength];
-  signal sub[maxSubLength];
+  signal nonceAscii[maxNonceAsciiLength];
+  signal issAscii[maxIssAsciiLength];
+  signal audAscii[maxAudAsciiLength];
+  signal subAscii[maxSubAsciiLength];
 
   // Check signature over JWT and extract payload
   payload <== JwtVerify(
     n,
     k,
-    maxMessageLength,
+    maxMessageByteLength,
     maxB64PayloadLength
   )(
-    messageAscii,
-    messageAsciiLength,
-    pubkeyChunks,
+    messageBytes,
+    messageByteLength,
+    rsaModulusChunks,
     signatureChunks,
     periodIndex
   );
 
 
-  (nonce, iss, aud, sub) <== JwtData(
+  (nonceAscii, issAscii, audAscii, subAscii) <== JwtData(
     maxPayloadLength,
-    maxNonceLength,
-    maxIssLength,
-    maxAudLength,
-    maxSubLength
+    maxNonceAsciiLength,
+    maxIssAsciiLength,
+    maxAudAsciiLength,
+    maxSubAsciiLength
   )(
     payload,
     nonceKeyStartIndex,
@@ -129,21 +129,21 @@ template JwtTxValidation(
   );
 
   VerifyOidcDigest(
-    maxIssLength,
-    maxAudLength,
-    maxSubLength
+    maxIssAsciiLength,
+    maxAudAsciiLength,
+    maxSubAsciiLength
   )(
-    iss,
-    aud,
-    sub,
+    issAscii,
+    audAscii,
+    subAscii,
     salt,
     oidcDigest
   );
 
-  VerifyNonce()(nonce, blindingFactor, nonceContentHash);
+  VerifyNonce()(nonceAscii, blindingFactor, nonceContentHash);
 }
 
-component main{public [pubkeyChunks, oidcDigest, nonceContentHash]} = JwtTxValidation(
+component main{public [rsaModulusChunks, oidcDigest, nonceContentHash]} = JwtTxValidation(
   121,
   17,
   1024,
