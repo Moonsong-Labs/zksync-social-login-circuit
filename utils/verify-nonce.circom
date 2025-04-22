@@ -10,7 +10,7 @@ function MAX_NONCE_BASE64_LENGTH() {
   return 44;
 }
 
-function lengthAfterDecodeBase64(maxB64Length) {
+function (maxB64Length) {
   return (maxB64Length * 3) \ 4;
 }
 
@@ -58,7 +58,7 @@ template VerifyNonce() {
   }
 
   // Pack nonce into Fields to compare with hash.
-  component bytesToField = BytesToField(bytesInAField);
+  component bytesToField = BytesToFieldLE(bytesInAField);
   for (var i = 0; i < bytesInAField; i++) {
     bytesToField.bytes[i] <== nonceBytes[i];
   }
