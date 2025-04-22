@@ -80,11 +80,12 @@ export class JwtTxValidationInputs implements CircuitInput {
 
     // rfc4634 4.1
     // Here we want to append a "1" just after the message.
-    msg.pushLast(128); // Push
+    msg.pushLast(128);
 
     // L is the length of the message
     // L is a 64-bit number
-    const encodedL = ByteVector.fromBigInt(L)
+    const encodedL = ByteVector.fromBigIntBE(L)
+      .reverse()
       .padLeft(0, 8);
 
     // K is an amount of zeros

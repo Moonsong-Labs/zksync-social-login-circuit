@@ -30,7 +30,12 @@ export class ByteVector {
     return new ByteVector(Array.from(decoded));
   }
 
-  static fromBigInt(n: bigint): ByteVector {
+  /**
+   * Takes a bigint and create a byte vector with the little endian
+   * representation of the number.
+   * @param n
+   */
+  static fromBigIntLE(n: bigint): ByteVector {
     let current = n;
     const mask = 255n;
     const data = [];
@@ -39,7 +44,16 @@ export class ByteVector {
       data.push(Number(byte));
       current = current >> 8n;
     }
-    return new ByteVector(data.reverse());
+    return new ByteVector(data);
+  }
+
+  /**
+   * Takes a bigint and create a byte vector with the big endian
+   * representation of the number.
+   * @param n
+   */
+  static fromBigIntBE(n: bigint): ByteVector {
+    return this.fromBigIntLE(n).reverse();
   }
 
   static fromHex(hex: string): ByteVector {

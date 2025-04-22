@@ -8,7 +8,7 @@ export function createNonce(contentHex: string, blindingFactor: bigint): string 
   // Padding to complete 2 fields
   const nonceFields = ByteVector.fromHex(contentHex).toBnChunks(FIELD_BYTES);
   const hash = poseidon3([...nonceFields, blindingFactor]);
-  return ByteVector.fromBigInt(hash).padLeft(0, 32).toBase64Url();
+  return ByteVector.fromBigIntLE(hash).padLeft(0, 32).toBase64Url();
 }
 
 export function createNonceV2(
