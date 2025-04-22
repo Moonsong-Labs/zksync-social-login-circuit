@@ -57,9 +57,6 @@ template VerifyNonce() {
     nonce[i] === 0;
   }
 
-  // The result of the hash is always 32 bytes long. Last byte it's always going to be 0.
-  nonce[bytesInAField] === 0;
-
   // Pack nonce into Fields to compare with hash.
   component bytesToField = BytesToField(bytesInAField);
   for (var i = 0; i < bytesInAField; i++) {
