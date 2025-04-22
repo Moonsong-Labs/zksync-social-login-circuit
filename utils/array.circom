@@ -29,14 +29,14 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
     shifter.in <== in;
     shifter.shift <== startIndex;
 
-    component gts[maxSubArrayLen];
+    component greatThans[maxSubArrayLen];
     for (var i = 0; i < maxSubArrayLen; i++) {
-        gts[i] = GreaterThan(log2Ceil(maxSubArrayLen));
-        gts[i].in[0] <== length;
-        gts[i].in[1] <== i;
+        greatThans[i] = GreaterThan(log2Ceil(maxSubArrayLen));
+        greatThans[i].in[0] <== length;
+        greatThans[i].in[1] <== i;
 
         // Pad with 'A' (ASCII 65) instead of zero
-        out[i] <== gts[i].out * shifter.out[i] + (1 - gts[i].out) * 65;
+        out[i] <== greatThans[i].out * shifter.out[i] + (1 - greatThans[i].out) * 65;
     }
 }
 

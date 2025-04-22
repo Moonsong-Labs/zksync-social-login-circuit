@@ -27,32 +27,37 @@ function ASCII_DOT() {
 ///      4. Extracting and decoding Base64 payload
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
-/// @param maxMessageLength Maximum JWT byte length (must be multiple of 64 for SHA256)
+/// @param maxMessageByteLength Maximum JWT byte length (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
+/// @input messageBytes[maxMessageByteLength] JWT string (header.payload) with sha256 pad
+/// @input messageByteLength Real length in bytes for `messageBytes`.
+/// @input rsaModulusChunks Rsa pub key modulus expressed in k chunks of n bits each.
+/// @input signatureChunks Rsa signature expressed in k chunks of n bits each.
+/// @input periodIndex The format of the message is `<headers>.<payload`. This is the index of the dot in the middle.
 template JwtVerify (
   n,
   k,
-  maxMessageLength,
+  maxMessageByteLength,
   maxB64PayloadLength
 ) {
-  signal input message[maxMessageLength]; // JWT message (header + payload)
-  signal input messageLength; // Length of the message signed in the JWT
-  signal input pubkeyChunks[k]; // RSA public key split into k chunks
-  signal input signature[k]; // RSA signature split into k chunks
+  signal input messageBytes[maxMessageByteLength]; // JWT message in plain ascii (header + payload)
+  signal input messageByteLength; // Length of the message signed in the JWT measured in bytes characters
+  signal input rsaModulusChunks[k]; // RSA public key split into k chunks
+  signal input signatureChunks[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
   signal output payload[maxPayloadLength];
 
-  // Assert message length fits in ceil(log2(maxMessageLength)) bits
-  component n2bMessageLength = Num2Bits(log2Ceil(maxMessageLength));
-  n2bMessageLength.in <== messageLength;
+  // Assert message length fits in ceil(log2(maxMessageByteLength)) bits
+  component n2bMessageLength = Num2Bits(log2Ceil(maxMessageByteLength));
+  n2bMessageLength.in <== messageByteLength;
 
   // Assert message data after messageLength are zeros
-  AssertZeroPadding(maxMessageLength)(message, messageLength);
+  AssertZeroPadding(maxMessageByteLength)(messageBytes, messageByteLength);
 
   // Calculate SHA256 hash of the JWT message
-  signal shaBits[256] <== Sha256Bytes(maxMessageLength)(message, messageLength);
+  signal shaBits[256] <== Sha256Bytes(maxMessageByteLength)(messageBytes, messageByteLength);
 
   // Pack SHA output bytes to int[] for RSA input message
   var rsaMessageSizeChunks = (256 + n) \ n; // Adjust based on RSA chunk size
@@ -75,23 +80,23 @@ template JwtVerify (
   for (var i = rsaMessageSizeChunks; i < k; i++) {
     rsaVerifier.message[i] <== 0;
   }
-  rsaVerifier.modulus <== pubkeyChunks;
-  rsaVerifier.signature <== signature;
+  rsaVerifier.modulus <== rsaModulusChunks;
+  rsaVerifier.signature <== signatureChunks;
 
   // Assert that period exists at periodIndex
-  signal period <== ItemAtIndex(maxMessageLength)(message, periodIndex);
+  signal period <== ItemAtIndex(maxMessageByteLength)(messageBytes, periodIndex);
   period === 46;
 
   // Find the real message length
-  signal realMessageLength <== FindRealMessageLengthInBytes(maxMessageLength)(message);
+  signal realMessageLength <== FindRealMessageLengthInBytes(maxMessageByteLength)(messageBytes);
 
   // Assert that period is unique
-  signal periodCount <== CountCharOccurrencesUpTo(maxMessageLength)(message, realMessageLength, ASCII_DOT());
+  signal periodCount <== CountCharOccurrencesUpTo(maxMessageByteLength)(messageBytes, realMessageLength, ASCII_DOT());
   periodCount === 1;
 
   signal b64HeaderLength <== periodIndex;
   signal b64PayloadLength <== realMessageLength - b64HeaderLength - 1;
-  signal b64Payload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageLength, maxB64PayloadLength)(message, b64HeaderLength + 1, b64PayloadLength);
+  signal b64Payload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageByteLength, maxB64PayloadLength)(messageBytes, b64HeaderLength + 1, b64PayloadLength);
 
   payload <== Base64Decode(maxPayloadLength)(b64Payload);
 }
