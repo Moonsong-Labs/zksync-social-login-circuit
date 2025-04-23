@@ -14,6 +14,13 @@ function P_AS_BYTES() {
    ];
 }
 
+// [
+//   48, 100,  78, 114, 224,  49, 160,  41,
+//  184,  80,  69, 182, 129, 129,  88,  93,
+//   40,  51, 232,  72, 121, 185, 112, 145,
+//   67, 225, 245, 147, 240,   0,   0,   1
+// ]
+
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
 ///         interpreted as a big endian number represents a number bigger than p.
@@ -31,14 +38,11 @@ template OverflowCheck() {
 
   signal input in[32];
   signal output out;
-  
-  
-  component lowersOrEquals[31];
-  component previousAndCurrent[31];
 
   // Used to compare each byte between the given number and p.
   signal lowers[32];
   signal equals[32];
+  signal lowersOrEquals[32];
 
   // If any number at the left was lower than p, then there is room for carry over.
   signal anyPreviosWasLower[32];
@@ -46,34 +50,30 @@ template OverflowCheck() {
   // Results for each bytes get accumulated here.
   signal partials[32];
 
-
-  // First values are initialized by hand outside the loop.
-  lowers[0] <== LessThan(8)([in[0], pAsBytes[0]]);
-  anyPreviosWasLower[0] <== lowers[0];
-  equals[0] <== IsEqual()([in[0], pAsBytes[0]]);
-  partials[0] <== OR()(lowers[0], equals[0]);
-
-  for (var i = 1; i < 32; i++) {
+  for (var i = 0; i < 32; i++) {
     lowers[i] <== LessThan(8)([in[i], pAsBytes[i]]);
     equals[i] <== IsEqual()([in[i], pAsBytes[i]]);
-    
-    lowersOrEquals[i - 1] = OR();
-    
+    lowersOrEquals[i] <== OR()(lowers[i], equals[i]);
+  }
 
-    lowersOrEquals[i - 1].a <== lowers[i];
-    lowersOrEquals[i - 1].b <== equals[i];
+  // First values are initialized by hand outside the loop.
+  anyPreviosWasLower[0] <== lowers[0];
+  partials[0] <== lowersOrEquals[0];
 
+  for (var i = 1; i < 32; i++) {
+    // We add the current position to the accumulation of lowers at the left.
+    anyPreviosWasLower[i] <== OR()(anyPreviosWasLower[i - 1], lowers[i]);
+  }
+
+  for (var i = 1; i < 32; i++) {
     // Partials for the current element is only true if the previous partial was true and
     // There is room for carry over. If any byte at the left was lower than the corresponding
     // byte in p, then there is room for carry over. Another option is that the inmediate byte at the left
-    // was equial than the corresponding byte in p, in that case the current element has to be equal or lower than p.
-    previousAndCurrent[i - 1] = AND();
-    previousAndCurrent[i - 1].a <== partials[i - 1];
-    previousAndCurrent[i - 1].b <== OR()(anyPreviosWasLower[i - 1], AND()(equals[i - 1], lowersOrEquals[i - 1].out));
-    partials[i] <== previousAndCurrent[i - 1].out;
-
-    // We add the current position to the accumulation of lowers at the left.
-    anyPreviosWasLower[i] <== OR()(anyPreviosWasLower[i - 1], lowers[i]);
+    // was equal than the corresponding byte in p, in that case the current element has to be equal or lower than p.
+    partials[i] <== AND()(
+      partials[i - 1],
+      OR()(anyPreviosWasLower[i - 1], AND()(equals[i - 1], lowersOrEquals[i]))
+    );
   }
 
   signal howManyEquals <== CalculateTotal(32)(equals);
