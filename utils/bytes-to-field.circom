@@ -2,14 +2,14 @@ pragma circom 2.2.0;
 
 include "@zk-email/circuits/utils/array.circom";
 
-/// @title BytesToFieldLE
+/// @title BytesToField
 /// @notice Transform an array of bytes into a single field. The bytes are interpreted using little endian format.
 /// @dev This template assumes that every element of the input array is between 0 and 255.
 /// @dev The result might overflow if the input interpreted in little endian is bigger than a field.
 /// @param n the size of the array of bytes.
 /// @input inputs[n] List of bytes to be transformed into a field.
 ///        The code assumes each element is a valid byte (0 <= inputs[i] <= 255).
-template BytesToFieldLE(n) {
+template BytesToField(n) {
   assert(n <= 32);
 
   signal input bytes[n];
