@@ -10,12 +10,10 @@ include "@zk-email/circuits/utils/hash.circom";
 include "@zk-email/circuits/lib/sha.circom";
 include "@zk-email/circuits/lib/rsa.circom";
 include "@zk-email/circuits/lib/base64.circom";
-include "./bytes.circom";
 include "./array.circom";
-
-function ASCII_DOT() {
-  return 46;
-}
+include "./assert-fits-binary.circom";
+include "./bytes.circom";
+include "./constants.circom";
 
 /// @title JwtVerify
 /// @notice Verifies JWT signatures and extracts payload
@@ -50,8 +48,7 @@ template JwtVerify (
   signal output payload[maxPayloadLength];
 
   // Assert message length fits in ceil(log2(maxMessageByteLength)) bits
-  component n2bMessageLength = Num2Bits(log2Ceil(maxMessageByteLength));
-  n2bMessageLength.in <== messageByteLength;
+  AssertFitsBinary(maxMessageByteLength)(messageByteLength);
 
   // Assert message data after messageLength are zeros
   AssertZeroPadding(maxMessageByteLength)(messageBytes, messageByteLength);
@@ -85,7 +82,7 @@ template JwtVerify (
 
   // Assert that period exists at periodIndex
   signal period <== ItemAtIndex(maxMessageByteLength)(messageBytes, periodIndex);
-  period === 46;
+  period === ASCII_DOT();
 
   // Find the real message length
   signal realMessageLength <== FindRealMessageLengthInBytes(maxMessageByteLength)(messageBytes);

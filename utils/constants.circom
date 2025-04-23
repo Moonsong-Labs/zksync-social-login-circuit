@@ -47,3 +47,7 @@ function MAX_BYTES_FIELD() {
 function MAX_NONCE_BASE64_LENGTH() {
   return 44;
 }
+
+function ASCII_DOT() {
+  return 46;
+}
