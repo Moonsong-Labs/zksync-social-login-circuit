@@ -84,7 +84,7 @@ export class JwtTxValidationInputs implements CircuitInput {
 
     // L is the length of the message
     // L is a 64-bit number
-    const encodedL = ByteVector.fromBigInt(L)
+    const encodedL = ByteVector.fromBigIntBE(L)
       .padLeft(0, 8);
 
     // K is an amount of zeros
