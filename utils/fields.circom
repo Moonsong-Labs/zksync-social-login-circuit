@@ -8,6 +8,19 @@ include "@zk-email/circuits/helpers/reveal-substring.circom";
 
 include "./constants.circom";
 
+/// @title AssertFitsBinary
+/// @notice ensures a field fits in the binary representation of a max boundry
+/// @dev this is useful to ensure that LessThan behaves as espected
+/// @dev notice Num2Bits performs the assertions inside
+/// @param maxLength this parameter is used to calculate the max number of bits
+/// @input realLength value to check that does not overflow the binary representation
+template AssertFitsBinary(maxLength) {
+  signal input realLength;
+  component n2bMessageLength = Num2Bits(log2Ceil(maxLength));
+  n2bMessageLength.in <== realLength;
+}
+
+
 /// @title ExtractNonce
 /// @notice Extracts and validates nonce from nonce field
 /// @dev maxNonceLength length has to be lower or equal maxPayloadLength
@@ -24,6 +37,8 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
   signal input nonceLength;
 
   signal output nonce[maxNonceLength];
+
+  AssertFitsBinary(maxNonceLength)(nonceLength);
 
   // Verify nonce key
   var nonceKeyLength = NONCE_LENGTH();
@@ -59,6 +74,8 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
   signal output iss[maxIssLength];
 
+  AssertFitsBinary(maxIssLength)(issLength);
+
   // Verify if the key `iss` in the payload is unique
   var issKeyLength = ISS_KEY_LENGTH();
   var issKey[issKeyLength] = ISS_KEY();
@@ -90,6 +107,8 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
   signal input audLength;
 
   signal output aud[maxAudLength];
+
+  AssertFitsBinary(maxAudLength)(audLength);
 
   // Verify if the key `aud` in the payload is unique
   var audKeyLength = AUD_KEY_LENGTH();
@@ -123,6 +142,8 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
   signal input subLength;
 
   signal output sub[maxSubLength];
+
+  AssertFitsBinary(maxSubLength)(subLength);
 
   // Verify if the key `sub` in the payload is unique
   var subKeyLength = SUB_KEY_LENGTH();

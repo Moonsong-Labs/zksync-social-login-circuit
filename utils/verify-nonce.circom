@@ -56,7 +56,7 @@ template VerifyNonce() {
   for (var i = 0; i < bytesInAField; i++) {
     bytesToField.bytes[i] <== nonceBytes[i];
   }
-  log("bytesToField.out", bytesToField.out, bytesToField.overflow);
+
   signal packedNonce <== bytesToField.out;
 
   // Calculate hash tx_hash and blindingFactor.
