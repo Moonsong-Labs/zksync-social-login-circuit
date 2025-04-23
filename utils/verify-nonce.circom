@@ -5,18 +5,12 @@ include "@zk-email/circuits/utils/bytes.circom";
 include "circomlib/circuits/poseidon.circom";
 include "./bytes-to-field.circom";
 include "./base64url-to-base64.circom";
-
-function MAX_NONCE_BASE64_LENGTH() {
-  return 44;
-}
+include "./constants.circom";
 
 function lengthAfterDecodeBase64(maxB64Length) {
   return (maxB64Length * 3) \ 4;
 }
 
-function MAX_BYTES_FIELD() {
-  return 32;
-}
 
 /// @title VerifyNonce
 /// @notice Verify content of nonce. Interpret nonce as base64url encoded blob. Check that matches Poseidon(sender_hash || blinding_factor)
@@ -62,6 +56,7 @@ template VerifyNonce() {
   for (var i = 0; i < bytesInAField; i++) {
     bytesToField.bytes[i] <== nonceBytes[i];
   }
+  log("bytesToField.out", bytesToField.out, bytesToField.overflow);
   signal packedNonce <== bytesToField.out;
 
   // Calculate hash tx_hash and blindingFactor.

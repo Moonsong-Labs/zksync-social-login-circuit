@@ -39,3 +39,11 @@ function SUB_KEY() {
   // "sub":
   return [34, 115, 117, 98, 34, 58];
 }
+
+function MAX_BYTES_FIELD() {
+  return 32;
+}
+
+function MAX_NONCE_BASE64_LENGTH() {
+  return 44;
+}
