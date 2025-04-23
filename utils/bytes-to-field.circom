@@ -1,7 +1,90 @@
 pragma circom 2.2.0;
 
 include "circomlib/circuits/bitify.circom";
+include "circomlib/circuits/gates.circom";
 include "@zk-email/circuits/utils/array.circom";
+include "./constants.circom";
+
+function P_AS_BYTES() {
+  return [
+      48, 100,  78, 114, 225,  49, 160,  41,
+     184,  80,  69, 182, 129, 129,  88,  93,
+      40,  51, 232,  72, 121, 185, 112, 145,
+      67, 225, 245, 147, 240,   0,   0,   1
+   ];
+}
+
+/// @title OverflowCheck
+/// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
+///         interpreted as a big endian number represents a number bigger than p.
+/// @dev this is meant to be used only with bn128
+/// @dev The algorithm is like a reverse carry over. It iterates byte by byte
+///      from the most significant to the less. The idea is check if there is room for
+///      carry over.
+/// @dev we avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 244 bits).
+/// @dev the case where the bytes decode to exactly p is also considered overflow.
+/// @input in[32] array of bytes to be interpreted as a big endian number
+/// @ouput out 0 if the number is under p, 1 otherwise.
+template OverflowCheck() {
+  var n = MAX_NONCE_BASE64_LENGTH();
+  var pAsBytes[32] = P_AS_BYTES();
+
+  signal input in[32];
+  signal output out;
+  
+  
+  component lowersOrEquals[31];
+  component previousAndCurrent[31];
+
+  // Used to compare each byte between the given number and p.
+  signal lowers[32];
+  signal equals[32];
+
+  // If any number at the left was lower than p, then there is room for carry over.
+  signal anyPreviosWasLower[32];
+
+  // Results for each bytes get accumulated here.
+  signal partials[32];
+
+
+  // First values are initialized by hand outside the loop.
+  lowers[0] <== LessThan(8)([in[0], pAsBytes[0]]);
+  anyPreviosWasLower[0] <== lowers[0];
+  equals[0] <== IsEqual()([in[0], pAsBytes[0]]);
+  partials[0] <== OR()(lowers[0], equals[0]);
+
+  for (var i = 1; i < 32; i++) {
+    lowers[i] <== LessThan(8)([in[i], pAsBytes[i]]);
+    equals[i] <== IsEqual()([in[i], pAsBytes[i]]);
+    
+    lowersOrEquals[i - 1] = OR();
+    
+
+    lowersOrEquals[i - 1].a <== lowers[i];
+    lowersOrEquals[i - 1].b <== equals[i];
+
+    // Partials for the current element is only true if the previous partial was true and
+    // There is room for carry over. If any byte at the left was lower than the corresponding
+    // byte in p, then there is room for carry over. Another option is that the inmediate byte at the left
+    // was equial than the corresponding byte in p, in that case the current element has to be equal or lower than p.
+    previousAndCurrent[i - 1] = AND();
+    previousAndCurrent[i - 1].a <== partials[i - 1];
+    previousAndCurrent[i - 1].b <== OR()(anyPreviosWasLower[i - 1], AND()(equals[i - 1], lowersOrEquals[i - 1].out));
+    partials[i] <== previousAndCurrent[i - 1].out;
+
+    // We add the current position to the accumulation of lowers at the left.
+    anyPreviosWasLower[i] <== OR()(anyPreviosWasLower[i - 1], lowers[i]);
+  }
+
+  signal howManyEquals <== CalculateTotal(32)(equals);
+  signal allAreEqual <== IsEqual()([howManyEquals, 32]);
+
+  // There was carry over if the last partial is false (0) or if the number was exactly equal to p.
+  out <== OR()(
+    IsEqual()([partials[31], 0]),
+    allAreEqual
+  );
+}
 
 /// @title BytesToFieldBE
 /// @notice Transform an array of bytes into a single field. The bytes are interpreted using big endian format.
@@ -17,6 +100,13 @@ template BytesToFieldBE(n) {
   signal revert[n];
   signal members[n];
   signal output out;
+  signal output overflow;
+
+  if (n == 32) {
+    overflow <== OverflowCheck()(bytes);
+  } else {
+    overflow <== 0;
+  }
 
   // First revert bytes.
   for (var i = 0; i < n; i++) {
