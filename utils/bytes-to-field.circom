@@ -5,12 +5,12 @@ include "circomlib/circuits/gates.circom";
 include "@zk-email/circuits/utils/array.circom";
 include "./constants.circom";
 
-function P_AS_BYTES() {
+function P_MINUS_ONE_AS_BYTES() {
   return [
       48, 100,  78, 114, 225,  49, 160,  41,
      184,  80,  69, 182, 129, 129,  88,  93,
       40,  51, 232,  72, 121, 185, 112, 145,
-      67, 225, 245, 147, 240,   0,   0,   1
+      67, 225, 245, 147, 240,   0,   0,   0
    ];
 }
 
@@ -20,6 +20,7 @@ function P_AS_BYTES() {
 //   40,  51, 232,  72, 121, 185, 112, 145,
 //   67, 225, 245, 147, 240,   0,   0,   1
 // ]
+
 
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
@@ -34,7 +35,7 @@ function P_AS_BYTES() {
 /// @ouput out 0 if the number is under p, 1 otherwise.
 template OverflowCheck() {
   var n = MAX_NONCE_BASE64_LENGTH();
-  var pAsBytes[32] = P_AS_BYTES();
+  var pAsBytes[32] = P_MINUS_ONE_AS_BYTES();
 
   signal input in[32];
   signal output out;
@@ -42,29 +43,20 @@ template OverflowCheck() {
   // Used to compare each byte between the given number and p.
   signal lowers[32];
   signal equals[32];
-  signal lowersOrEquals[32];
-
-  // If any number at the left was lower than p, then there is room for carry over.
-  signal anyPreviosWasLower[32];
-
-  // Results for each bytes get accumulated here.
   signal partials[32];
+  signal anyLowerUpTo[32];
 
   for (var i = 0; i < 32; i++) {
     lowers[i] <== LessThan(8)([in[i], pAsBytes[i]]);
     equals[i] <== IsEqual()([in[i], pAsBytes[i]]);
-    lowersOrEquals[i] <== OR()(lowers[i], equals[i]);
   }
 
-  // First values are initialized by hand outside the loop.
-  anyPreviosWasLower[0] <== lowers[0];
-  partials[0] <== lowersOrEquals[0];
-
+  anyLowerUpTo[0] <== lowers[0];
   for (var i = 1; i < 32; i++) {
-    // We add the current position to the accumulation of lowers at the left.
-    anyPreviosWasLower[i] <== OR()(anyPreviosWasLower[i - 1], lowers[i]);
+    anyLowerUpTo[i] <== OR()(anyLowerUpTo[i - 1], lowers[i]);
   }
 
+  partials[0] <== OR()(anyLowerUpTo[0], equals[0]);
   for (var i = 1; i < 32; i++) {
     // Partials for the current element is only true if the previous partial was true and
     // There is room for carry over. If any byte at the left was lower than the corresponding
@@ -72,18 +64,12 @@ template OverflowCheck() {
     // was equal than the corresponding byte in p, in that case the current element has to be equal or lower than p.
     partials[i] <== AND()(
       partials[i - 1],
-      OR()(anyPreviosWasLower[i - 1], AND()(equals[i - 1], lowersOrEquals[i]))
+      OR()(anyLowerUpTo[i], equals[i])
     );
   }
 
-  signal howManyEquals <== CalculateTotal(32)(equals);
-  signal allAreEqual <== IsEqual()([howManyEquals, 32]);
-
   // There was carry over if the last partial is false (0) or if the number was exactly equal to p.
-  out <== OR()(
-    IsEqual()([partials[31], 0]),
-    allAreEqual
-  );
+  out <== IsEqual()([partials[31], 0]);
 }
 
 /// @title BytesToFieldBE
