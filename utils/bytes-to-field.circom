@@ -26,9 +26,6 @@ function P_MINUS_ONE_AS_BYTES() {
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
 ///         interpreted as a big endian number represents a number bigger than p.
 /// @dev this is meant to be used only with bn128
-/// @dev The algorithm is like a reverse carry over. It iterates byte by byte
-///      from the most significant to the less. The idea is check if there is room for
-///      carry over.
 /// @dev we avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 244 bits).
 /// @dev the case where the bytes decode to exactly p is also considered overflow.
 /// @input in[32] array of bytes to be interpreted as a big endian number
@@ -40,11 +37,12 @@ template OverflowCheck() {
   signal input in[32];
   signal output out;
 
-  // Used to compare each byte between the given number and p.
   signal lowers[32];
   signal equals[32];
-  signal partials[32];
-  signal anyLowerUpTo[32];
+  signal partials[32]; // Used to accumulate the results.
+  signal anyLowerUpTo[32]; // anyLowerUpTo[i] is true only if that
+                           // byte or any at the left is lower
+                           // than the corresponding byte of 'p -1'
 
   for (var i = 0; i < 32; i++) {
     lowers[i] <== LessThan(8)([in[i], pAsBytes[i]]);
@@ -59,16 +57,15 @@ template OverflowCheck() {
   partials[0] <== OR()(anyLowerUpTo[0], equals[0]);
   for (var i = 1; i < 32; i++) {
     // Partials for the current element is only true if the previous partial was true and
-    // There is room for carry over. If any byte at the left was lower than the corresponding
-    // byte in p, then there is room for carry over. Another option is that the inmediate byte at the left
-    // was equal than the corresponding byte in p, in that case the current element has to be equal or lower than p.
+    // There is more significant number that los lower the the corresponding byte for p-1 or
+    // The current byte is equal to the corresponding byte of p-1.
     partials[i] <== AND()(
       partials[i - 1],
       OR()(anyLowerUpTo[i], equals[i])
     );
   }
 
-  // There was carry over if the last partial is false (0) or if the number was exactly equal to p.
+  // Because we acumulate with AND, the last value condense the entire result.
   out <== IsEqual()([partials[31], 0]);
 }
 
