@@ -2,24 +2,12 @@
  * Based on @zkemail work.
  * Original: https://github.com/zkemail/jwt-tx-builder/blob/e5d79009fc5d00b97fcdcdeec697e1b9689a46b2/packages/circuits/helpers/fields.circom
  */
-pragma circom 2.1.6;
+pragma circom 2.2.0;
 
 include "@zk-email/circuits/helpers/reveal-substring.circom";
+include "./assert-fits-binary.circom";
 
 include "./constants.circom";
-
-/// @title AssertFitsBinary
-/// @notice ensures a field fits in the binary representation of a max boundry
-/// @dev this is useful to ensure that LessThan behaves as espected
-/// @dev notice Num2Bits performs the assertions inside
-/// @param maxLength this parameter is used to calculate the max number of bits
-/// @input realLength value to check that does not overflow the binary representation
-template AssertFitsBinary(maxLength) {
-  signal input realLength;
-  component n2bMessageLength = Num2Bits(log2Ceil(maxLength));
-  n2bMessageLength.in <== realLength;
-}
-
 
 /// @title ExtractNonce
 /// @notice Extracts and validates nonce from nonce field
