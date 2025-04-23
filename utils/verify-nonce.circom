@@ -58,7 +58,7 @@ template VerifyNonce() {
   }
 
   // Pack nonce into Fields to compare with hash.
-  component bytesToField = BytesToField(bytesInAField);
+  component bytesToField = BytesToFieldBE(bytesInAField);
   for (var i = 0; i < bytesInAField; i++) {
     bytesToField.bytes[i] <== nonceBytes[i];
   }

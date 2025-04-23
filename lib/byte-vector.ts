@@ -30,7 +30,7 @@ export class ByteVector {
     return new ByteVector(Array.from(decoded));
   }
 
-  static fromBigInt(n: bigint): ByteVector {
+  static fromBigIntLE(n: bigint): ByteVector {
     let current = n;
     const mask = 255n;
     const data = [];
@@ -39,7 +39,11 @@ export class ByteVector {
       data.push(Number(byte));
       current = current >> 8n;
     }
-    return new ByteVector(data.reverse());
+    return new ByteVector(data);
+  }
+
+  static fromBigIntBE(n: bigint): ByteVector {
+    return this.fromBigIntLE(n).reverse();
   }
 
   static fromHex(hex: string): ByteVector {
@@ -75,23 +79,24 @@ export class ByteVector {
 
   toBnChunks(chunkSizeBytes: number): bigint[] {
     return intoChunks(this.vec, chunkSizeBytes)
-      .map((chunk) => new ByteVector(chunk).toBigInt());
+      .map((chunk) => new ByteVector(chunk).toBigIntBE());
   }
 
   toFieldArray(): bigint[] {
     return intoChunks(this.vec, FIELD_BYTES)
-      .map((chunk) => new ByteVector(chunk).reverse())
-      .map((chunk) => chunk.toBigInt());
+      .map((chunk) => new ByteVector(chunk).toBigIntLE());
   }
 
-  toBigInt(): bigint {
-    // Because we consider this was read from left to right, the result number is "big endian"-ish.
-    // We need to copy the array because javascript "reverse" changes the array.
-    const parts = [...this.vec].reverse().map((byte, i) => {
+  toBigIntLE(): bigint {
+    const parts = this.vec.map((byte, i) => {
       return BigInt(byte) << 8n * BigInt(i);
     });
 
     return parts.reduce((a, b) => a + b);
+  }
+
+  toBigIntBE(): bigint {
+    return this.reverse().toBigIntLE();
   }
 
   get byteLength(): number {
@@ -132,7 +137,7 @@ export class ByteVector {
   }
 
   reverse(): ByteVector {
-    return new ByteVector(this.vec.reverse());
+    return new ByteVector([...this.vec].reverse());
   }
 
   toBase64Url(): string {
