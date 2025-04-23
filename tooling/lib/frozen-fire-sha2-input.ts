@@ -92,7 +92,7 @@ export class FrozenFireSha2Input implements CircuitInput {
     // L + 1 + K = 448 (mod 512)
     // L is a 64-bit number
     const L = BigInt(this.msg.byteLength * 8);
-    const encodedL = ByteVector.fromBigIntLE(L)
+    const encodedL = ByteVector.fromBigInt(L)
       .padLeft(0, 8)
       .toCircomBinary();
 

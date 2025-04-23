@@ -21,7 +21,7 @@ export class OidcDigest {
   }
 
   toHex(): Hex {
-    return ByteVector.fromBigIntLE(this.toBigInt()).toHex();
+    return ByteVector.fromBigInt(this.toBigInt()).toHex();
   }
 
   toBigInt(): bigint {

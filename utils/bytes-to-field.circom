@@ -13,14 +13,19 @@ template BytesToField(n) {
   assert(n <= 32);
 
   signal input bytes[n];
+  signal revert[n];
   signal members[n];
   signal output out;
 
-  // Iterate each byte.
-  // Each byte is shifted to the right position
+  // First revert bytes.
+  for (var i = 0; i < n; i++) {
+    revert[n - i - 1] <== bytes[i];
+  }
+
+  // Then multiply each number for the right factor.
   for (var i = 0; i < n; i++) {
     var shifts = i * 8;
-    members[i] <== (1 << shifts) * bytes[i];
+    members[i] <== (1 << shifts) * revert[i];
   }
 
   // Last, add each component to get the final value.
