@@ -2,9 +2,10 @@
  * Based on @zkemail work.
  * Original: https://github.com/zkemail/jwt-tx-builder/blob/e5d79009fc5d00b97fcdcdeec697e1b9689a46b2/packages/circuits/helpers/fields.circom
  */
-pragma circom 2.1.6;
+pragma circom 2.2.0;
 
 include "@zk-email/circuits/helpers/reveal-substring.circom";
+include "./assert-fits-binary.circom";
 
 include "./constants.circom";
 
@@ -24,6 +25,8 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
   signal input nonceLength;
 
   signal output nonce[maxNonceLength];
+
+  AssertFitsBinary(maxNonceLength)(nonceLength);
 
   // Verify nonce key
   var nonceKeyLength = NONCE_LENGTH();
@@ -59,6 +62,8 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
   signal output iss[maxIssLength];
 
+  AssertFitsBinary(maxIssLength)(issLength);
+
   // Verify if the key `iss` in the payload is unique
   var issKeyLength = ISS_KEY_LENGTH();
   var issKey[issKeyLength] = ISS_KEY();
@@ -90,6 +95,8 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
   signal input audLength;
 
   signal output aud[maxAudLength];
+
+  AssertFitsBinary(maxAudLength)(audLength);
 
   // Verify if the key `aud` in the payload is unique
   var audKeyLength = AUD_KEY_LENGTH();
@@ -123,6 +130,8 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
   signal input subLength;
 
   signal output sub[maxSubLength];
+
+  AssertFitsBinary(maxSubLength)(subLength);
 
   // Verify if the key `sub` in the payload is unique
   var subKeyLength = SUB_KEY_LENGTH();
