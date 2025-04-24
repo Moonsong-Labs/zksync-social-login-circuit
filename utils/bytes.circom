@@ -14,8 +14,8 @@ include "@zk-email/circuits/utils/array.circom";
 ///      1. Base64 uses characters with ASCII values < 128
 ///      2. SHA-256 padding starts with 128 (10000000 in binary)
 ///      3. The first 128 encountered marks the end of the Base64 string and start of padding
+/// @param maxLength The maximum possible length of the padded message
 /// @input in[maxLength] The padded message array
-/// @input maxLength The maximum possible length of the padded message
 /// @output realLength The length of the real message (before padding)
 template FindRealMessageLength(maxLength) {
   signal input in[maxLength];
