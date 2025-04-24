@@ -48,19 +48,19 @@ template VerifyNonce() {
   signal b64Nonce[maxNonceB64Length] <== Base64UrlToBase64(maxNonceB64Length)(b64UrlNonce);
 
   // Decode base64
-  signal nonce[maxNonceLength] <== Base64Decode(maxNonceLength)(b64Nonce);
+  signal nonceBytes[maxNonceLength] <== Base64Decode(maxNonceLength)(b64Nonce);
 
   // The nonce is expected to include one field. But because it's encoded as base 64, the closest
   // size that can fit a field is 44 characters. This means that there is always extra padding
   // at the end, this padding has to be zero.
   for (var i = bytesInAField; i < maxNonceLength; i++) {
-    nonce[i] === 0;
+    nonceBytes[i] === 0;
   }
 
   // Pack nonce into Fields to compare with hash.
-  component bytesToField = BytesToField(bytesInAField);
+  component bytesToField = BytesToFieldBE(bytesInAField);
   for (var i = 0; i < bytesInAField; i++) {
-    bytesToField.inputs[i] <== nonce[i];
+    bytesToField.bytes[i] <== nonceBytes[i];
   }
   signal packedNonce <== bytesToField.out;
 
