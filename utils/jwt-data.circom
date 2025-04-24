@@ -15,11 +15,11 @@ include "./fields.circom";
 /// @input payload[maxPayloadLength] entire payload already decoded (ascii).
 /// @input nonceKeyStartIndex index o '"nonce":' substring inside payload.
 /// @input nonceLength actual length of nonce.
-/// @input issKeyStartIndex index of '"iss":' substring inside payload..
+/// @input issKeyStartIndex index of '"iss":' substring inside payload.
 /// @input issLength actual length of iss.
-/// @input audKeyStartIndex index of '"aud":' substring inside payload..
+/// @input audKeyStartIndex index of '"aud":' substring inside payload.
 /// @input audLength actual length of aud.
-/// @input subKeyStartIndex index of '"sub":' substring inside payload..
+/// @input subKeyStartIndex index of '"sub":' substring inside payload.
 /// @input subLength actual length of sub.
 template JwtData(
   maxPayloadLength,
