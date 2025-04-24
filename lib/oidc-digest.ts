@@ -21,14 +21,14 @@ export class OidcDigest {
   }
 
   toHex(): Hex {
-    return ByteVector.fromBigInt(this.toBigInt()).toHex();
+    return ByteVector.fromBigIntBE(this.toBigInt()).toHex();
   }
 
   toBigInt(): bigint {
     const iss = ByteVector.fromAsciiString(this.iss).padRight(0, ISS_MAX_LENGTH).toFieldArray(); // 1 Field
     const aud = ByteVector.fromAsciiString(this.aud).padRight(0, AUD_MAX_LENGTH).toFieldArray(); // 4 Fields
     const sub = ByteVector.fromAsciiString(this.sub).padRight(0, SUB_MAX_LENGTH).toFieldArray(); // 1 Field
-    const salt = this.salt.toBigInt(); // 1 Field
+    const salt = this.salt.toBigIntBE(); // 1 Field
 
     return poseidon7([...iss, ...aud, ...sub, salt]);
   }
