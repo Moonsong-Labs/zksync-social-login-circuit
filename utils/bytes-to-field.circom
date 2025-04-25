@@ -18,9 +18,9 @@ function P_MINUS_ONE_AS_BYTES() {
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
 ///         interpreted as a big endian number represents a number bigger than p.
-/// @dev this is meant to be used only with bn128
-/// @dev we avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 244 bits).
-/// @dev the case where the bytes decode to exactly p is also considered overflow.
+/// @dev This is meant to be used only with bn128
+/// @dev We avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 254 bits).
+/// @dev The case where the bytes decode to exactly p is also considered overflow.
 /// @input in[32] array of bytes to be interpreted as a big endian number
 /// @ouput out 0 if the number is under p, 1 otherwise.
 template OverflowCheck() {
