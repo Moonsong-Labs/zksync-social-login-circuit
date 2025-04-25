@@ -26,7 +26,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
   signal output nonce[maxNonceLength];
 
-  AssertFitsBinary(maxNonceLength)(nonceLength);
+  AssertFitsBinary(maxNonceLength + 1)(nonceLength);
 
   // Verify nonce key
   var nonceKeyLength = NONCE_LENGTH();
@@ -62,7 +62,7 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
   signal output iss[maxIssLength];
 
-  AssertFitsBinary(maxIssLength)(issLength);
+  AssertFitsBinary(maxIssLength + 1)(issLength);
 
   // Verify if the key `iss` in the payload is unique
   var issKeyLength = ISS_KEY_LENGTH();
@@ -96,7 +96,7 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
 
   signal output aud[maxAudLength];
 
-  AssertFitsBinary(maxAudLength)(audLength);
+  AssertFitsBinary(maxAudLength + 1)(audLength);
 
   // Verify if the key `aud` in the payload is unique
   var audKeyLength = AUD_KEY_LENGTH();
@@ -131,7 +131,7 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
 
   signal output sub[maxSubLength];
 
-  AssertFitsBinary(maxSubLength)(subLength);
+  AssertFitsBinary(maxSubLength + 1)(subLength);
 
   // Verify if the key `sub` in the payload is unique
   var subKeyLength = SUB_KEY_LENGTH();
