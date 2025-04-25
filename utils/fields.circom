@@ -39,7 +39,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
   // Extract nonce
   signal nonceStartIndex <== nonceKeyStartIndex + nonceKeyLength + 1;
 
-  // `RevealSubstring` asserts nonceStartIndex and nonceStartIndex + nonceLength are in valid range.
+  // `RevealSubstring` asserts nonceStartIndex, nonceLength, and nonceStartIndex + nonceLength are in valid range.
   nonce <== RevealSubstring(maxPayloadLength, maxNonceLength, 0)(payload, nonceStartIndex, nonceLength);
 }
 
@@ -75,7 +75,7 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
   // Reveal the iss in the payload
   signal issStartIndex <== issKeyStartIndex + issKeyLength + 1;
 
-  // `RevealSubstring` asserts issStartIndex and issStartIndex + issLength are in valid range.
+  // `RevealSubstring` asserts issStartIndex, issLength and issStartIndex + issLength are in valid range.
   iss <== RevealSubstring(maxPayloadLength, maxIssLength, 0)(payload, issStartIndex, issLength);
 }
 
@@ -109,7 +109,7 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
   // Reveal the aud in the payload
   signal audStartIndex <== audKeyStartIndex + audKeyLength + 1;
 
-  // `RevealSubstring` asserts audStartIndex and audStartIndex + audLength are in valid range.
+  // `RevealSubstring` asserts audStartIndex, audLength and audStartIndex + audLength are in valid range.
   aud <== RevealSubstring(maxPayloadLength, maxAudLength, 0)(payload, audStartIndex, audLength);
 }
 
@@ -144,6 +144,6 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
   // Reveal the sub in the payload
   signal subStartIndex <== subKeyStartIndex + subKeyLength + 1;
 
-  // `RevealSubstring` asserts subStartIndex and subStartIndex + subLength are in valid range.
+  // `RevealSubstring` asserts subStartIndex, subLength and subStartIndex + subLength are in valid range.
   sub <== RevealSubstring(maxPayloadLength, maxSubLength, 0)(payload, subStartIndex, subLength);
 }
