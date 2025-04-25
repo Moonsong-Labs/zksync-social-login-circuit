@@ -34,7 +34,7 @@ template Base64UrlToBase64(n) {
   signal input b64Url[n];
   signal output b64[n];
 
-  // First we ensure that thera are no '+' or '/';
+  // First we ensure that there are no '+' or '/';
   signal countAsciiPlus <== CountCharOccurrencesUpTo(n)(b64Url, ASCII_PLUS(), n);
   countAsciiPlus === 0;
   signal countAsciiSlash <== CountCharOccurrencesUpTo(n)(b64Url, ASCII_SLASH(), n);
