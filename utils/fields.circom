@@ -47,7 +47,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
 /// @title ExtractIssuer
 /// @notice Extracts and validates the 'iss' (Issuer) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxIssLength length has to be lower or equal maxPayloadLength
 /// @dev issKeyStartIndex and issKeyStartIndex + issLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxIssLength Maximum length of issuer value in bytes
@@ -81,7 +81,7 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
 /// @title ExtractAud
 /// @notice Extracts and validates the 'aud' (Audience) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxAudLength length has to be lower or equal maxPayloadLength
 /// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxAudLength Maximum length of aud value in bytes
@@ -116,7 +116,7 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
 
 /// @title ExtractSub
 /// @notice Extracts and validates the 'sub' (Subject) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxSubLength length has to be lower or equal maxPayloadLength
 /// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxSubLength Maximum length of sub value in bytes
