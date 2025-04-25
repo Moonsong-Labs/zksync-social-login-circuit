@@ -27,7 +27,7 @@ function ASCII_EQUAL() {
 /// @notice Assumes input is encoded as base64url and translates to regular base64.
 /// @dev We use this to translate from a base64url array of bytes a to a base64 formated array of bytes.
 /// @dev This can be used as a middle step to later on use zkemail's base64 decoder.
-/// @dev This template validares that original array does not have any of the non base64url specific characters. This avoids non-determinism.
+/// @dev This template validates that original array does not have any of the non base64url specific characters. This avoids non-determinism.
 /// @param n Length of the array to re encode.
 /// @input b64Url Array of base64url characters.
 template Base64UrlToBase64(n) {
