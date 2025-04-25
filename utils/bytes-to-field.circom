@@ -72,7 +72,7 @@ template OverflowCheck() {
 /// @title BytesToFieldBE
 /// @notice Transform an array of bytes into a single field. The bytes are interpreted using big endian format.
 /// @dev This template assumes that every element of the input array is between 0 and 255.
-/// @dev This template is meant to be used using bn128.
+/// @dev This template is meant to be used only with bn128.
 /// @param n the size of the array of bytes. It has to be lower or equal to 32
 /// @input inputs[n] List of bytes to be transformed into a field.
 ///        The code assumes each element is a valid byte (0 <= inputs[i] <= 255).
