@@ -14,20 +14,13 @@ function P_MINUS_ONE_AS_BYTES() {
    ];
 }
 
-// [
-//   48, 100,  78, 114, 224,  49, 160,  41,
-//  184,  80,  69, 182, 129, 129,  88,  93,
-//   40,  51, 232,  72, 121, 185, 112, 145,
-//   67, 225, 245, 147, 240,   0,   0,   1
-// ]
-
 
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
 ///         interpreted as a big endian number represents a number bigger than p.
-/// @dev this is meant to be used only with bn128
-/// @dev we avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 244 bits).
-/// @dev the case where the bytes decode to exactly p is also considered overflow.
+/// @dev This is meant to be used only with bn128
+/// @dev We avoid using LessThan with big numbers, because it doesn't behave well over 252 bits (p is 254 bits).
+/// @dev The case where the bytes decode to exactly p is also considered overflow.
 /// @input in[32] array of bytes to be interpreted as a big endian number
 /// @ouput out 0 if the number is under p, 1 otherwise.
 template OverflowCheck() {
@@ -56,9 +49,10 @@ template OverflowCheck() {
 
   partials[0] <== OR()(anyLowerUpTo[0], equals[0]);
   for (var i = 1; i < 32; i++) {
-    // Partials for the current element is only true if the previous partial was true and
-    // There is more significant number that los lower the the corresponding byte for p-1 or
-    // The current byte is equal to the corresponding byte of p-1.
+    // partials[i] === partials[i-1] && (
+    //   ( in[0] < pAsBytes[0] || ... || in[i] < pAsBytes[i] ) ||
+    //   in[i] == pAsBytes[i]
+    // ).
     partials[i] <== AND()(
       partials[i - 1],
       OR()(anyLowerUpTo[i], equals[i])
@@ -72,7 +66,7 @@ template OverflowCheck() {
 /// @title BytesToFieldBE
 /// @notice Transform an array of bytes into a single field. The bytes are interpreted using big endian format.
 /// @dev This template assumes that every element of the input array is between 0 and 255.
-/// @dev This template is meant to be used using bn128.
+/// @dev This template is meant to be used only with bn128.
 /// @param n the size of the array of bytes. It has to be lower or equal to 32
 /// @input inputs[n] List of bytes to be transformed into a field.
 ///        The code assumes each element is a valid byte (0 <= inputs[i] <= 255).
