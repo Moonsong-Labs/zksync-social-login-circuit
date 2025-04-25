@@ -14,13 +14,6 @@ function P_MINUS_ONE_AS_BYTES() {
    ];
 }
 
-// [
-//   48, 100,  78, 114, 224,  49, 160,  41,
-//  184,  80,  69, 182, 129, 129,  88,  93,
-//   40,  51, 232,  72, 121, 185, 112, 145,
-//   67, 225, 245, 147, 240,   0,   0,   1
-// ]
-
 
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
@@ -56,9 +49,10 @@ template OverflowCheck() {
 
   partials[0] <== OR()(anyLowerUpTo[0], equals[0]);
   for (var i = 1; i < 32; i++) {
-    // Partials for the current element is only true if the previous partial was true and
-    // There is more significant number that los lower the the corresponding byte for p-1 or
-    // The current byte is equal to the corresponding byte of p-1.
+    // partials[i] === partials[i-1] && (
+    //   ( in[0] < pAsBytes[0] || ... || in[i] < pAsBytes[i] ) ||
+    //   in[i] == pAsBytes[i]
+    // ).
     partials[i] <== AND()(
       partials[i - 1],
       OR()(anyLowerUpTo[i], equals[i])
