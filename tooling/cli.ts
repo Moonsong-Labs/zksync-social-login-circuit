@@ -19,13 +19,14 @@ import { digestCommand } from "./lib/digest.js";
 import { env } from "./lib/env.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
+import { recreateCmd } from "./recreate-cmd.js";
 import { runCmd } from "./run-cmd.js";
+import { runTestCmd } from "./run-test-cmd.js";
 import { verificationKeyCmd } from "./verification-key.js";
 import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { runTestCmd } from "./run-test-cmd.js";
 
 config();
 
@@ -179,6 +180,12 @@ const args = yargs(process.argv.slice(2))
     "Performs all neded tasks to export verifier and prepared zkey",
     FILE_ARG_DEF,
     async (argv) => allCmd(argv.file),
+  )
+  .command(
+    "recreate",
+    "Recreates verifier using exported version of zkey file",
+    {},
+    async () => recreateCmd(),
   )
   .command(
     "run <file>",
