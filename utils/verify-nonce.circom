@@ -24,9 +24,9 @@ function lengthAfterDecodeBase64(maxB64Length) {
 ///      The sender hash is calculated as keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))
 /// @input b64UrlNonce[44] the nonce encoded as base64url.
 /// @input blindingFactor Factor used to prevent Google from identifying user's transactions.
-/// @input txHash[2] Hash of the current transaction. The tx hash is 32 bytes long, this why its encoded in the following way:
-///        - txhash[0] contains the first 31 bytes of the txHash starting from the left interpreted as a single field.
-///        - txhash[1] it's the last byte of the txHash starting from the left.
+/// @input content[2] The content of the jwt nonce are 32 bytes, which are encoded like this:
+///        - content[0] contains the first 31 bytes of the content starting from the left interpreted as a single field.
+///        - content[1] it's the last byte of the content starting from the left.
 template VerifyNonce() {
   // Useful constants
   var maxNonceB64Length = MAX_NONCE_BASE64_LENGTH();

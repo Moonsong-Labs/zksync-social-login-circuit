@@ -45,9 +45,8 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
 /// @notice Counts the number of occurrences of a specified character in an array up to a certain position
 /// @dev This template iterates through the input array and counts how many times the specified character appears in
 ///      the first "upTo" elements.
-/// @dev The "upTo" index is not included in the range to check.
 /// @input in[maxLength] The input array in which to count occurrences of the character
-/// @input upTo Max index used to count occurrences
+/// @input upTo Max index used to count occurrences. Is assumed to be <= maxLength
 /// @input char The character to count within the input array
 /// @output count The number of times the specified character appears in the input array
 template CountCharOccurrencesUpTo(maxLength) {
