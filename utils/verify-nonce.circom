@@ -22,6 +22,7 @@ function lengthAfterDecodeBase64(maxB64Length) {
 ///      3. Calculate expected value (Poseidon(sender_hash || blinding_factor))
 ///      4. Ensures decoded nonce matches calculated hash
 ///      The sender hash is calculated as keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))
+/// @dev This template assumes that base64url encoded nonce is padded using `=`. A nonce padded using `\0` will fail.
 /// @input b64UrlNonce[44] the nonce encoded as base64url.
 /// @input blindingFactor Factor used to prevent Google from identifying user's transactions.
 /// @input content[2] The content of the jwt nonce are 32 bytes, which are encoded like this:
