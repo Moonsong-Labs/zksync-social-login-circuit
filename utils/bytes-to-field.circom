@@ -25,7 +25,7 @@ function P_MINUS_ONE_AS_BYTES() {
 /// @ouput out 0 if the number is under p, 1 otherwise.
 template OverflowCheck() {
   var n = MAX_NONCE_BASE64_LENGTH();
-  var pAsBytes[32] = P_MINUS_ONE_AS_BYTES();
+  var pMinusOneAsBytes[32] = P_MINUS_ONE_AS_BYTES();
 
   signal input in[32];
   signal output out;
@@ -38,8 +38,8 @@ template OverflowCheck() {
                            // than the corresponding byte of 'p -1'
 
   for (var i = 0; i < 32; i++) {
-    lowers[i] <== LessThan(8)([in[i], pAsBytes[i]]);
-    equals[i] <== IsEqual()([in[i], pAsBytes[i]]);
+    lowers[i] <== LessThan(8)([in[i], pMinusOneAsBytes[i]]);
+    equals[i] <== IsEqual()([in[i], pMinusOneAsBytes[i]]);
   }
 
   anyLowerUpTo[0] <== lowers[0];
@@ -50,8 +50,8 @@ template OverflowCheck() {
   partials[0] <== OR()(anyLowerUpTo[0], equals[0]);
   for (var i = 1; i < 32; i++) {
     // partials[i] === partials[i-1] && (
-    //   ( in[0] < pAsBytes[0] || ... || in[i] < pAsBytes[i] ) ||
-    //   in[i] == pAsBytes[i]
+    //   ( in[0] < pMinusOneAsBytes[0] || ... || in[i] < pMinusOneAsBytes[i] ) ||
+    //   in[i] == pMinusOneAsBytes[i]
     // ).
     partials[i] <== AND()(
       partials[i - 1],
