@@ -53,8 +53,10 @@ template Base64UrlToBase64(n) {
   signal totalSlash <== CalculateTotal(n)(matchesSlash);
   totalSlash === 0;
 
-  // replace '-' with '+';
+  // replace '-' with '+'
   signal partial1[n] <== ReplaceAll(n)(b64Url, ASCII_MINUS(), ASCII_PLUS());
-  // replace '_' with '/';
-  b64 <== ReplaceAll(n)(partial1, ASCII_UNDERSCORE(), ASCII_SLASH());
+  // replace '_' with '/'
+  signal partial2[n] <== ReplaceAll(n)(partial1, ASCII_UNDERSCORE(), ASCII_SLASH());
+  // replace '0' with '='
+  b64 <== ReplaceAll(n)(partial1, 0, ASCII_EQUAL());
 }
