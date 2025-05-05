@@ -11,6 +11,7 @@ import { deployVerifier } from "./deploy-verifier.js";
 import { downloadPtau } from "./download-ptau.js";
 import { exportCircuitCmd } from "./export-circuit.js";
 import { exportVerifierCmd } from "./export-verifier.js";
+import { exportVerifierTestCmd } from "./export-verifier-test.js";
 import { inputCommand } from "./generate-input.js";
 import { generateVerifier } from "./generate-verifier.js";
 import { getJwtCmd } from "./get-jwt-cmd.js";
@@ -20,9 +21,11 @@ import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { runCmd } from "./run-cmd.js";
 import { verificationKeyCmd } from "./verification-key.js";
+import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { runTestCmd } from "./run-test-cmd.js";
 
 config();
 
@@ -127,6 +130,13 @@ const args = yargs(process.argv.slice(2))
       await exportVerifierCmd(argv.file);
     })
   .command(
+    "export-verifier-test <file>",
+    "calculates oidc_digest for jwt in env var",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await exportVerifierTestCmd(argv.file);
+    })
+  .command(
     "deploy-verifier <file>",
     "deploys verifier to local anvil",
     FILE_ARG_DEF,
@@ -179,6 +189,22 @@ const args = yargs(process.argv.slice(2))
     },
   )
   .command(
+    "run-test <file>",
+    "Generates inputs, wasm and witness for a test circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await runTestCmd(argv.file);
+    },
+  )
+  .command(
+    "verifier-for-test <file>",
+    "Generates a verifier to be use in testing environments",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await verifierTestCmd(argv.file);
+    },
+  )
+  .command(
     "create-nonce <address> <nonce>",
     "Creates a nonce for a given address and nonce",
     {
@@ -194,7 +220,12 @@ const args = yargs(process.argv.slice(2))
       },
     },
     async (argv) => {
-      const nonce = createNonceV2(getAddress(argv.address), BigInt(argv.nonce), BigInt(env("BLINDING_FACTOR")));
+      const nonce = createNonceV2(
+        getAddress(argv.address),
+        BigInt(argv.nonce),
+        BigInt(env("BLINDING_FACTOR")),
+        BigInt(env("TIMESTAMP_LIMIT")),
+      );
       console.log(nonce);
     },
   )
