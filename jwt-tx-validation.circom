@@ -19,60 +19,70 @@ include "./utils/verify-nonce.circom";
 ///      5. Computing public key hash for external reference
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
-/// @param maxMessageLength Maximum raw JWT string length (This is header.payload,
+/// @param maxMessageByteLength Maximum raw JWT string length (This is header.payload,
 ///        where both are base64url encoded) (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
-/// @param maxNonceLength
-/// @param maxIssLength
-/// @param maxAudLength
-/// @param maxSubLength
-/// @input message[maxMessageLength] JWT string (header.payload)
-/// @input messageLength Actual length of JWT string
-/// @input pubkey[k] RSA public key in k chunks
-/// @input signature[k] RSA signature in k chunks
+/// @param maxNonceAsciiLength
+/// @param maxIssAsciiLength
+/// @param maxAudAsciiLength
+/// @param maxSubAsciiLength
+/// @input messageBytes[maxMessageByteLength] JWT string (header.payload) with sha256 pad
+/// @input messageByteLength Actual length of JWT string
+/// @input rsaModulusChunks[k] RSA public key modulus in k chunks of n bits
+/// @input signatureChunks[k] RSA signature in k chunks
 /// @input periodIndex Location of period separating header.payload
-/// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
-/// @input nonceLength Actual length for nonce string.
-/// @input expectedNonce Value expected for nonce.
-///        Even when this circuit works with any 44 character base64url nonce, it's
+/// @input issKeyStartIndex Index for '"iss":' substring in payload
+/// @input issAsciiLength Length of the iss counted as ascii characters
+/// @input audKeyStartIndex Index for '"aud":' substring in payload
+/// @input audAsciiLength Length of the aud counted as ascii characters
+/// @input subKeyStartIndex Index for '"sub":' substring in payload
+/// @input subAsciiLength Length of the sub counted as ascii characters
+/// @input salt Salt used to generate oidcDigest
+/// @input oidcDigest Result of doing Poseidon(iss, aud, sub, salt)
+///        The circuit recalculates this value and checks that the provided
+///        one is correct.
+/// @input nonceKeyStartIndex Index for '"nonce":' substring in payload
+/// @input nonceAsciiLength Length of the nonce counted as ascii characters
+/// @input nonceContentHash Value expected for nonce hash.
+///        Even when this circuit works with any 44 charecter base64url nonce, it's
 ///        meant to be used wit a nonce calculated as `Poseidon3(sender_hash[0..31], sender_hash.subarray[31..32], blinding_factor)`
 ///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))`
-/// @input issKeyStartIndex Index for '"iss":' substring in payload
+
 template JwtTxValidation(
   n,
   k,
-  maxMessageLength,
+  maxMessageByteLength,
   maxB64PayloadLength,
-  maxNonceLength,
-  maxIssLength,
-  maxAudLength,
-  maxSubLength
+  maxNonceAsciiLength,
+  maxIssAsciiLength,
+  maxAudAsciiLength,
+  maxSubAsciiLength
 ) {
   assert(n*k >= 2048); // n*k has to fit a 2048 bit public key.
   assert(n < 127); // Each field needs enough room to fit carry on during big int operations.
-  assert(maxMessageLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
+  assert(maxMessageByteLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
   assert(maxB64PayloadLength % 4 == 0); // Because it's b64 encoded.
 
-  signal input message[maxMessageLength]; // JWT message (header + payload)
-  signal input messageLength; // Length of the message signed in the JWT
-  signal input pubkey[k]; // RSA public key split into k chunks
-  signal input signature[k]; // RSA signature split into k chunks
+  signal input messageBytes[maxMessageByteLength]; // JWT message (header + payload)
+  signal input messageByteLength; // Length of the message signed in the JWT
+  signal input rsaModulusChunks[k]; // RSA public key modulus split into k chunks
+  signal input signatureChunks[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
-  signal input nonceKeyStartIndex; // Index for '"nonce":' substring in payload
-  signal input nonceLength; // Length for nonce.
-
   signal input issKeyStartIndex; // Index for '"iss":' substring in payload
-  signal input issLength; // Real length for iss value.
+  signal input issAsciiLength; // Real length for iss value.
 
   signal input audKeyStartIndex; // Index for '"aud":' substring in payload
-  signal input audLength; // Real length for aud value.
+  signal input audAsciiLength; // Real length for aud value.
 
   signal input subKeyStartIndex; // Index for '"sub":' substring in payload
-  signal input subLength; // Real length for sub value.
+  signal input subAsciiLength; // Real length for sub value.
 
   signal input salt; // Salt used to generate oidcDigest
   signal input oidcDigest; // Poseidon(iss, aud, sub, salt)
+
+  signal input nonceKeyStartIndex; // Index for '"nonce":' substring in payload
+  signal input nonceAsciiLength; // Length for nonce.
 
   signal input nonceContentHash[2];
   signal input blindingFactor;
@@ -80,60 +90,60 @@ template JwtTxValidation(
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
   signal payload[maxPayloadLength];
-  signal nonce[maxNonceLength];
-  signal iss[maxIssLength];
-  signal aud[maxAudLength];
-  signal sub[maxSubLength];
+  signal nonceAscii[maxNonceAsciiLength];
+  signal issAscii[maxIssAsciiLength];
+  signal audAscii[maxAudAsciiLength];
+  signal subAscii[maxSubAsciiLength];
 
   // Check signature over JWT and extract payload
   payload <== JwtVerify(
     n,
     k,
-    maxMessageLength,
+    maxMessageByteLength,
     maxB64PayloadLength
   )(
-    message,
-    messageLength,
-    pubkey,
-    signature,
+    messageBytes,
+    messageByteLength,
+    rsaModulusChunks,
+    signatureChunks,
     periodIndex
   );
 
 
-  (nonce, iss, aud, sub) <== JwtData(
+  (nonceAscii, issAscii, audAscii, subAscii) <== JwtData(
     maxPayloadLength,
-    maxNonceLength,
-    maxIssLength,
-    maxAudLength,
-    maxSubLength
+    maxNonceAsciiLength,
+    maxIssAsciiLength,
+    maxAudAsciiLength,
+    maxSubAsciiLength
   )(
     payload,
     nonceKeyStartIndex,
-    nonceLength,
+    nonceAsciiLength,
     issKeyStartIndex,
-    issLength,
+    issAsciiLength,
     audKeyStartIndex,
-    audLength,
+    audAsciiLength,
     subKeyStartIndex,
-    subLength
+    subAsciiLength
   );
 
   VerifyOidcDigest(
-    maxIssLength,
-    maxAudLength,
-    maxSubLength
+    maxIssAsciiLength,
+    maxAudAsciiLength,
+    maxSubAsciiLength
   )(
-    iss,
-    aud,
-    sub,
+    issAscii,
+    audAscii,
+    subAscii,
     salt,
     oidcDigest
   );
 
-  VerifyNonce()(nonce, blindingFactor, nonceContentHash);
+  VerifyNonce()(nonceAscii, blindingFactor, nonceContentHash);
 }
 
-component main{public [pubkey, oidcDigest, nonceContentHash]} = JwtTxValidation(
+component main{public [rsaModulusChunks, oidcDigest, nonceContentHash]} = JwtTxValidation(
   121,
   17,
   1024,

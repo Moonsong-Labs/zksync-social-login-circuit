@@ -29,14 +29,14 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
     shifter.in <== in;
     shifter.shift <== startIndex;
 
-    component gts[maxSubArrayLen];
+    component greatThans[maxSubArrayLen];
     for (var i = 0; i < maxSubArrayLen; i++) {
-        gts[i] = GreaterThan(log2Ceil(maxSubArrayLen));
-        gts[i].in[0] <== length;
-        gts[i].in[1] <== i;
+        greatThans[i] = GreaterThan(log2Ceil(maxSubArrayLen));
+        greatThans[i].in[0] <== length;
+        greatThans[i].in[1] <== i;
 
         // Pad with 'A' (ASCII 65) instead of zero
-        out[i] <== gts[i].out * shifter.out[i] + (1 - gts[i].out) * 65;
+        out[i] <== greatThans[i].out * shifter.out[i] + (1 - greatThans[i].out) * 65;
     }
 }
 
@@ -46,7 +46,7 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
 /// @dev This template iterates through the input array and counts how many times the specified character appears in
 ///      the first "upTo" elements.
 /// @input in[maxLength] The input array in which to count occurrences of the character
-/// @input upTo Max index used to count occurrences
+/// @input upTo Max index used to count occurrences. Is assumed to be <= maxLength
 /// @input char The character to count within the input array
 /// @output count The number of times the specified character appears in the input array
 template CountCharOccurrencesUpTo(maxLength) {

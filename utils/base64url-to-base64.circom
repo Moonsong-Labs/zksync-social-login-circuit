@@ -1,6 +1,10 @@
 pragma circom 2.2.0;
 
+
+include "@zk-email/circuits/utils/array.circom";
+include "./array.circom";
 include "./replace-all.circom";
+
 
 function ASCII_MINUS() {
   return 45;
@@ -24,17 +28,34 @@ function ASCII_EQUAL() {
 
 /// @title Base64UrlToBase64
 /// @notice Assumes input is encoded as base64url and translates to regular base64.
-/// @dev We use this to translate from a base64 received into jwt to zkemail's base64 decoder.
+/// @dev We use this to translate from a base64url array of bytes a to a base64 formated array of bytes.
+/// @dev This can be used as a middle step to later on use zkemail's base64 decoder.
+/// @dev This template validates that original array does not have any of the non base64url specific characters. This avoids non-determinism.
 /// @param n Length of the array to re encode.
 /// @input b64Url Array of base64url characters.
 template Base64UrlToBase64(n) {
   signal input b64Url[n];
   signal output b64[n];
 
-  // replace '-' with '+';
+  // First we ensure that there are no '+' or '/' in b64url
+  signal matchesPlus[n];
+  signal matchesSlash[n];
+
+  // Save all positions where is '+' or '/'.
+  for (var i = 0; i < n; i++) {
+    matchesPlus[i] <== IsEqual()([b64Url[i], ASCII_PLUS()]);
+    matchesSlash[i] <== IsEqual()([b64Url[i], ASCII_SLASH()]);
+  }
+
+  signal totalPlus <== CalculateTotal(n)(matchesPlus);
+  totalPlus === 0;
+  signal totalSlash <== CalculateTotal(n)(matchesSlash);
+  totalSlash === 0;
+
+  // replace '-' with '+'
   signal partial1[n] <== ReplaceAll(n)(b64Url, ASCII_MINUS(), ASCII_PLUS());
-  // replace '_' with '/';
+  // replace '_' with '/'
   signal partial2[n] <== ReplaceAll(n)(partial1, ASCII_UNDERSCORE(), ASCII_SLASH());
-  // replace '\0' with '=' (to recreate the padding back);
+  // replace '0' with '='
   b64 <== ReplaceAll(n)(partial2, 0, ASCII_EQUAL());
 }

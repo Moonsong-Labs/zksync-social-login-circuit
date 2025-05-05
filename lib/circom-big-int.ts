@@ -14,7 +14,7 @@ export class CircomBigInt {
   }
 
   static fromByteVector(buf: ByteVector): CircomBigInt {
-    return new CircomBigInt(buf.toBigInt());
+    return new CircomBigInt(buf.toBigIntBE());
   }
 
   serialize(): string[] {
