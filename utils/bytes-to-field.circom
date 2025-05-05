@@ -14,7 +14,6 @@ function P_MINUS_ONE_AS_BYTES() {
    ];
 }
 
-
 /// @title OverflowCheck
 /// @notice Returns a boolean (0 or 1) indicating if a given array of bytes
 ///         interpreted as a big endian number represents a number bigger than p.
