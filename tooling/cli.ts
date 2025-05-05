@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { getAddress } from "viem";
+import { getAddress, type Hex, pad } from "viem";
 import yargs from "yargs";
 
 import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
@@ -25,6 +25,7 @@ import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
+import { runTestCmd } from "./run-test-cmd.js";
 
 config();
 
@@ -188,6 +189,14 @@ const args = yargs(process.argv.slice(2))
     },
   )
   .command(
+    "run-test <file>",
+    "Generates inputs, wasm and witness for a test circuit",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await runTestCmd(argv.file);
+    },
+  )
+  .command(
     "verifier-for-test <file>",
     "Generates a verifier to be use in testing environments",
     FILE_ARG_DEF,
@@ -196,13 +205,23 @@ const args = yargs(process.argv.slice(2))
     },
   )
   .command(
-    "create-nonce <address> <nonce>",
+    "create-nonce <sender> <target> <passkeyHash> <nonce>",
     "Creates a nonce for a given address and nonce",
     {
-      address: {
+      sender: {
         type: "string",
         demandOption: true,
-        description: "Address to create nonce for",
+        description: "Address of the sender of the tx",
+      },
+      target: {
+        type: "string",
+        demandOption: true,
+        description: "Address of the account to recover",
+      },
+      passkeyHash: {
+        type: "string",
+        demandOption: true,
+        description: "hash of new passkey",
       },
       nonce: {
         type: "string",
@@ -212,7 +231,9 @@ const args = yargs(process.argv.slice(2))
     },
     async (argv) => {
       const nonce = createNonceV2(
-        getAddress(argv.address),
+        getAddress(argv.sender),
+        getAddress(argv.target),
+        pad(argv.passkeyHash as Hex),
         BigInt(argv.nonce),
         BigInt(env("BLINDING_FACTOR")),
         BigInt(env("TIMESTAMP_LIMIT")),

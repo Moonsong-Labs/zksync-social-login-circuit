@@ -39,3 +39,35 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
         out[i] <== gts[i].out * shifter.out[i] + (1 - gts[i].out) * 65;
     }
 }
+
+
+/// @title CountCharOccurrencesUpTo
+/// @notice Counts the number of occurrences of a specified character in an array up to a certain position
+/// @dev This template iterates through the input array and counts how many times the specified character appears in
+///      the first "upTo" elements.
+/// @input in[maxLength] The input array in which to count occurrences of the character
+/// @input upTo Max index used to count occurrences
+/// @input char The character to count within the input array
+/// @output count The number of times the specified character appears in the input array
+template CountCharOccurrencesUpTo(maxLength) {
+    signal input in[maxLength];
+    signal input upTo;
+    signal input char;
+    signal output count;
+
+    signal match[maxLength];
+    signal inRange[maxLength];
+    signal counter[maxLength];
+
+    match[0] <== IsEqual()([in[0], char]);
+    inRange[0] <== LessThan(log2Ceil(maxLength))([0, upTo]);
+    counter[0] <== match[0] * inRange[0];
+
+    for (var i = 1; i < maxLength; i++) {
+        match[i] <== IsEqual()([in[i], char]);
+        inRange[i] <== LessThan(log2Ceil(maxLength))([i, upTo]);
+        counter[i] <== counter[i-1] + match[i] * inRange[i];
+    }
+
+    count <== counter[maxLength-1];
+}

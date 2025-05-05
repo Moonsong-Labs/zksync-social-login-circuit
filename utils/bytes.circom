@@ -5,6 +5,7 @@
 pragma circom 2.1.6;
 
 include "circomlib/circuits/comparators.circom";
+include "@zk-email/circuits/utils/array.circom";
 
 /// @title FindRealMessageLength
 /// @notice Finds the length of the real message in a padded array by locating the first occurrence of 128
@@ -47,29 +48,4 @@ template FindRealMessageLength(maxLength) {
 
     // Constraint to ensure 128 was really found
     found[maxLength] === 1;
-}
-
-/// @title CountCharOccurrences
-/// @notice Counts the number of occurrences of a specified character in an array
-/// @dev This template iterates through the input array and counts how many times the specified character appears.
-/// @input in[maxLength] The input array in which to count occurrences of the character
-/// @input char The character to count within the input array
-/// @output count The number of times the specified character appears in the input array
-template CountCharOccurrences(maxLength) {
-    signal input in[maxLength];
-    signal input char;
-    signal output count;
-
-    signal match[maxLength];
-    signal counter[maxLength];
-
-    match[0] <== IsEqual()([in[0], char]);
-    counter[0] <== match[0];
-
-    for (var i = 1; i < maxLength; i++) {
-        match[i] <== IsEqual()([in[i], char]);
-        counter[i] <== counter[i-1] + match[i];
-    }
-
-    count <== counter[maxLength-1];
 }

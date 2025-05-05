@@ -10,11 +10,6 @@ function JWT_KID_KEY_LENGTH() {
     return 6;
 }
 
-// KID is 20 bytes long
-function JWT_KID_LENGTH() {
-    return 40;
-}
-
 function AZP_KEY_LENGTH() {
     // len("azp":)
     return 6;

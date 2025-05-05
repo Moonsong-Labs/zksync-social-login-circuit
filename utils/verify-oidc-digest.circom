@@ -14,8 +14,10 @@ include "circomlib/circuits/poseidon.circom";
 /// @input iss[maxIssLength] value for iss extracted from jwt.
 /// @input aud[maxAudLength] value for aud extracted from jwt.
 /// @input sub[maxSubLength] value for sub extracted from jwt.
-/// @input salt salt used to anonymize the result. Provided by user.
-/// @input expectedDigest Expected value for oidc_digest. Provided by user.
+/// @input salt salt used to anonymize the result.
+/// @input expectedDigest Expected value for oidc_digest. This value is built by the user
+///        when the proof is generated, and then reconstructed by the smart contract when the proof
+///        is verified.
 template VerifyOidcDigest(
   maxIssLength,
   maxAudLength,
@@ -30,13 +32,16 @@ template VerifyOidcDigest(
   var issFieldLength = computeIntChunkLength(maxIssLength);
   var audFieldLength = computeIntChunkLength(maxAudLength);
   var subFieldLength = computeIntChunkLength(maxSubLength);
+
+  // These values are spread across the rest of the components. That's
+  // Why we assert the precise value.
   assert(issFieldLength == 1);
   assert(audFieldLength == 4);
   assert(subFieldLength == 1);
 
-  signal packedIss[computeIntChunkLength(issFieldLength)] <== PackBytes(maxIssLength)(iss);
-  signal packedAud[computeIntChunkLength(maxAudLength)] <== PackBytes(maxAudLength)(aud);
-  signal packedSub[computeIntChunkLength(maxSubLength)] <== PackBytes(maxSubLength)(sub);
+  signal packedIss[issFieldLength] <== PackBytes(maxIssLength)(iss);
+  signal packedAud[audFieldLength] <== PackBytes(maxAudLength)(aud);
+  signal packedSub[subFieldLength] <== PackBytes(maxSubLength)(sub);
 
   signal calculatedDigest <== Poseidon(7)([
     packedIss[0],
