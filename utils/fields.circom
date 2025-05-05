@@ -26,7 +26,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
   signal output nonce[maxNonceLength];
 
-  AssertFitsBinary(maxNonceLength)(nonceLength);
+  AssertFitsBinary(maxNonceLength + 1)(nonceLength);
 
   // Verify nonce key
   var nonceKeyLength = NONCE_LENGTH();
@@ -39,7 +39,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
   // Extract nonce
   signal nonceStartIndex <== nonceKeyStartIndex + nonceKeyLength + 1;
 
-  // `RevealSubstring` asserts nonceStartIndex and nonceStartIndex + nonceLength are in valid range.
+  // `RevealSubstring` asserts nonceStartIndex, nonceLength, and nonceStartIndex + nonceLength are in valid range.
   nonce <== RevealSubstring(maxPayloadLength, maxNonceLength, 0)(payload, nonceStartIndex, nonceLength);
 }
 
@@ -47,7 +47,7 @@ template ExtractNonce(maxPayloadLength, maxNonceLength) {
 
 /// @title ExtractIssuer
 /// @notice Extracts and validates the 'iss' (Issuer) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxIssLength length has to be lower or equal maxPayloadLength
 /// @dev issKeyStartIndex and issKeyStartIndex + issLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxIssLength Maximum length of issuer value in bytes
@@ -62,7 +62,7 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
 
   signal output iss[maxIssLength];
 
-  AssertFitsBinary(maxIssLength)(issLength);
+  AssertFitsBinary(maxIssLength + 1)(issLength);
 
   // Verify if the key `iss` in the payload is unique
   var issKeyLength = ISS_KEY_LENGTH();
@@ -75,13 +75,13 @@ template ExtractIssuer(maxPayloadLength, maxIssLength) {
   // Reveal the iss in the payload
   signal issStartIndex <== issKeyStartIndex + issKeyLength + 1;
 
-  // `RevealSubstring` asserts issStartIndex and issStartIndex + issLength are in valid range.
+  // `RevealSubstring` asserts issStartIndex, issLength and issStartIndex + issLength are in valid range.
   iss <== RevealSubstring(maxPayloadLength, maxIssLength, 0)(payload, issStartIndex, issLength);
 }
 
 /// @title ExtractAud
 /// @notice Extracts and validates the 'aud' (Audience) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxAudLength length has to be lower or equal maxPayloadLength
 /// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxAudLength Maximum length of aud value in bytes
@@ -96,7 +96,7 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
 
   signal output aud[maxAudLength];
 
-  AssertFitsBinary(maxAudLength)(audLength);
+  AssertFitsBinary(maxAudLength + 1)(audLength);
 
   // Verify if the key `aud` in the payload is unique
   var audKeyLength = AUD_KEY_LENGTH();
@@ -109,14 +109,14 @@ template ExtractAud(maxPayloadLength, maxAudLength) {
   // Reveal the aud in the payload
   signal audStartIndex <== audKeyStartIndex + audKeyLength + 1;
 
-  // `RevealSubstring` asserts audStartIndex and audStartIndex + audLength are in valid range.
+  // `RevealSubstring` asserts audStartIndex, audLength and audStartIndex + audLength are in valid range.
   aud <== RevealSubstring(maxPayloadLength, maxAudLength, 0)(payload, audStartIndex, audLength);
 }
 
 
 /// @title ExtractSub
 /// @notice Extracts and validates the 'sub' (Subject) from JWT payload
-/// @dev maxNonceLength length has to be lower or equal maxPayloadLength
+/// @dev maxSubLength length has to be lower or equal maxPayloadLength
 /// @dev audKeyStartIndex and audKeyStartIndex + audLength have to be in correct range
 /// @param maxPayloadLength Maximum length of JWT payload
 /// @param maxSubLength Maximum length of sub value in bytes
@@ -131,7 +131,7 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
 
   signal output sub[maxSubLength];
 
-  AssertFitsBinary(maxSubLength)(subLength);
+  AssertFitsBinary(maxSubLength + 1)(subLength);
 
   // Verify if the key `sub` in the payload is unique
   var subKeyLength = SUB_KEY_LENGTH();
@@ -144,6 +144,6 @@ template ExtractSub(maxPayloadLength, maxSubLength) {
   // Reveal the sub in the payload
   signal subStartIndex <== subKeyStartIndex + subKeyLength + 1;
 
-  // `RevealSubstring` asserts subStartIndex and subStartIndex + subLength are in valid range.
+  // `RevealSubstring` asserts subStartIndex, subLength and subStartIndex + subLength are in valid range.
   sub <== RevealSubstring(maxPayloadLength, maxSubLength, 0)(payload, subStartIndex, subLength);
 }
