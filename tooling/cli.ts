@@ -20,12 +20,12 @@ import { env } from "./lib/env.js";
 import { prepareZkeyCmd } from "./prepare-zkey.js";
 import { prove } from "./prove.js";
 import { runCmd } from "./run-cmd.js";
+import { runTestCmd } from "./run-test-cmd.js";
 import { verificationKeyCmd } from "./verification-key.js";
 import { verifierTestCmd } from "./verifier-test.js";
 import { verifyCmd } from "./verify.js";
 import { witnessCommand } from "./witness.js";
 import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
-import { runTestCmd } from "./run-test-cmd.js";
 
 config();
 
