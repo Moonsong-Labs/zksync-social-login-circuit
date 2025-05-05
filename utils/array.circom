@@ -59,13 +59,15 @@ template CountCharOccurrencesUpTo(maxLength) {
   signal inRange[maxLength];
   signal counter[maxLength];
 
+  var bitLength = log2Ceil(maxLength);
+
   match[0] <== IsEqual()([in[0], char]);
-  inRange[0] <== LessThan(log2Ceil(maxLength))([0, upTo]);
+  inRange[0] <== LessThan(bitLength)([0, upTo]);
   counter[0] <== match[0] * inRange[0];
 
   for (var i = 1; i < maxLength; i++) {
     match[i] <== IsEqual()([in[i], char]);
-    inRange[i] <== LessThan(log2Ceil(maxLength))([i, upTo]);
+    inRange[i] <== LessThan(bitLength)([i, upTo]);
     counter[i] <== counter[i-1] + match[i] * inRange[i];
   }
 

@@ -15,7 +15,7 @@ include "circomlib/circuits/poseidon.circom";
 /// @input audAscii[maxAudAsciiLength] value for aud extracted from jwt.
 /// @input subAscii[maxSubAsciiLength] value for sub extracted from jwt.
 /// @input salt salt used to anonymize the result.
-/// @input expectedDigest Expected value for oidc_digest. This value is build by the user
+/// @input expectedDigest Expected value for oidc_digest. This value is built by the user
 ///        when the proof is generated, and then reconstructed by the smart contract when the proof
 ///        is verified.
 template VerifyOidcDigest(
