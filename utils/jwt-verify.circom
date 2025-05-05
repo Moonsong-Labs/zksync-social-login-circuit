@@ -41,11 +41,10 @@ template JwtVerify (
   signal input signature[k]; // RSA signature split into k chunks
   signal input periodIndex; // Index of the period in the JWT message
 
-
   var maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
   signal output payload[maxPayloadLength];
 
-  // Assert message length fits in ceil(log2(maxMessageLength))
+  // Assert message length fits in ceil(log2(maxMessageLength)) bits
   component n2bMessageLength = Num2Bits(log2Ceil(maxMessageLength));
   n2bMessageLength.in <== messageLength;
 
@@ -71,10 +70,10 @@ template JwtVerify (
   // Verify RSA signature
   component rsaVerifier = RSAVerifier65537(n, k);
   for (var i = 0; i < rsaMessageSize; i++) {
-      rsaVerifier.message[i] <== rsaMessage[i].out;
+    rsaVerifier.message[i] <== rsaMessage[i].out;
   }
   for (var i = rsaMessageSize; i < k; i++) {
-      rsaVerifier.message[i] <== 0;
+    rsaVerifier.message[i] <== 0;
   }
   rsaVerifier.modulus <== pubkey;
   rsaVerifier.signature <== signature;

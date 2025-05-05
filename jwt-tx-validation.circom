@@ -19,7 +19,8 @@ include "./utils/verify-nonce.circom";
 ///      5. Computing public key hash for external reference
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
-/// @param maxMessageLength Maximum JWT string length (must be multiple of 64 for SHA256)
+/// @param maxMessageLength Maximum raw JWT string length (This is header.payload,
+///        where both are base64url encoded) (must be multiple of 64 for SHA256)
 /// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
 /// @param maxNonceLength
 /// @param maxIssLength
@@ -30,9 +31,12 @@ include "./utils/verify-nonce.circom";
 /// @input pubkey[k] RSA public key in k chunks
 /// @input signature[k] RSA signature in k chunks
 /// @input periodIndex Location of period separating header.payload
-/// @input nonceKeyStartIndex Index for "nonce":" substring inside the payload
+/// @input nonceKeyStartIndex Index for '"nonce":' substring inside the payload
 /// @input nonceLength Actual length for nonce string.
 /// @input expectedNonce Value expected for nonce.
+///        Even when this circuit works with any 44 charecter base64url nonce, it's
+///        meant to be used wit a nonce calculated as `Poseidon3(sender_hash[0..31], sender_hash.subarray[31..32], blinding_factor)`
+///        where sender_hash is calculated as `keccak256(abi.encode(auxAddress, targetAddress, newPasskeyHash, recoverNonce, timeLimit))`
 /// @input issKeyStartIndex Index for '"iss":' substring in payload
 template JwtTxValidation(
   n,
@@ -44,6 +48,11 @@ template JwtTxValidation(
   maxAudLength,
   maxSubLength
 ) {
+  assert(n*k >= 2048); // n*k has to fit a 2048 bit public key.
+  assert(n < 127); // Each field needs enough room to fit carry on during big int operations.
+  assert(maxMessageLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
+  assert(maxB64PayloadLength % 4 == 0); // Because it's b64 encoded.
+
   signal input message[maxMessageLength]; // JWT message (header + payload)
   signal input messageLength; // Length of the message signed in the JWT
   signal input pubkey[k]; // RSA public key split into k chunks
@@ -55,11 +64,9 @@ template JwtTxValidation(
 
   signal input issKeyStartIndex; // Index for '"iss":' substring in payload
   signal input issLength; // Real length for iss value.
-  signal input expectedIss[maxIssLength]; // Expected value for iss.
 
   signal input audKeyStartIndex; // Index for '"aud":' substring in payload
   signal input audLength; // Real length for aud value.
-  signal input expectedAud[maxAudLength]; // Expected value for aud.
 
   signal input subKeyStartIndex; // Index for '"sub":' substring in payload
   signal input subLength; // Real length for sub value.
@@ -110,9 +117,6 @@ template JwtTxValidation(
     subKeyStartIndex,
     subLength
   );
-
-  iss === expectedIss;
-  aud === expectedAud;
 
   VerifyOidcDigest(
     maxIssLength,

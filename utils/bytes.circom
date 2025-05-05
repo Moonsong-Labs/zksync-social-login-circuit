@@ -14,38 +14,38 @@ include "@zk-email/circuits/utils/array.circom";
 ///      1. Base64 uses characters with ASCII values < 128
 ///      2. SHA-256 padding starts with 128 (10000000 in binary)
 ///      3. The first 128 encountered marks the end of the Base64 string and start of padding
+/// @param maxLength The maximum possible length of the padded message
 /// @input in[maxLength] The padded message array
-/// @input maxLength The maximum possible length of the padded message
 /// @output realLength The length of the real message (before padding)
 template FindRealMessageLength(maxLength) {
-    signal input in[maxLength];
-    signal output realLength;
+  signal input in[maxLength];
+  signal output realLength;
 
-    // Signal to track if we've found 128
-    signal found[maxLength + 1];
-    found[0] <== 0;
+  // Signal to track if we've found 128
+  signal found[maxLength + 1];
+  found[0] <== 0;
 
-    // Signal to accumulate the length
-    signal lengthAcc[maxLength + 1];
-    lengthAcc[0] <== 0;
+  // Signal to accumulate the length
+  signal lengthAcc[maxLength + 1];
+  lengthAcc[0] <== 0;
 
-    signal is128[maxLength];
+  signal is128[maxLength];
 
-    // Iterate through the array
-    for (var i = 0; i < maxLength; i++) {
-        // Check if current element is 128
-        is128[i] <== IsEqual()([in[i], 128]);
+  // Iterate through the array
+  for (var i = 0; i < maxLength; i++) {
+    // Check if current element is 128
+    is128[i] <== IsEqual()([in[i], 128]);
 
-        // Update found signal
-        found[i + 1] <== found[i] + is128[i] - found[i] * is128[i];
+    // Update found signal
+    found[i + 1] <== found[i] + is128[i] - found[i] * is128[i];
 
-        // If 128 not found yet, increment length
-        lengthAcc[i + 1] <== lengthAcc[i] + 1 - found[i + 1];
-    }
+    // If 128 not found yet, increment length
+    lengthAcc[i + 1] <== lengthAcc[i] + 1 - found[i + 1];
+  }
 
-    // The final accumulated length is our real message length
-    realLength <== lengthAcc[maxLength];
+  // The final accumulated length is our real message length
+  realLength <== lengthAcc[maxLength];
 
-    // Constraint to ensure 128 was really found
-    found[maxLength] === 1;
+  // Constraint to ensure 128 was really found
+  found[maxLength] === 1;
 }
