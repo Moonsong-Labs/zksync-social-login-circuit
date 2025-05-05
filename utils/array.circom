@@ -50,24 +50,26 @@ template SelectSubArrayBase64(maxArrayLen, maxSubArrayLen) {
 /// @input char The character to count within the input array
 /// @output count The number of times the specified character appears in the input array
 template CountCharOccurrencesUpTo(maxLength) {
-    signal input in[maxLength];
-    signal input upTo;
-    signal input char;
-    signal output count;
+  signal input in[maxLength];
+  signal input upTo;
+  signal input char;
+  signal output count;
 
-    signal match[maxLength];
-    signal inRange[maxLength];
-    signal counter[maxLength];
+  signal match[maxLength];
+  signal inRange[maxLength];
+  signal counter[maxLength];
 
-    match[0] <== IsEqual()([in[0], char]);
-    inRange[0] <== LessThan(log2Ceil(maxLength))([0, upTo]);
-    counter[0] <== match[0] * inRange[0];
+  var bitLength = log2Ceil(maxLength);
 
-    for (var i = 1; i < maxLength; i++) {
-        match[i] <== IsEqual()([in[i], char]);
-        inRange[i] <== LessThan(log2Ceil(maxLength))([i, upTo]);
-        counter[i] <== counter[i-1] + match[i] * inRange[i];
-    }
+  match[0] <== IsEqual()([in[0], char]);
+  inRange[0] <== LessThan(bitLength)([0, upTo]);
+  counter[0] <== match[0] * inRange[0];
 
-    count <== counter[maxLength-1];
+  for (var i = 1; i < maxLength; i++) {
+    match[i] <== IsEqual()([in[i], char]);
+    inRange[i] <== LessThan(bitLength)([i, upTo]);
+    counter[i] <== counter[i-1] + match[i] * inRange[i];
+  }
+
+  count <== counter[maxLength-1];
 }

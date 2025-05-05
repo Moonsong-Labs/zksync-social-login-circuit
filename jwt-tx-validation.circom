@@ -48,6 +48,11 @@ template JwtTxValidation(
   maxAudLength,
   maxSubLength
 ) {
+  assert(n*k >= 2048); // n*k has to fit a 2048 bit public key.
+  assert(n < 127); // Each field needs enough room to fit carry on during big int operations.
+  assert(maxMessageLength % 64 == 0); // message it's already sha256 padded. That means it has to be a multiple of 512 bits (64 bytes).
+  assert(maxB64PayloadLength % 4 == 0); // Because it's b64 encoded.
+
   signal input message[maxMessageLength]; // JWT message (header + payload)
   signal input messageLength; // Length of the message signed in the JWT
   signal input pubkey[k]; // RSA public key split into k chunks
@@ -59,11 +64,9 @@ template JwtTxValidation(
 
   signal input issKeyStartIndex; // Index for '"iss":' substring in payload
   signal input issLength; // Real length for iss value.
-  signal input expectedIss[maxIssLength]; // Expected value for iss.
 
   signal input audKeyStartIndex; // Index for '"aud":' substring in payload
   signal input audLength; // Real length for aud value.
-  signal input expectedAud[maxAudLength]; // Expected value for aud.
 
   signal input subKeyStartIndex; // Index for '"sub":' substring in payload
   signal input subLength; // Real length for sub value.
@@ -114,9 +117,6 @@ template JwtTxValidation(
     subKeyStartIndex,
     subLength
   );
-
-  iss === expectedIss;
-  aud === expectedAud;
 
   VerifyOidcDigest(
     maxIssLength,

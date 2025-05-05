@@ -10,8 +10,8 @@ function MAX_NONCE_BASE64_LENGTH() {
   return 44;
 }
 
-function MAX_LENGTH_DECODED_NONCE() {
-  return (MAX_NONCE_BASE64_LENGTH() * 3) \ 4;
+function lengthAfterDecodeBase64(maxB64Length) {
+  return (maxB64Length * 3) \ 4;
 }
 
 function MAX_BYTES_FIELD() {
@@ -34,7 +34,12 @@ function MAX_BYTES_FIELD() {
 ///        - txhash[0] contains the first 31 bytes of the txHash starting from the left interpreted as a single field.
 ///        - txhash[1] it's the last byte of the txHash starting from the left.
 template VerifyNonce() {
+  // Useful constants
   var maxNonceB64Length = MAX_NONCE_BASE64_LENGTH();
+  var bytesInAField = MAX_BYTES_FIELD();
+  var maxNonceLength = lengthAfterDecodeBase64(maxNonceB64Length);
+
+  // Inputs
   signal input b64UrlNonce[maxNonceB64Length];
   signal input blindingFactor;
   signal input content[2];
@@ -42,17 +47,19 @@ template VerifyNonce() {
   // Translate from base64Url to base64.
   signal b64Nonce[maxNonceB64Length] <== Base64UrlToBase64(maxNonceB64Length)(b64UrlNonce);
 
-  var maxNonceLength = MAX_LENGTH_DECODED_NONCE();
-
   // Decode base64
   signal nonce[maxNonceLength] <== Base64Decode(maxNonceLength)(b64Nonce);
 
-  // The result of the hash is always 32 bytes long. Last byte it's always going to be 0.
-  nonce[32] === 0;
+  // The nonce is expected to include one field. But because it's encoded as base 64, the closest
+  // size that can fit a field is 44 characters. This means that there is always extra padding
+  // at the end, this padding has to be zero.
+  for (var i = bytesInAField; i < maxNonceLength; i++) {
+    nonce[i] === 0;
+  }
 
   // Pack nonce into Fields to compare with hash.
-  component bytesToField = BytesToField(MAX_BYTES_FIELD());
-  for (var i = 0; i < 32; i++) {
+  component bytesToField = BytesToField(bytesInAField);
+  for (var i = 0; i < bytesInAField; i++) {
     bytesToField.inputs[i] <== nonce[i];
   }
   signal packedNonce <== bytesToField.out;
