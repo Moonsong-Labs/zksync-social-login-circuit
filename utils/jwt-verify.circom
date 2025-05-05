@@ -13,20 +13,22 @@ include "@zk-email/circuits/lib/base64.circom";
 include "./array.circom";
 include "./assert-fits-binary.circom";
 include "./bytes.circom";
+include "./base64url-to-base64.circom";
 include "./constants.circom";
+
 
 /// @title JwtVerify
 /// @notice Verifies JWT signatures and extracts payload
-/// @dev This template verifies RSA-SHA256 signed JWTs and decodes Base64 encoded components.
+/// @dev This template verifies RSA-SHA256 signed JWTs and decodes Base64Url encoded components.
 ///      It works by:
 ///      1. Verifying message length and padding
 ///      2. Computing SHA256 hash of `<header>.<payload>`
 ///      3. Verifying RSA signature against public key
-///      4. Extracting and decoding Base64 payload
+///      4. Extracting and decoding Base64Url payload
 /// @param n RSA chunk size in bits (n < 127 for field arithmetic)
 /// @param k Number of RSA chunks (n*k > 2048 for RSA-2048)
 /// @param maxMessageByteLength Maximum JWT byte length (must be multiple of 64 for SHA256)
-/// @param maxB64PayloadLength Maximum Base64 payload length (must be multiple of 4)
+/// @param maxB64PayloadLength Maximum Base64Url payload length (must be multiple of 4)
 /// @input messageBytes[maxMessageByteLength] JWT string (header.payload) with sha256 pad
 /// @input messageByteLength Real length in bytes for `messageBytes`.
 /// @input rsaModulusChunks Rsa pub key modulus expressed in k chunks of n bits each.
@@ -93,7 +95,8 @@ template JwtVerify (
 
   signal b64HeaderLength <== periodIndex;
   signal b64PayloadLength <== realMessageLength - b64HeaderLength - 1;
-  signal b64Payload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageByteLength, maxB64PayloadLength)(messageBytes, b64HeaderLength + 1, b64PayloadLength);
+  signal b64UrlPayload[maxB64PayloadLength] <== SelectSubArrayBase64(maxMessageByteLength, maxB64PayloadLength)(messageBytes, b64HeaderLength + 1, b64PayloadLength);
 
+  signal b64Payload[maxB64PayloadLength] <== Base64UrlToBase64(maxB64PayloadLength)(b64UrlPayload);
   payload <== Base64Decode(maxPayloadLength)(b64Payload);
 }
