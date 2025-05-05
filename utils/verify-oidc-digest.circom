@@ -30,13 +30,16 @@ template VerifyOidcDigest(
   var issFieldLength = computeIntChunkLength(maxIssLength);
   var audFieldLength = computeIntChunkLength(maxAudLength);
   var subFieldLength = computeIntChunkLength(maxSubLength);
+
+  // These values are spread across the rest of the components. That's
+  // Why we assert the precise value.
   assert(issFieldLength == 1);
   assert(audFieldLength == 4);
   assert(subFieldLength == 1);
 
-  signal packedIss[computeIntChunkLength(issFieldLength)] <== PackBytes(maxIssLength)(iss);
-  signal packedAud[computeIntChunkLength(maxAudLength)] <== PackBytes(maxAudLength)(aud);
-  signal packedSub[computeIntChunkLength(maxSubLength)] <== PackBytes(maxSubLength)(sub);
+  signal packedIss[issFieldLength] <== PackBytes(maxIssLength)(iss);
+  signal packedAud[audFieldLength] <== PackBytes(maxAudLength)(aud);
+  signal packedSub[subFieldLength] <== PackBytes(maxSubLength)(sub);
 
   signal calculatedDigest <== Poseidon(7)([
     packedIss[0],
