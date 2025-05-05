@@ -6,19 +6,19 @@ import { JWT } from "./jwt.js";
 import type { CircuitInput } from "./types.js";
 
 export type JwtTxValidationData = {
-  message: string[];
-  messageLength: string;
-  pubkey: string[];
-  signature: string[];
+  messageBytes: string[];
+  messageByteLength: string;
+  rsaModulusChunks: string[];
+  signatureChunks: string[];
   periodIndex: string;
   nonceKeyStartIndex: string;
-  nonceLength: string;
+  nonceAsciiLength: string;
   issKeyStartIndex: string;
-  issLength: string;
+  issAsciiLength: string;
   audKeyStartIndex: string;
-  audLength: string;
+  audAsciiLength: string;
   subKeyStartIndex: string;
-  subLength: string;
+  subAsciiLength: string;
   salt: string;
   oidcDigest: string;
   nonceContentHash: string[];
@@ -45,19 +45,19 @@ export class JwtTxValidationInputs implements CircuitInput {
     const [messagePadded, messagePaddedLen] = this.message();
 
     return {
-      message: messagePadded.toCircomByteArray(),
-      messageLength: messagePaddedLen.toString(),
-      pubkey: this.pubkey(),
-      signature: this.signature(),
+      messageBytes: messagePadded.toCircomByteArray(),
+      messageByteLength: messagePaddedLen.toString(),
+      rsaModulusChunks: this.rsaModulusChunks(),
+      signatureChunks: this.signatureChunks(),
       periodIndex: periodIndex.toString(),
       nonceKeyStartIndex: this.nonceKeyStartIndex(),
-      nonceLength: this.nonceLength(),
+      nonceAsciiLength: this.nonceAsciiLength(),
       issKeyStartIndex: this.issKeyStartIndex(),
-      issLength: this.issLength(),
+      issAsciiLength: this.issAsciiLength(),
       audKeyStartIndex: this.audKeyStartIndex(),
-      audLength: this.audLength(),
+      audAsciiLength: this.audAsciiLength(),
       subKeyStartIndex: this.subKeyStartIndex(),
-      subLength: this.subLength(),
+      subAsciiLength: this.subAsciiLength(),
       salt: this.salt.toString(),
       oidcDigest: this.oidcDigest(),
       nonceContentHash: this.serializeNonceContentHash(),
@@ -84,7 +84,7 @@ export class JwtTxValidationInputs implements CircuitInput {
 
     // L is the length of the message
     // L is a 64-bit number
-    const encodedL = ByteVector.fromBigInt(L)
+    const encodedL = ByteVector.fromBigIntBE(L)
       .padLeft(0, 8);
 
     // K is an amount of zeros
@@ -105,11 +105,11 @@ export class JwtTxValidationInputs implements CircuitInput {
     return [finalMessage, byteLength];
   }
 
-  private pubkey(): string[] {
+  private rsaModulusChunks(): string[] {
     return CircomBigInt.fromBase64(this.jwkModulus).serialize();
   }
 
-  private signature(): string[] {
+  private signatureChunks(): string[] {
     return CircomBigInt.fromBase64(this.jwt.signature).serialize();
   }
 
@@ -119,7 +119,7 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.findSubstringIndexForPayload("\"nonce\":");
   }
 
-  private nonceLength(): string {
+  private nonceAsciiLength(): string {
     const length = this.buildCircomStringLength(this.jwt.nonce);
     if (Number(length) > MAX_B64_NONCE_LENGTH) {
       throw new Error("Nonce too long");
@@ -133,7 +133,7 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.findSubstringIndexForPayload("\"iss\":");
   }
 
-  private issLength(): string {
+  private issAsciiLength(): string {
     return this.buildCircomStringLength(this.jwt.iss);
   }
 
@@ -143,7 +143,7 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.findSubstringIndexForPayload("\"aud\":");
   }
 
-  private audLength(): string {
+  private audAsciiLength(): string {
     return this.buildCircomStringLength(this.jwt.aud);
   }
 
@@ -153,7 +153,7 @@ export class JwtTxValidationInputs implements CircuitInput {
     return this.findSubstringIndexForPayload("\"sub\":");
   }
 
-  private subLength(): string {
+  private subAsciiLength(): string {
     return this.buildCircomStringLength(this.jwt.sub);
   }
 
