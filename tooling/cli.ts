@@ -41,8 +41,8 @@ const args = yargs(process.argv.slice(2))
   .command("compile <file>", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
     await compileCmd(argv.file);
   })
-  .command("input <file>", "generates input for circuit if it knows how to.", FILE_ARG_DEF, async (argv) => {
-    await generateInputCmd(argv.file);
+  .command("input", "generates input for circuit if it knows how to.", async () => {
+    await generateInputCmd();
   })
   .command("witness <file>", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
     await generateWitnessCmd(argv.file);

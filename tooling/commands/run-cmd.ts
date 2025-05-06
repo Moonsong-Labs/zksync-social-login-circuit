@@ -4,7 +4,7 @@ import { generateWitnessCmd } from "./generate-witness-cmd.js";
 
 export async function runCmd(circuit: string, recreateInput = true) {
   if (recreateInput) {
-    await generateInputCmd(circuit);
+    await generateInputCmd();
   }
   await compileCmd(circuit);
   await generateWitnessCmd(circuit);

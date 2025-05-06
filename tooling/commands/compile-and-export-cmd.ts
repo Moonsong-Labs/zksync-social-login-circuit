@@ -31,7 +31,7 @@ export async function compileAndExportCmd() {
   }
 
   await compileCmd(circuit);
-  await generateInputCmd(circuit);
+  await generateInputCmd();
   await generateWitnessCmd(circuit);
 
   const defaultPtauPath = path.join(ROOT_DIR, DEFAULT_PTAU);
