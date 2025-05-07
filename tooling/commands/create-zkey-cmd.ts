@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import * as path from "node:path";
 
-import { cmd } from "../lib/cmd.js";
 import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
+import { cmd } from "../lib/cmd.js";
 
 export const DEFAULT_PTAU = "ptaus/ppot_0080_20.ptau";
 

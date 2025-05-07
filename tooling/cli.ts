@@ -23,6 +23,7 @@ import { addRunTestCmd } from "./commands/run-test-cmd.js";
 import { addVerificationKeyCmd } from "./commands/verification-key-cmd.js";
 import { addVerifyCmd } from "./commands/verify-cmd.js";
 import { addDigestCommand } from "./lib/digest.js";
+import { addUploadedPreparedZkeyCmd } from "./commands/upload-prepared-zkey-cmd.js";
 
 const cli = buildCli([
   addCompileCmd,
@@ -47,6 +48,7 @@ const cli = buildCli([
   addRunTestCmd,
   addGenerateVerifierTestCmd,
   addGenerateNonceCmd,
+  addUploadedPreparedZkeyCmd,
 ]);
 
 async function runCli() {

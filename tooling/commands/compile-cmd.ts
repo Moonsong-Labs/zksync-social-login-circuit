@@ -4,6 +4,10 @@ import path from "node:path";
 import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 import { cmd } from "../lib/cmd.js";
 
+export function compiledWasmFile(name: string): string {
+  return path.join("target", name, `${name}_js`, `${name}.wasm`);
+}
+
 export async function compileCmd(filePath: string) {
   const fileData = path.parse(filePath);
 
