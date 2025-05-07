@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 import { cmd } from "../lib/cmd.js";
 
 export async function compileCmd(filePath: string) {
@@ -16,3 +17,9 @@ export async function compileCmd(filePath: string) {
   await cmd(`touch ${packageJsonPath}`);
   writeFileSync(packageJsonPath, JSON.stringify({ type: "commonjs" }, null, 2));
 }
+
+export const addCompileCmd: AddCmdFn = (cli) => {
+  return cli.command("compile <file>", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
+    await compileCmd(argv.file);
+  });
+};

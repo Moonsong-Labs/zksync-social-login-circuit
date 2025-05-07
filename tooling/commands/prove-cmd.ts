@@ -4,6 +4,7 @@ import path from "node:path";
 import { cmd } from "../lib/cmd.js";
 import { witnessFile } from "./generate-witness-cmd.js";
 import { preparedZkeyFile } from "./prepare-zkey-cmd.js";
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 
 export function proofPath(name: string): string {
   return `target/${name}/proof.json`;
@@ -28,3 +29,14 @@ export async function proveCmd(filePath: string) {
 
   await cmd(`snarkjs g16p ${zkey} ${witness} ${outProof} ${outPublic} -v`);
 }
+
+export const addProveCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "prove <file>",
+    "Calculates a proof using default inputs",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await proveCmd(argv.file);
+    },
+  );
+};

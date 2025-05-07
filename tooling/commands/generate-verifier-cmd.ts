@@ -6,6 +6,7 @@ import { compileCmd } from "./compile-cmd.js";
 import { createZkeyCmd, DEFAULT_PTAU, r1csFilePath } from "./create-zkey-cmd.js";
 import { downloadPtauCmd } from "./download-ptau-cmd.js";
 import { preparedZkeyFile, prepareZkeyCmd } from "./prepare-zkey-cmd.js";
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 
 export function defaultVerifierPath(name: string): string {
   return `target/${name}/verifier.sol`;
@@ -36,3 +37,22 @@ export async function generateVerifierCmd(circuit: string, outFile: string | nul
 
   await cmd(`snarkjs zkey export solidityverifier ${zkey} ${outPath}`);
 }
+
+export const addGenerateVerifierCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "verifier <file>",
+    "calculates oidc_digest for jwt in env var",
+    {
+      ...FILE_ARG_DEF,
+      out: {
+        type: "string",
+        demandOption: false,
+        description: "where to save the contract.",
+        default: null,
+        alias: ["o"],
+      },
+    },
+    async (argv) => {
+      await generateVerifierCmd(argv.file, argv.out);
+    });
+};
