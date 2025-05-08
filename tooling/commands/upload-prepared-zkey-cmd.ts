@@ -37,12 +37,12 @@ async function uploadFile(client: S3Client, body: Buffer, key: string): Promise<
   await upload.done();
 }
 
-export async function uploadPreparedZkeyCmd(force: boolean) {
+export async function uploadPreparedZkeyCmd(forceRecreate: boolean) {
   const wasmPath = compiledWasmFile(MAIN_CIRCUIT_NAME);
   const zkeyPath = preparedZkeyFile(MAIN_CIRCUIT_NAME);
   const ptauPath = path.join(ROOT_DIR, DEFAULT_PTAU);
 
-  if (!existsSync(wasmPath)) {
+  if (!existsSync(wasmPath) || forceRecreate) {
     await compileCmd(MAIN_CIRCUIT_FILE);
   }
 
@@ -50,7 +50,7 @@ export async function uploadPreparedZkeyCmd(force: boolean) {
     await downloadPtauCmd(20);
   }
 
-  if (!existsSync(zkeyPath) || force) {
+  if (!existsSync(zkeyPath) || forceRecreate) {
     await createZkeyCmd(MAIN_CIRCUIT_FILE, DEFAULT_PTAU);
     await prepareZkeyCmd(MAIN_CIRCUIT_FILE);
   }
@@ -78,17 +78,17 @@ export async function uploadPreparedZkeyCmd(force: boolean) {
 
 export const addUploadedPreparedZkeyCmd: AddCmdFn = (cli) => {
   return cli.command(
-    "upload-zkey",
+    "upload-final-zkey",
     "Uploads the prepared zkey file to the given s3 compatible bucket",
     (args) => args
-      .option("force-recreate", {
-        alias: ["f", "forceRecreate"],
+      .option("forceRecreate", {
+        alias: ["f", "force-recreate"],
         describe: "Force to recreate the collaboration and the beacon with new random values",
         type: "boolean",
         default: false,
       }),
     async (args) => {
-      return uploadPreparedZkeyCmd(args.force);
+      return uploadPreparedZkeyCmd(args.forceRecreate);
     },
   );
 };
