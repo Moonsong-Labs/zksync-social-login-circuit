@@ -8,9 +8,12 @@ import { Upload } from "@aws-sdk/lib-storage";
 import type { AddCmdFn } from "../base-cli.js";
 import { env, envOrDefault } from "../lib/env.js";
 import { MAIN_CIRCUIT_FILE, MAIN_CIRCUIT_NAME } from "../paths.js";
-import { preparedZkeyFile, prepareZkeyCmd } from "./prepare-zkey-cmd.js";
 import { compileCmd, compiledWasmFile } from "./compile-cmd.js";
 import { createZkeyCmd, DEFAULT_PTAU } from "./create-zkey-cmd.js";
+import { preparedZkeyFile, prepareZkeyCmd } from "./prepare-zkey-cmd.js";
+import path from "node:path";
+import { ROOT_DIR } from "../lib/cmd.js";
+import { downloadPtauCmd } from "./download-ptau-cmd.js";
 
 async function uploadFile(client: S3Client, body: Buffer, key: string): Promise<void> {
   console.log(`Starting with ${key} upload.`);
@@ -34,15 +37,20 @@ async function uploadFile(client: S3Client, body: Buffer, key: string): Promise<
   await upload.done();
 }
 
-export async function uploadPreparedZkeyCmd() {
+export async function uploadPreparedZkeyCmd(force: boolean) {
   const wasmPath = compiledWasmFile(MAIN_CIRCUIT_NAME);
   const zkeyPath = preparedZkeyFile(MAIN_CIRCUIT_NAME);
+  const ptauPath = path.join(ROOT_DIR, DEFAULT_PTAU);
 
   if (!existsSync(wasmPath)) {
     await compileCmd(MAIN_CIRCUIT_FILE);
   }
 
-  if (!existsSync(zkeyPath)) {
+  if (!existsSync(zkeyPath) && existsSync(ptauPath)) {
+    await downloadPtauCmd(20);
+  }
+
+  if (!existsSync(zkeyPath) || force) {
     await createZkeyCmd(MAIN_CIRCUIT_FILE, DEFAULT_PTAU);
     await prepareZkeyCmd(MAIN_CIRCUIT_FILE);
   }
@@ -72,9 +80,15 @@ export const addUploadedPreparedZkeyCmd: AddCmdFn = (cli) => {
   return cli.command(
     "upload-zkey",
     "Uploads the prepared zkey file to the given s3 compatible bucket",
-    {},
-    async () => {
-      return uploadPreparedZkeyCmd();
+    (args) => args
+      .option("force-recreate", {
+        alias: ["f", "forceRecreate"],
+        describe: "Force to recreate the collaboration and the beacon with new random values",
+        type: "boolean",
+        default: false,
+      }),
+    async (args) => {
+      return uploadPreparedZkeyCmd(args.force);
     },
   );
 };
