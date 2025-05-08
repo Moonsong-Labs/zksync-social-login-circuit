@@ -46,11 +46,12 @@ export async function uploadPreparedZkeyCmd(forceRecreate: boolean) {
     await compileCmd(MAIN_CIRCUIT_FILE);
   }
 
-  if (!existsSync(zkeyPath) && existsSync(ptauPath)) {
+  const haveToRecreate = !existsSync(zkeyPath) || forceRecreate;
+  if (haveToRecreate && !existsSync(ptauPath)) {
     await downloadPtauCmd(20);
   }
 
-  if (!existsSync(zkeyPath) || forceRecreate) {
+  if (haveToRecreate) {
     await createZkeyCmd(MAIN_CIRCUIT_FILE, DEFAULT_PTAU);
     await prepareZkeyCmd(MAIN_CIRCUIT_FILE);
   }
