@@ -20,10 +20,12 @@ import { addPrepareZkeyCmd } from "./commands/prepare-zkey-cmd.js";
 import { addProveCmd } from "./commands/prove-cmd.js";
 import { addRunCmd } from "./commands/run-cmd.js";
 import { addRunTestCmd } from "./commands/run-test-cmd.js";
+import { addUploadedPreparedZkeyCmd } from "./commands/upload-prepared-zkey-cmd.js";
 import { addVerificationKeyCmd } from "./commands/verification-key-cmd.js";
 import { addVerifyCmd } from "./commands/verify-cmd.js";
 import { addDigestCommand } from "./lib/digest.js";
-import { addUploadedPreparedZkeyCmd } from "./commands/upload-prepared-zkey-cmd.js";
+import { addCeremonyStartCmd } from "./commands/ceremony-start-cmd.js";
+import { addCeremonyContribute } from "./commands/ceremony-contribute-cmd.js";
 
 const cli = buildCli([
   addCompileCmd,
@@ -49,6 +51,8 @@ const cli = buildCli([
   addGenerateVerifierTestCmd,
   addGenerateNonceCmd,
   addUploadedPreparedZkeyCmd,
+  addCeremonyStartCmd,
+  addCeremonyContribute,
 ]);
 
 async function runCli() {
