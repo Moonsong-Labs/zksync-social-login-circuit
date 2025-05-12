@@ -5,7 +5,8 @@ import { pascalCase } from "change-case";
 
 import { generateVerifierCmd } from "./generate-verifier-cmd.js";
 import { cmd, ROOT_DIR } from "../lib/cmd.js";
-import { MAIN_CIRCUIT_FILE } from "../../lib/constants.js";
+import type { AddCmdFn } from "../base-cli.js";
+import { MAIN_CIRCUIT_FILE } from "../paths.js";
 
 export async function exportVerifierCmd(): Promise<void> {
   const circuitPath = path.join(ROOT_DIR, MAIN_CIRCUIT_FILE);
@@ -26,3 +27,12 @@ export async function exportVerifierCmd(): Promise<void> {
   await generateVerifierCmd(circuitPath, out);
   console.log(`Generated verifier at: ${out}`);
 }
+
+export const addExportVerifierCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "export-verifier",
+    "exports verifier into right contracts folder",
+    async () => {
+      await exportVerifierCmd();
+    });
+};

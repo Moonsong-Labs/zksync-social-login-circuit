@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { cmd } from "../lib/cmd.js";
 import { rawZkeyFilePath } from "./create-zkey-cmd.js";
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 
 export function preparedZkeyFile(name: string): string {
   return `target/${name}/${name}.final.zkey`;
@@ -22,3 +23,11 @@ export async function prepareZkeyCmd(file: string) {
   const finalZkey = `target/${parsed.name}/${parsed.name}.final.zkey`;
   await cmd(`snarkjs zkb ${phase2Zkey} ${finalZkey} ${beacon} 10 -v`);
 }
+
+export const addPrepareZkeyCmd: AddCmdFn = (cli) => {
+  return cli.command("prepare-zkey <file>", "downloads perpetual power of tau file",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await prepareZkeyCmd(argv.file);
+    });
+};

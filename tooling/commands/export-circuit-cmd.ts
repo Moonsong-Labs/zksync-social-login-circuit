@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { MAIN_CIRCUIT_NAME, TARGET_DIR } from "../../lib/constants.js";
 import { cmd, ROOT_DIR } from "../lib/cmd.js";
 import { preparedZkeyFile } from "./prepare-zkey-cmd.js";
+import type { AddCmdFn } from "../base-cli.js";
+import { MAIN_CIRCUIT_NAME, TARGET_DIR } from "../paths.js";
 
 export async function exportCircuitCmd(): Promise<void> {
   const publicDir = path.join(ROOT_DIR, "..", "auth-server", "public");
@@ -33,3 +34,14 @@ export async function exportCircuitCmd(): Promise<void> {
   const snarkJsDst = path.join(publicDir, "snarkjs.min.js");
   fs.copyFileSync(snarkJsOrigin, snarkJsDst);
 }
+
+export const addExportCircuitCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "export-circuit",
+    "Exports circuit files directly into Auth Server public folder",
+    {},
+    async () => {
+      await exportCircuitCmd();
+    },
+  );
+};
