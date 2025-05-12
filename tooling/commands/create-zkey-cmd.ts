@@ -24,7 +24,8 @@ export async function createZkeyCmd(filePath: string, ptauPath: string) {
   const r1cs = r1csFilePath(fileData.name);
 
   const out = rawZkeyFilePath(fileData.name);
-  await cmd(`snarkjs g16s ${r1cs} ${ptauPath} ${out}`);
+  console.log("out", out);
+  await cmd(`snarkjs g16s -v ${r1cs} ${ptauPath} ${out}`);
 }
 
 export const addCreateZkeyCmd: AddCmdFn = (cli) => {

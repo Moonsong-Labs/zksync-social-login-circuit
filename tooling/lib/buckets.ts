@@ -3,6 +3,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 
 import { env, envOrDefault } from "./env.js";
 import type { Readable } from "stream";
+import { MAIN_CIRCUIT_NAME } from "../paths.js";
 
 export async function uploadFile(client: S3Client, body: Buffer, key: string): Promise<void> {
   console.log(`Starting with ${key} upload.`);
@@ -15,7 +16,7 @@ export async function uploadFile(client: S3Client, body: Buffer, key: string): P
       ContentType: "application/octet-stream",
       ACL: "public-read",
     },
-    queueSize: 1,
+    queueSize: Number(envOrDefault("BUCKET_UPLOAD_QUEUE_SIZE", "1")),
     partSize: 1024 * 1024 * 5, // 5MB
   });
 
@@ -51,6 +52,7 @@ async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
 }
 
 export async function downloadS3File(client: S3Client, key: string): Promise<Buffer> {
+  console.log(`Downloading ${key} from bucket...`);
   const getObjCmd = new GetObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,
@@ -75,4 +77,25 @@ export async function listObjectKeys(client: S3Client, prefix: string): Promise<
     .Contents
     .filter((obj) => obj !== undefined)
     .map((obj) => obj.Key!);
+}
+
+export async function getGreatestContribution(client: S3Client): Promise<number> {
+  const keys = await listObjectKeys(client, MAIN_CIRCUIT_NAME);
+  const regex = new RegExp(`^${MAIN_CIRCUIT_NAME}\\.(\\d\\d\\d)\\.zkey$`);
+  const previousContributions = keys
+    .filter((key) => regex.test(key))
+    .sort();
+
+  const latest = previousContributions.at(-1);
+
+  if (!latest) {
+    throw new Error("Ceremony not started in this bucket");
+  }
+
+  const match = latest.match(regex);
+  if (match === null) {
+    throw new Error("Wrong contribution name");
+  }
+
+  return Number(match[1]);
 }

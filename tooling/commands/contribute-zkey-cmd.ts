@@ -3,9 +3,13 @@ import { randomBytes } from "node:crypto";
 import { type AddCmdFn } from "../base-cli.js";
 import { cmd } from "../lib/cmd.js";
 
-function contributionFilePath(name: string, n: number): string {
+export function contributionFileName(name: string, n: number): string {
   const formated = n.toString().padStart(3, "0");
-  return `target/${name}/${name}.${formated}.zkey`;
+  return `${name}.${formated}.zkey`;
+}
+
+export function contributionFilePath(name: string, n: number): string {
+  return `target/${name}/${contributionFileName(name, n)}`;
 }
 
 export async function contributeZkeyCmd(name: string, currentOrder: number, contributor: string) {
