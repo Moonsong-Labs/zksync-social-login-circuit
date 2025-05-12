@@ -4,28 +4,28 @@ import yargs from "yargs";
 
 import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
 import { createNonceV2 } from "../lib/index.js";
-import { allCmd } from "./all.js";
-import { callVerifierCmd } from "./call-verifier.js";
-import { compileCmd } from "./compile.js";
-import { deployVerifier } from "./deploy-verifier.js";
-import { downloadPtau } from "./download-ptau.js";
-import { exportCircuitCmd } from "./export-circuit.js";
-import { exportVerifierCmd } from "./export-verifier.js";
-import { exportVerifierTestCmd } from "./export-verifier-test.js";
-import { inputCommand } from "./generate-input.js";
-import { generateVerifier } from "./generate-verifier.js";
-import { getJwtCmd } from "./get-jwt-cmd.js";
+import { callVerifierCmd } from "./commands/call-verifier-cmd.js";
+import { compileAndExportCmd } from "./commands/compile-and-export-cmd.js";
+import { compileCmd } from "./commands/compile-cmd.js";
+import { createZkeyCmd, DEFAULT_PTAU } from "./commands/create-zkey-cmd.js";
+import { deployVerifierCmd } from "./commands/deploy-verifier-cmd.js";
+import { downloadPtauCmd } from "./commands/download-ptau-cmd.js";
+import { exportCircuitCmd } from "./commands/export-circuit-cmd.js";
+import { exportVerifierCmd } from "./commands/export-verifier-cmd.js";
+import { exportVerifierTestCmd } from "./commands/export-verifier-test.js";
+import { generateInputCmd } from "./commands/generate-input-cmd.js";
+import { generateVerifierCmd } from "./commands/generate-verifier-cmd.js";
+import { generateWitnessCmd } from "./commands/generate-witness-cmd.js";
+import { getJwtCmd } from "./commands/get-jwt-cmd.js";
+import { prepareZkeyCmd } from "./commands/prepare-zkey-cmd.js";
+import { proveCmd } from "./commands/prove-cmd.js";
+import { runCmd } from "./commands/run-cmd.js";
+import { runTestCmd } from "./commands/run-test-cmd.js";
+import { verificationKeyCmd } from "./commands/verification-key-cmd.js";
+import { verifierTestCmd } from "./commands/verifier-test-cmd.js";
+import { verifyCmd } from "./commands/verify-cmd.js";
 import { digestCommand } from "./lib/digest.js";
 import { env } from "./lib/env.js";
-import { prepareZkeyCmd } from "./prepare-zkey.js";
-import { prove } from "./prove.js";
-import { runCmd } from "./run-cmd.js";
-import { runTestCmd } from "./run-test-cmd.js";
-import { verificationKeyCmd } from "./verification-key.js";
-import { verifierTestCmd } from "./verifier-test.js";
-import { verifyCmd } from "./verify.js";
-import { witnessCommand } from "./witness.js";
-import { DEFAULT_PTAU, zkeyCommand } from "./zkey.js";
 
 config();
 
@@ -41,11 +41,11 @@ const args = yargs(process.argv.slice(2))
   .command("compile <file>", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
     await compileCmd(argv.file);
   })
-  .command("input <file>", "generates input for circuit if it knows how to.", FILE_ARG_DEF, async (argv) => {
-    await inputCommand(argv.file);
+  .command("input", "generates input for circuit if it knows how to.", async () => {
+    await generateInputCmd();
   })
   .command("witness <file>", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
-    await witnessCommand(argv.file);
+    await generateWitnessCmd(argv.file);
   })
   .command(
     "zkey <file>",
@@ -61,7 +61,7 @@ const args = yargs(process.argv.slice(2))
     },
     async (argv) => {
       console.warn("For production please use a prepared power of tau.");
-      await zkeyCommand(argv.file, argv.ptau);
+      await createZkeyCmd(argv.file, argv.ptau);
     })
   .command("download-ptau <size>", "downloads perpetual power of tau file", {
     size: {
@@ -70,7 +70,7 @@ const args = yargs(process.argv.slice(2))
       default: DEFAULT_PTAU_SIZE,
     },
   }, async (argv) => {
-    await downloadPtau(argv.size);
+    await downloadPtauCmd(argv.size);
   })
   .command("prepare-zkey <file>", "downloads perpetual power of tau file",
     FILE_ARG_DEF,
@@ -89,7 +89,7 @@ const args = yargs(process.argv.slice(2))
     "Calculates a proof using default inputs",
     FILE_ARG_DEF,
     async (argv) => {
-      await prove(argv.file);
+      await proveCmd(argv.file);
     },
   )
   .command(
@@ -106,7 +106,7 @@ const args = yargs(process.argv.slice(2))
       },
     },
     async (argv) => {
-      await generateVerifier(argv.file, argv.out);
+      await generateVerifierCmd(argv.file, argv.out);
     })
   .command(
     "vkey <file>",
@@ -124,10 +124,9 @@ const args = yargs(process.argv.slice(2))
     })
   .command(
     "export-verifier <file>",
-    "calculates oidc_digest for jwt in env var",
-    FILE_ARG_DEF,
-    async (argv) => {
-      await exportVerifierCmd(argv.file);
+    "exports verifier into right contracts folder",
+    async () => {
+      await exportVerifierCmd();
     })
   .command(
     "export-verifier-test <file>",
@@ -141,7 +140,7 @@ const args = yargs(process.argv.slice(2))
     "deploys verifier to local anvil",
     FILE_ARG_DEF,
     async (argv) => {
-      await deployVerifier(argv.file);
+      await deployVerifierCmd(argv.file);
     },
   )
   .command(
@@ -177,8 +176,8 @@ const args = yargs(process.argv.slice(2))
   .command(
     "all <file>",
     "Performs all neded tasks to export verifier and prepared zkey",
-    FILE_ARG_DEF,
-    async (argv) => allCmd(argv.file),
+    {},
+    async () => compileAndExportCmd(),
   )
   .command(
     "run <file>",

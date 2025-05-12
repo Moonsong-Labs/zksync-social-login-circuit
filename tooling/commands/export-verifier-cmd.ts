@@ -3,10 +3,12 @@ import path from "node:path";
 
 import { pascalCase } from "change-case";
 
-import { generateVerifier } from "./generate-verifier.js";
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
+import { generateVerifierCmd } from "./generate-verifier-cmd.js";
+import { cmd, ROOT_DIR } from "../lib/cmd.js";
+import { MAIN_CIRCUIT_FILE } from "../../lib/constants.js";
 
-export async function exportVerifierCmd(circuitPath: string): Promise<void> {
+export async function exportVerifierCmd(): Promise<void> {
+  const circuitPath = path.join(ROOT_DIR, MAIN_CIRCUIT_FILE);
   const fileData = path.parse(circuitPath);
 
   const contractsDir = path.join(ROOT_DIR, "..", "contracts", "src");
@@ -21,6 +23,6 @@ export async function exportVerifierCmd(circuitPath: string): Promise<void> {
   const fileName = pascalCase(`${fileData.name}-verifier`) + ".sol";
   const out = path.join(outDir, fileName);
 
-  await generateVerifier(circuitPath, out);
+  await generateVerifierCmd(circuitPath, out);
   console.log(`Generated verifier at: ${out}`);
 }

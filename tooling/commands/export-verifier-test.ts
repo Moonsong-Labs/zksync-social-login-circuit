@@ -3,9 +3,9 @@ import path from "node:path";
 
 import { pascalCase } from "change-case";
 
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
-import { testVerifierPath, verifierTestCmd } from "./verifier-test.js";
-import { DEFAULT_PTAU, rawZkeyFilePath, zkeyCommand } from "./zkey.js";
+import { cmd, ROOT_DIR } from "../lib/cmd.js";
+import { createZkeyCmd, DEFAULT_PTAU, rawZkeyFilePath } from "./create-zkey-cmd.js";
+import { testVerifierPath, verifierTestCmd } from "./verifier-test-cmd.js";
 
 export async function exportVerifierTestCmd(circuitPath: string): Promise<void> {
   const fileData = path.parse(circuitPath);
@@ -19,7 +19,7 @@ export async function exportVerifierTestCmd(circuitPath: string): Promise<void> 
   const testPath = testVerifierPath(fileData.name);
   const fullPZkeyPath = path.join(ROOT_DIR, zkey);
   if (!fs.existsSync(fullPZkeyPath)) {
-    await zkeyCommand(circuitPath, DEFAULT_PTAU);
+    await createZkeyCmd(circuitPath, DEFAULT_PTAU);
   }
 
   const fullTestPath = path.join(ROOT_DIR, testPath);

@@ -1,9 +1,9 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { compileCmd } from "./compile.js";
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
-import { witnessCommand } from "./witness.js";
+import { cmd, ROOT_DIR } from "../lib/cmd.js";
+import { compileCmd } from "./compile-cmd.js";
+import { generateWitnessCmd } from "./generate-witness-cmd.js";
 
 export async function runTestCmd(circuitPath: string) {
   const circomFileData = path.parse(circuitPath);
@@ -12,5 +12,5 @@ export async function runTestCmd(circuitPath: string) {
   writeFileSync(inputDestinationPath, Buffer.from("{}", "utf8"));
   await cmd(`mkdir -p ${inputFileData.dir}`);
   await compileCmd(circuitPath);
-  await witnessCommand(circuitPath);
+  await generateWitnessCmd(circuitPath);
 }

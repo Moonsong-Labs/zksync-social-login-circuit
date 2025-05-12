@@ -1,7 +1,7 @@
 import path from "node:path";
 
-import { cmd } from "./lib/cmd.js";
-import { preparedZkeyFile } from "./prepare-zkey.js";
+import { cmd } from "../lib/cmd.js";
+import { preparedZkeyFile } from "./prepare-zkey-cmd.js";
 
 export function verificationKeyPath(name: string): string {
   return `target/${name}/${name}.vkey`;

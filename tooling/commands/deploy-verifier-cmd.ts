@@ -2,11 +2,11 @@
 
 import path from "node:path";
 
-import { defaultVerifierPath } from "./generate-verifier.js";
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
-import { envOrDefault } from "./lib/env.js";
+import { cmd, ROOT_DIR } from "../lib/cmd.js";
+import { envOrDefault } from "../lib/env.js";
+import { defaultVerifierPath } from "./generate-verifier-cmd.js";
 
-export async function deployVerifier(circuit: string): Promise<void> {
+export async function deployVerifierCmd(circuit: string): Promise<void> {
   const data = path.parse(circuit);
 
   const rpcUrl = envOrDefault("RPC_URL", "http://localhost:8011");

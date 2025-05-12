@@ -1,8 +1,8 @@
 import path from "node:path";
 
-import { cmd } from "./lib/cmd.js";
-import { proofPath, publicInputPath } from "./prove.js";
-import { verificationKeyPath } from "./verification-key.js";
+import { cmd } from "../lib/cmd.js";
+import { proofPath, publicInputPath } from "./prove-cmd.js";
+import { verificationKeyPath } from "./verification-key-cmd.js";
 
 export async function verifyCmd(filePath: string) {
   const fileData = path.parse(filePath);

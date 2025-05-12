@@ -1,8 +1,8 @@
 import { randomBytes } from "node:crypto";
 import path from "node:path";
 
-import { cmd } from "./lib/cmd.js";
-import { rawZkeyFilePath } from "./zkey.js";
+import { cmd } from "../lib/cmd.js";
+import { rawZkeyFilePath } from "./create-zkey-cmd.js";
 
 export function preparedZkeyFile(name: string): string {
   return `target/${name}/${name}.final.zkey`;

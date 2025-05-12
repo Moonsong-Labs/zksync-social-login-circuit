@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import * as path from "node:path";
 
-import { cmd } from "./lib/cmd.js";
+import { cmd } from "../lib/cmd.js";
 
 export const DEFAULT_PTAU = "ptaus/ppot_0080_20.ptau";
 
@@ -13,7 +13,7 @@ export function rawZkeyFilePath(name: string): string {
   return `target/${name}/${name}.zkey`;
 }
 
-export async function zkeyCommand(filePath: string, ptauPath: string) {
+export async function createZkeyCmd(filePath: string, ptauPath: string) {
   const fileData = path.parse(filePath);
 
   if (!existsSync(ptauPath)) {
