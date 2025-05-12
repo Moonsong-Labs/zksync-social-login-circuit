@@ -42,7 +42,7 @@ export function createS3Client(): S3Client {
   });
 }
 
-async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
+export async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     stream.on("data", (chunk) => chunks.push(chunk));

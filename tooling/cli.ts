@@ -27,6 +27,7 @@ import { addDigestCommand } from "./lib/digest.js";
 import { addCeremonyStartCmd } from "./commands/ceremony-start-cmd.js";
 import { addCeremonyContribute } from "./commands/ceremony-contribute-cmd.js";
 import { addCeremonyFinishCmd } from "./commands/ceremony-finish-cmd.js";
+import { addZkeyRecreateCmd } from "./commands/zkey-recreate-cmd.js";
 
 const cli = buildCli([
   addCompileCmd,
@@ -55,6 +56,7 @@ const cli = buildCli([
   addCeremonyStartCmd,
   addCeremonyContribute,
   addCeremonyFinishCmd,
+  addZkeyRecreateCmd,
 ]);
 
 async function runCli() {
