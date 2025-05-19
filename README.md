@@ -5,7 +5,7 @@ key, and issued by a specific issuer, to a given user in the context of a given
 app.
 
 This repo also includes a library to interact with the circuit from typescript
-in a confortable way, and a CLI to help with the development tasks
+in a comfortable way, and a CLI to help with the development tasks
 
 
 ## About the repo
