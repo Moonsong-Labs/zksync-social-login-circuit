@@ -11,7 +11,6 @@ export async function generateWitnessCmd(filePath: string) {
   const fileData = path.parse(filePath);
 
   const input = `inputs/${filePath.replace(".circom", ".input.json")}`;
-  console.log(input);
   if (!existsSync(input)) {
     throw new Error("Missing input. try running `tooling input :circuit:`");
   }
