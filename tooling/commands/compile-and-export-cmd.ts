@@ -47,7 +47,7 @@ export async function compileAndExportCmd() {
 export const addCompileAndExportCmd: AddCmdFn = (cli) => {
   return cli.command(
     "all",
-    "Performs all neded tasks to export verifier and prepared zkey",
+    "Performs all needed tasks to export verifier and prepared zkey",
     {},
     async () => compileAndExportCmd(),
   );
