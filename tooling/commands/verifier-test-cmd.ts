@@ -1,7 +1,7 @@
 import path from "node:path";
 
-import { cmd, cmdArgs } from "./lib/cmd.js";
-import { rawZkeyFilePath } from "./zkey.js";
+import { cmd, cmdArgs } from "../lib/cmd.js";
+import { rawZkeyFilePath } from "./create-zkey-cmd.js";
 
 export function testVerifierPath(name: string): string {
   return `target/${name}/verifier-test.sol`;

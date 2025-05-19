@@ -1,17 +1,16 @@
 import { existsSync } from "node:fs";
 import * as path from "node:path";
 
-import { cmd } from "./lib/cmd.js";
+import { cmd } from "../lib/cmd.js";
 
 export function witnessFile(name: string): string {
   return `target/${name}/${name}.wtns`;
 }
 
-export async function witnessCommand(filePath: string) {
+export async function generateWitnessCmd(filePath: string) {
   const fileData = path.parse(filePath);
 
-  const input = `inputs/${fileData.name}.input.json`;
-
+  const input = `inputs/${filePath.replace(".circom", ".input.json")}`;
   if (!existsSync(input)) {
     throw new Error("Missing input. try running `tooling input :circuit:`");
   }

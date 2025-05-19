@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { cmd, ROOT_DIR } from "./lib/cmd.js";
-import { preparedZkeyFile } from "./prepare-zkey.js";
+import { MAIN_CIRCUIT_NAME, TARGET_DIR } from "../../lib/constants.js";
+import { cmd, ROOT_DIR } from "../lib/cmd.js";
+import { preparedZkeyFile } from "./prepare-zkey-cmd.js";
 
 export async function exportCircuitCmd(): Promise<void> {
   const publicDir = path.join(ROOT_DIR, "..", "auth-server", "public");
@@ -13,17 +14,14 @@ export async function exportCircuitCmd(): Promise<void> {
   const outDir = path.join(publicDir, "circuit");
 
   await cmd(`mkdir -p ${outDir}`);
-
-  const mainName = "jwt-tx-validation";
-
-  const wasmOrigin = path.join(ROOT_DIR, "target", mainName, `${mainName}_js`, `${mainName}.wasm`);
+  const wasmOrigin = path.join(ROOT_DIR, TARGET_DIR, MAIN_CIRCUIT_NAME, `${MAIN_CIRCUIT_NAME}_js`, `${MAIN_CIRCUIT_NAME}.wasm`);
   if (!fs.existsSync(wasmOrigin)) {
     throw new Error("Missing wasm file. Try running running `pnpm tool compile` first");
   }
   const wasmDst = path.join(outDir, "witness.wasm");
   fs.copyFileSync(wasmOrigin, wasmDst);
 
-  const zkOrigin = preparedZkeyFile(mainName);
+  const zkOrigin = preparedZkeyFile(MAIN_CIRCUIT_NAME);
   if (!fs.existsSync(zkOrigin)) {
     throw new Error("Missing zkey file. Please generate and prepare it first.");
   }
