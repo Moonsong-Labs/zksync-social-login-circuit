@@ -1,9 +1,9 @@
 import { GetObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-
-import { env, envOrDefault } from "./env.js";
 import type { Readable } from "stream";
+
 import { MAIN_CIRCUIT_NAME } from "../paths.js";
+import { env, envOrDefault } from "./env.js";
 
 export async function uploadFile(client: S3Client, body: Buffer, key: string): Promise<void> {
   console.log(`Starting with ${key} upload.`);
