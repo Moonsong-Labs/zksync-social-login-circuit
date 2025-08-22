@@ -44,7 +44,6 @@ internal CLI tool that can be used to perform the steps needed to make the
 circuit work:
 
 ```bash
-# Compile the circuit
 pnpm tool --help
 ```
 
