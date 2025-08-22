@@ -131,7 +131,7 @@ With this, the witness can be calculated:
 
 ```shell
 pnpm tool input
-pnpm tool witness jwt-tx-validation.circom
+pnpm tool witness
 ```
 
 With the witness the proof can be generated
