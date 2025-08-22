@@ -118,7 +118,7 @@ const args = yargs(process.argv.slice(2))
       await verificationKeyCmd(argv.file);
     })
   .command(
-    "verify <file>",
+    "verify [file]",
     "exports verification key for a circuit",
     FILE_ARG_DEF,
     async (argv) => {
