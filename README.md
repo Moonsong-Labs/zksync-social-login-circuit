@@ -87,14 +87,16 @@ echo "TARGET_ADDRESS=0x70997970C51812dc3A010C7d01b50e0d17dc79C8" >> .env
 Once this is set, we need get our nonce:
 
 ``` shelll
-pnpm tool create-nonce 
+pnpm tool create-nonce
 ```
 
-From that we need to take the "sendHash" and store it in another env variable:
+This prints 2 values: Packed nonce and senderHash. The packed nonce is the combination
+between the blinding factor and the senderHash. We only need to store the senderHash to move forward:
 
 ```shell
 echo "NONCE_CONTENT=<senderHash>" >> .env
 ```
+
 
 Now we can get a valid jwt:
 
