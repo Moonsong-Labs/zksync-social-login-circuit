@@ -1,9 +1,7 @@
 import { config } from "dotenv";
-import { getAddress, type Hex, pad } from "viem";
 import yargs from "yargs";
 
 import { DEFAULT_PTAU_SIZE } from "../lib/constants.js";
-import { createNonceV2 } from "../lib/index.js";
 import { callVerifierCmd } from "./commands/call-verifier-cmd.js";
 import { compileAndExportCmd } from "./commands/compile-and-export-cmd.js";
 import { compileCmd } from "./commands/compile-cmd.js";
@@ -25,30 +23,34 @@ import { verificationKeyCmd } from "./commands/verification-key-cmd.js";
 import { verifierTestCmd } from "./commands/verifier-test-cmd.js";
 import { verifyCmd } from "./commands/verify-cmd.js";
 import { digestCommand } from "./lib/digest.js";
-import { env } from "./lib/env.js";
+import path from "node:path";
+import { ROOT_DIR } from "./lib/cmd.js";
+import { generateNonceCmd } from "./commands/generate-nonce-cmd.js";
 
 config();
 
 const FILE_ARG_DEF = {
   file: {
     type: "string",
-    demandOption: true,
+    demandOption: false,
+    default: path.join(ROOT_DIR, 'jwt-tx-validation.circom')
   },
 } as const;
 
 const args = yargs(process.argv.slice(2))
   .scriptName("tooling")
-  .command("compile <file>", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
-    await compileCmd(argv.file);
-  })
+  .command("compile [file]", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF,
+    async (argv) => {
+      await compileCmd(argv.file);
+    })
   .command("input", "generates input for circuit if it knows how to.", async () => {
     await generateInputCmd();
   })
-  .command("witness <file>", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
+  .command("witness [file]", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
     await generateWitnessCmd(argv.file);
   })
   .command(
-    "zkey <file>",
+    "zkey [file]",
     "generate a zkey file for a circuit",
     {
       file: FILE_ARG_DEF.file,
@@ -63,16 +65,16 @@ const args = yargs(process.argv.slice(2))
       console.warn("For production please use a prepared power of tau.");
       await createZkeyCmd(argv.file, argv.ptau);
     })
-  .command("download-ptau <size>", "downloads perpetual power of tau file", {
+  .command("download-ptau [size]", "downloads perpetual power of tau file", {
     size: {
       type: "number",
-      demandOption: true,
+      demandOption: false,
       default: DEFAULT_PTAU_SIZE,
     },
   }, async (argv) => {
     await downloadPtauCmd(argv.size);
   })
-  .command("prepare-zkey <file>", "downloads perpetual power of tau file",
+  .command("prepare-zkey [file]", "downloads perpetual power of tau file",
     FILE_ARG_DEF,
     async (argv) => {
       await prepareZkeyCmd(argv.file);
@@ -85,7 +87,7 @@ const args = yargs(process.argv.slice(2))
       await digestCommand();
     })
   .command(
-    "prove <file>",
+    "prove [file]",
     "Calculates a proof using default inputs",
     FILE_ARG_DEF,
     async (argv) => {
@@ -109,7 +111,7 @@ const args = yargs(process.argv.slice(2))
       await generateVerifierCmd(argv.file, argv.out);
     })
   .command(
-    "vkey <file>",
+    "vkey [file]",
     "exports verification key for a circuit",
     FILE_ARG_DEF,
     async (argv) => {
@@ -160,17 +162,11 @@ const args = yargs(process.argv.slice(2))
     },
   )
   .command(
-    "get-jwt <nonce>",
+    "get-jwt",
     "Helps to perform oidc flow with given nonce. Prints resulting JWT.",
-    {
-      nonce: {
-        type: "string",
-        demandOption: true,
-        description: "Nonce used to obtain jwt",
-      },
-    },
-    async (argv) => {
-      await getJwtCmd(argv.nonce);
+    {},
+    async (_argv) => {
+      await getJwtCmd();
     },
   )
   .command(
@@ -204,40 +200,11 @@ const args = yargs(process.argv.slice(2))
     },
   )
   .command(
-    "create-nonce <sender> <target> <passkeyHash> <nonce>",
+    "create-nonce",
     "Creates a nonce for a given address and nonce",
-    {
-      sender: {
-        type: "string",
-        demandOption: true,
-        description: "Address of the sender of the tx",
-      },
-      target: {
-        type: "string",
-        demandOption: true,
-        description: "Address of the account to recover",
-      },
-      passkeyHash: {
-        type: "string",
-        demandOption: true,
-        description: "hash of new passkey",
-      },
-      nonce: {
-        type: "string",
-        demandOption: true,
-        description: "OidcRecoveryValidator Contract nonce",
-      },
-    },
-    async (argv) => {
-      const nonce = createNonceV2(
-        getAddress(argv.sender),
-        getAddress(argv.target),
-        pad(argv.passkeyHash as Hex),
-        BigInt(argv.nonce),
-        BigInt(env("BLINDING_FACTOR")),
-        BigInt(env("TIMESTAMP_LIMIT")),
-      );
-      console.log(nonce);
+    {},
+    async (_argv) => {
+      await generateNonceCmd();
     },
   )
   .strictCommands()
