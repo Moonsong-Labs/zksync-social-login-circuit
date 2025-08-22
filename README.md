@@ -105,7 +105,7 @@ pnpm tool get-jwt
 ```
 
 This is going to print a link to login to a dummy google app.
-After a jwt and a jwk modulous are going to be printed in the terminal. Both need to
+After a jwt and a jwk modulus are going to be printed in the terminal. Both need to
 be saved as en vars
 
 ``` shell
