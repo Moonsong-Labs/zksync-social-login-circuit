@@ -10,8 +10,8 @@ export function witnessFile(name: string): string {
 export async function generateWitnessCmd(filePath: string) {
   const fileData = path.parse(filePath);
 
-  const input = `inputs/${filePath.replace(".circom", ".input.json")}`;
-  if (!existsSync(input)) {
+  const inputFilePath = path.join('inputs', `${fileData.name}.input.json`);
+  if (!existsSync(inputFilePath)) {
     throw new Error("Missing input. try running `tooling input :circuit:`");
   }
 
@@ -24,5 +24,5 @@ export async function generateWitnessCmd(filePath: string) {
   }
 
   await cmd(`mkdir -p target/${fileData.name}`);
-  await cmd(`node ${wtnsScript} ${wasm} ${input} ${out}`);
+  await cmd(`node ${wtnsScript} ${wasm} ${inputFilePath} ${out}`);
 }
