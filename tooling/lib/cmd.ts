@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { join } from "node:path";
 
-const thisDir = import.meta.dirname;
+const thisDir = ".";
 export const ROOT_DIR = join(thisDir, "..", "..");
 
 export async function cmdArgs(cmd: string, args: string[]) {
