@@ -19,7 +19,7 @@ export async function verificationKeyCmd(filePath: string) {
 
 export const addVerificationKeyCmd: AddCmdFn = (cli) => {
   return cli.command(
-    "vkey <file>",
+    "vkey [file]",
     "exports verification key for a circuit",
     FILE_ARG_DEF,
     async (argv) => {

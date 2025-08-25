@@ -25,7 +25,7 @@ export async function prepareZkeyCmd(file: string) {
 }
 
 export const addPrepareZkeyCmd: AddCmdFn = (cli) => {
-  return cli.command("prepare-zkey <file>", "downloads perpetual power of tau file",
+  return cli.command("prepare-zkey [file]", "downloads perpetual power of tau file",
     FILE_ARG_DEF,
     async (argv) => {
       await prepareZkeyCmd(argv.file);

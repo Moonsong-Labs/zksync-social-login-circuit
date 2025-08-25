@@ -86,17 +86,11 @@ export async function getJwtCmd() {
 
 export const addGetJwtCmd: AddCmdFn = (cli) => {
   return cli.command(
-    "get-jwt <nonce>",
+    "get-jwt",
     "Helps to perform oidc flow with given nonce. Prints resulting JWT.",
-    {
-      nonce: {
-        type: "string",
-        demandOption: true,
-        description: "Nonce used to obtain jwt",
-      },
-    },
+    {},
     async (argv) => {
-      await getJwtCmd(argv.nonce);
+      await getJwtCmd();
     },
   );
 };

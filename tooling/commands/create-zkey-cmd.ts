@@ -30,7 +30,7 @@ export async function createZkeyCmd(filePath: string, ptauPath: string) {
 
 export const addCreateZkeyCmd: AddCmdFn = (cli) => {
   return cli.command(
-    "zkey <file>",
+    "zkey [file]",
     "generate a zkey file for a circuit",
     {
       file: FILE_ARG_DEF.file,

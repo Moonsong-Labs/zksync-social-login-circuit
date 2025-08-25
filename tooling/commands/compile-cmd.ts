@@ -25,7 +25,7 @@ export async function compileCmd(filePath: string) {
 }
 
 export const addCompileCmd: AddCmdFn = (cli) => {
-  return cli.command("compile <file>", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
+  return cli.command("compile [file]", "compiles circuit to wasm, sym and r1cs", FILE_ARG_DEF, async (argv) => {
     await compileCmd(argv.file);
   });
 };
