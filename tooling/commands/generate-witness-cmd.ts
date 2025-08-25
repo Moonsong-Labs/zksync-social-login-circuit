@@ -11,10 +11,8 @@ export function witnessFile(name: string): string {
 export async function generateWitnessCmd(filePath: string) {
   const fileData = path.parse(filePath);
 
-  console.log(filePath);
-  const input = `inputs/${filePath.replace(".circom", ".input.json")}`;
-  console.log(input);
-  if (!existsSync(input)) {
+  const inputFilePath = path.join('inputs', `${fileData.name}.input.json`);
+  if (!existsSync(inputFilePath)) {
     throw new Error("Missing input. try running `tooling input :circuit:`");
   }
 
@@ -27,11 +25,11 @@ export async function generateWitnessCmd(filePath: string) {
   }
 
   await cmd(`mkdir -p target/${fileData.name}`);
-  await cmd(`node ${wtnsScript} ${wasm} ${input} ${out}`);
+  await cmd(`node ${wtnsScript} ${wasm} ${inputFilePath} ${out}`);
 }
 
 export const addGenerateWitnessCmd: AddCmdFn = (cli) => {
-  return cli.command("witness <file>", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
+  return cli.command("witness [file]", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
     await generateWitnessCmd(argv.file);
   });
 };

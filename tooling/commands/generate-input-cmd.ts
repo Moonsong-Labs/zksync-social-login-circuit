@@ -18,7 +18,7 @@ export async function generateInputCmd() {
   const circomFileData = path.parse(filePath);
 
   const rawJWT = env("RAW_JWT");
-  const jwkModulus = env("JWK_MODULOUS");
+  const jwkModulus = env("JWK_MODULUS");
   const salt = env("SALT") as Hex;
   const nonceContent = env("NONCE_CONTENT") as Hex;
   const blindingFactor = BigInt(env("BLINDING_FACTOR"));

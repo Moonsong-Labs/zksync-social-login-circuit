@@ -1,4 +1,6 @@
 import yargs from "yargs";
+import path from "node:path";
+import { ROOT_DIR } from "./lib/cmd.js";
 
 export const baseCli = yargs(process.argv.slice(2))
   .scriptName("tooling")
@@ -12,7 +14,8 @@ export type AddCmdFn = (cli: BaseCli) => BaseCli;
 export const FILE_ARG_DEF = {
   file: {
     type: "string",
-    demandOption: true,
+    demandOption: false,
+    default: path.join(ROOT_DIR, 'jwt-tx-validation.circom')
   },
 } as const;
 

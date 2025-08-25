@@ -39,14 +39,15 @@ function waitForJwt(): Promise<string> {
 
     app.get("/oauth/plain", async (_req, res) => {
       res.contentType("text/html");
-      res.send("<script>const a = encodeURIComponent(location.href); fetch('/finish/?url=' + a)</script>");
+      res.send("<script>const a = encodeURIComponent(location.href); fetch('/finish/?url=' + a).then(() => document.getElementById('done').innerText = 'Done!')</script><h1 id='done'></h1>");
     });
 
     const server = app.listen(3002, () => console.log("Listening..."));
   });
 }
 
-export async function getJwtCmd(nonceContent: string) {
+export async function getJwtCmd() {
+  const nonceContent = env('NONCE_CONTENT');
   const rawBlindingFactor = env("BLINDING_FACTOR");
 
   if (!rawBlindingFactor) {
@@ -80,7 +81,7 @@ export async function getJwtCmd(nonceContent: string) {
     throw new Error("Unable to get jwk");
   }
 
-  console.log(`${rawJwt}\n\n${jwk.n}`);
+  console.log(`RAW_JWT=${rawJwt}\nJWK_MODULUS=${jwk.n}`);
 }
 
 export const addGetJwtCmd: AddCmdFn = (cli) => {
