@@ -27,7 +27,7 @@ export async function uploadFile(client: S3Client, body: Buffer, key: string): P
   await upload.done();
 }
 
-export const BUCKET_NAME = env("BUCKET_ENDPOINT");
+export const getBucketName = () => env("BUCKET_ENDPOINT");
 
 export function createS3Client(): S3Client {
   return new S3Client({
@@ -54,7 +54,7 @@ export async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
 export async function downloadS3File(client: S3Client, key: string): Promise<Buffer> {
   console.log(`Downloading ${key} from bucket...`);
   const getObjCmd = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
+    Bucket: getBucketName(),
     Key: key,
   });
   const getObjResponse = await client.send(getObjCmd);
@@ -63,7 +63,7 @@ export async function downloadS3File(client: S3Client, key: string): Promise<Buf
 
 export async function listObjectKeys(client: S3Client, prefix: string): Promise<string[]> {
   const searchObjects = new ListObjectsV2Command({
-    Bucket: BUCKET_NAME,
+    Bucket: getBucketName(),
     Prefix: prefix,
   });
 
