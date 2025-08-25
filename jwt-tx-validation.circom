@@ -2,7 +2,8 @@ pragma circom 2.1.6;
 
 include "./utils/fields.circom";
 include "./utils/jwt-verify.circom";
-include "@zk-email/circuits/utils/bytes.circom";
+// Using local bytes utility instead of external @zk-email/circuits dependency
+include "./utils/bytes.circom";
 include "circomlib/circuits/poseidon.circom";
 include "./utils/jwt-data.circom";
 include "./utils/verify-oidc-digest.circom";

@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { config } from "dotenv";
 import yargs from "yargs";
 
@@ -12,6 +14,7 @@ import { exportCircuitCmd } from "./commands/export-circuit-cmd.js";
 import { exportVerifierCmd } from "./commands/export-verifier-cmd.js";
 import { exportVerifierTestCmd } from "./commands/export-verifier-test.js";
 import { generateInputCmd } from "./commands/generate-input-cmd.js";
+import { generateNonceCmd } from "./commands/generate-nonce-cmd.js";
 import { generateVerifierCmd } from "./commands/generate-verifier-cmd.js";
 import { generateWitnessCmd } from "./commands/generate-witness-cmd.js";
 import { getJwtCmd } from "./commands/get-jwt-cmd.js";
@@ -22,10 +25,8 @@ import { runTestCmd } from "./commands/run-test-cmd.js";
 import { verificationKeyCmd } from "./commands/verification-key-cmd.js";
 import { verifierTestCmd } from "./commands/verifier-test-cmd.js";
 import { verifyCmd } from "./commands/verify-cmd.js";
-import { digestCommand } from "./lib/digest.js";
-import path from "node:path";
 import { ROOT_DIR } from "./lib/cmd.js";
-import { generateNonceCmd } from "./commands/generate-nonce-cmd.js";
+import { digestCommand } from "./lib/digest.js";
 
 config();
 
@@ -33,7 +34,7 @@ const FILE_ARG_DEF = {
   file: {
     type: "string",
     demandOption: false,
-    default: path.join(ROOT_DIR, 'jwt-tx-validation.circom')
+    default: path.join(ROOT_DIR, "jwt-tx-validation.circom"),
   },
 } as const;
 
