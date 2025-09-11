@@ -1,12 +1,14 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import { type AddCmdFn } from "../base-cli.js";
 import { cmd } from "../lib/cmd.js";
 import { env, envOrDefault } from "../lib/env.js";
 import { proofPath, publicInputPath } from "./prove-cmd.js";
+import { MAIN_CIRCUIT_PATH } from "../paths.js";
 
-export async function callVerifierCmd(circuit: string) {
-  const fileData = path.parse(circuit);
+export async function callVerifierCmd() {
+  const fileData = path.parse(MAIN_CIRCUIT_PATH);
   const addr = env("VERIFIER_ADDR");
   const rpcUrl = envOrDefault("RPC_URL", "http://localhost:8011");
 
@@ -28,3 +30,14 @@ export async function callVerifierCmd(circuit: string) {
 
   await cmd(`cast send --private-key=${privKey} --rpc-url ${rpcUrl} ${addr} ${fnSign} ${piA} ${piB} ${piC} ${serializedPub}`);
 }
+
+export const addCallVerifierCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "call-verifier",
+    "cast calls verifier",
+    {},
+    async () => {
+      await callVerifierCmd();
+    },
+  );
+};

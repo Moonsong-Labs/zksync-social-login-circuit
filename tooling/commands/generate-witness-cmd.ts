@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import * as path from "node:path";
 
 import { cmd } from "../lib/cmd.js";
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 
 export function witnessFile(name: string): string {
   return `target/${name}/${name}.wtns`;
@@ -26,3 +27,9 @@ export async function generateWitnessCmd(filePath: string) {
   await cmd(`mkdir -p target/${fileData.name}`);
   await cmd(`node ${wtnsScript} ${wasm} ${inputFilePath} ${out}`);
 }
+
+export const addGenerateWitnessCmd: AddCmdFn = (cli) => {
+  return cli.command("witness [file]", "generate a witness file from an input generated previously", FILE_ARG_DEF, async (argv) => {
+    await generateWitnessCmd(argv.file);
+  });
+};

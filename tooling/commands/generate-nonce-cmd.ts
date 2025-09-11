@@ -1,4 +1,5 @@
 import { ByteVector, createNonceV2 } from "../../lib/index.js";
+import type { AddCmdFn } from "../base-cli.js";
 import { env } from "../lib/env.js";
 
 export async function generateNonceCmd() {
@@ -23,3 +24,14 @@ export async function generateNonceCmd() {
   console.log(`senderHash (nonce content): ${senderHash}`);
   console.log(`packed nonce: ${nonce}`);
 }
+
+export const addGenerateNonceCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "create-nonce",
+    "Creates a nonce for a given address and nonce",
+    {},
+    async (argv) => {
+      return generateNonceCmd();
+    },
+  );
+};

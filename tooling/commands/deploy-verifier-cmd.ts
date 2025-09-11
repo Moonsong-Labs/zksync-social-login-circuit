@@ -5,6 +5,7 @@ import path from "node:path";
 import { cmd, ROOT_DIR } from "../lib/cmd.js";
 import { envOrDefault } from "../lib/env.js";
 import { defaultVerifierPath } from "./generate-verifier-cmd.js";
+import { type AddCmdFn, FILE_ARG_DEF } from "../base-cli.js";
 
 export async function deployVerifierCmd(circuit: string): Promise<void> {
   const data = path.parse(circuit);
@@ -17,3 +18,14 @@ export async function deployVerifierCmd(circuit: string): Promise<void> {
 
   await cmd(`forge create --rpc-url ${rpcUrl} --private-key ${privKey} --zksync ${ROOT_DIR}/${verifier}:Groth16Verifier`);
 }
+
+export const addDeployVerifierCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "deploy-verifier <file>",
+    "deploys verifier to local anvil",
+    FILE_ARG_DEF,
+    async (argv) => {
+      await deployVerifierCmd(argv.file);
+    },
+  );
+};

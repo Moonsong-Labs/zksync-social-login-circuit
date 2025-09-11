@@ -4,6 +4,7 @@ import express from "express";
 
 import { ByteVector, createNonce, JWT } from "../../lib/index.js";
 import { env } from "../lib/env.js";
+import type { AddCmdFn } from "../base-cli.js";
 
 function waitForJwt(): Promise<string> {
   const app = express();
@@ -82,3 +83,14 @@ export async function getJwtCmd() {
 
   console.log(`RAW_JWT=${rawJwt}\nJWK_MODULUS=${jwk.n}`);
 }
+
+export const addGetJwtCmd: AddCmdFn = (cli) => {
+  return cli.command(
+    "get-jwt",
+    "Helps to perform oidc flow with given nonce. Prints resulting JWT.",
+    {},
+    async (argv) => {
+      await getJwtCmd();
+    },
+  );
+};

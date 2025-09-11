@@ -160,3 +160,37 @@ of the main one.
 
 Inside the `test` folder there are circuits used exclusively for testing
 purposes.
+
+
+# Cermony commands ()
+
+TODO improve
+
+## Upload prepared zkey to a bucket
+
+The easiest way to make a prepared zkey file public is upload
+it to a s3-like bucket. That can be done as follows.
+
+First set the following environment variables:
+
+```dotenv
+BUCKET_ENDPOINT="<your-bucket-endpoint>"
+BUCKET_KEY="<your-key-id>"
+BUCKET_SECRET="<your-key-secret>"
+```
+
+Please also ensure that circom is installed:
+
+https://docs.circom.io/getting-started/installation/
+
+Once those are set you can run:
+
+``` bash
+pnpm tool upload-final-zkey -f
+```
+
+The `-f` flag is going to force the process to recompile the circuit
+and recreate the contributions to the zkey file.
+
+The process takes some time, but at the end both the zkey and the wasm
+files will be uploaded to the bucket with public read settings.
